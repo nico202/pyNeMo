@@ -61,7 +61,7 @@ if __name__ == "__main__":
         iz = net.add_neuron_type('Izhikevich')
         nemo_config = nemo.Configuration()
 
-        #TODO: for small network, cpu is faster, use it (if config permits)
+        #TODO: for small networks, cpu is faster, use it (if config permits)
         if general_config._GPU:
             try:
                 nemo_config.set_cuda_backend(general_config._BACKEND_NUMBER)
@@ -73,13 +73,13 @@ if __name__ == "__main__":
         # Neurons
         neuron_list = config.neurons[0]
         for nidx in range(len(neuron_list)):
-            a, b, c, d = neuron_list[nidx]
+            a, b, c, d = neuron_list[nidx] #FIXME: add the other parameters
             net.add_neuron(iz, nidx, a, b, c, d, 5.0, 0.2*c, c) #What is u, v ?
 
         #Synapses
         for sidx in range(len(config.synapses)):
             source, dests, synaptic_prop = config.synapses[sidx]
-            learning, weights, boh = synaptic_prop
+            delay, weights, plastic = synaptic_prop
             try: #dests is a single value or a list?
                 dests = int(dests)
                 dests = [ dests ]
@@ -98,7 +98,7 @@ if __name__ == "__main__":
                 else:
                     exit("Malformed synapse line %d" % (sidx + 1))
 
-            net.add_synapse(source, dests, 1, weights, False);
+            net.add_synapse(source, dests, delay, weights, plastic);
 
         conf = nemo.Configuration()
         sim = nemo.Simulation(net, conf)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             while not t == 0:
                 general_config.steps
                 fired = sim.step()
-                output_firings[t] = [ i for i in fired[:]]
+                output_firings[t] = [ i for i in fired ]
                 t -= 1
 
     end = time.time()
@@ -137,5 +137,6 @@ if __name__ == "__main__":
     history = open("history.log", 'a') #Update the history with results timing
     history.write("%f, %f\n" % (total_time, step_time))
     history.close()
-    print("DEBUG: total_time = %f" % (total_time))
-    print("DEBUG: step_time = %f" % (step_time))
+    if general_config._DEBUG:
+        print("DEBUG: total_time = %f" % (total_time))
+        print("DEBUG: step_time = %f" % (step_time))
