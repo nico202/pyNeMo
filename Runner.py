@@ -27,6 +27,15 @@ if __name__ == "__main__":
         print("DEBUG: Unknown error")
         raise
 
+    try:
+        force_run = argv[2]
+        if force_run == "--force":
+            force_run = True
+        else:
+            force_run = False
+    except:
+        force_run = False
+
     bypass = False
     if startup_check(general_config._history_dir):
         os.chdir(general_config._history_dir)
@@ -52,8 +61,8 @@ if __name__ == "__main__":
                 print open(old_output, 'r').readlines()
             else:
                 print("Simulation has previously been executed!")
-                print("Watch the file %s" % ( general_config._history_dir + '/' + old_output))
-                bypass = True
+                print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
+                bypass = True and not force_run
 
     #TODO: create an array of all the config. Hash it and save it.
     if not bypass:
@@ -124,12 +133,16 @@ if __name__ == "__main__":
                 to_save = config.save
             except:
                 to_save = []
-            if to_save: #Every optimization here matter
+            if to_save: #Every optimization here matters
                 while not t == 0:
                     general_config.steps
                     fired = sim.step()
                     for neuron in to_save:
-                        print net.get_neuron_state(neuron, 1)
+                        value = net.get_neuron_state(neuron, 1)
+                        if value != -65.0:
+                            print value
+                        else:
+                            print "same"
                     output_firings[t] = [ i for i in fired ]
                     t -= 1
             else:
@@ -138,11 +151,10 @@ if __name__ == "__main__":
                     fired = sim.step()
                     output_firings[t] = [ i for i in fired ]
                     t -= 1
-
     end = time.time()
 
     if not bypass:
-        #TODO /FIX: if this is slow for big networks, replace with pickle
+        #TODO/FIXME: if this is slow for big networks, replace with pickle
         saveKey(general_config_hash + config_hash, output_firings)
 
     total_time = end - start
