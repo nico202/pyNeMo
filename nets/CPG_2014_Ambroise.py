@@ -5,6 +5,8 @@ neurons = [ #TODO: support other type of neurons? Right now, IZ only
      FastSpiking * 8
 ]
 
+save = [0]
+
 #synapses:
 #From, to, (delay, weight, plastic)
 #"To" can be both an array or a single value

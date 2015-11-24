@@ -120,11 +120,24 @@ if __name__ == "__main__":
                     T = tot - t
                 print T, ":", fired
         else:
-            while not t == 0:
-                general_config.steps
-                fired = sim.step()
-                output_firings[t] = [ i for i in fired ]
-                t -= 1
+            try:
+                to_save = config.save
+            except:
+                to_save = []
+            if to_save: #Every optimization here matter
+                while not t == 0:
+                    general_config.steps
+                    fired = sim.step()
+                    for neuron in to_save:
+                        print net.get_neuron_state(neuron, 1)
+                    output_firings[t] = [ i for i in fired ]
+                    t -= 1
+            else:
+                while not t == 0:
+                    general_config.steps
+                    fired = sim.step()
+                    output_firings[t] = [ i for i in fired ]
+                    t -= 1
 
     end = time.time()
 
