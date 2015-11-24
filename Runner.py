@@ -73,8 +73,8 @@ if __name__ == "__main__":
         # Neurons
         neuron_list = config.neurons[0]
         for nidx in range(len(neuron_list)):
-            a, b, c, d = neuron_list[nidx] #FIXME: add the other parameters
-            net.add_neuron(iz, nidx, a, b, c, d, 5.0, 0.2*c, c) #What is u, v ?
+            a, b, c, d, s, u, v = neuron_list[nidx] #FIXME: add the other parameters
+            net.add_neuron(iz, nidx, a, b, c, d, s, u, v) #What is u, v ?
 
         #Synapses
         for sidx in range(len(config.synapses)):
@@ -89,7 +89,7 @@ if __name__ == "__main__":
             try: #if weight length is 1, apply it to all synapses
                 weights = int(weights)
                 weights = [ weights ]
-            except TypeError:
+            except TypeError: #Already an array
                 pass
 
             if ( len(weights) != len(dests) ):

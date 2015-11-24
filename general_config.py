@@ -1,4 +1,4 @@
-steps = 3000       #if step == 0, run indefinitely (how to stop?)
+steps = 10000       #if step == 0, run indefinitely (how to stop?)
 
 #Prevent different Runner version being considered the same config
 commit_version = open(".git/refs/heads/master", 'r').readline().rstrip()
