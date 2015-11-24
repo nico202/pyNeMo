@@ -2,7 +2,13 @@
 
 from sys import argv, exit
 import ast #load saved dict
-import Image
+try:
+    import Image
+    have_Image = True
+except:
+    have_Image = False
+    print("You don't have Image installed! Printing to terminal")
+    print("Please note: this is not optimal. Install Image")
 
 
 black = (0, 0, 0)
@@ -25,13 +31,29 @@ for l in source:
         y = max(i, y)
 
 print x, y
-img = Image.new( 'RGB', (x,y+1), "white") # create a new black image
-pixels = img.load() # create the pixel map
+if have_Image:
+    img = Image.new( 'RGB', (x,y+1), "white") # create a new black image
+    pixels = img.load() # create the pixel map
 
-for i in range(1, x+1):    # for every pixel:
-    col = source[i]
-    if col:
-        for l in col:
-            pixels[i -1, l ] = black
+    for i in range(1, x+1):    # for every pixel:
+        col = source[i]
+        if col:
+            for l in col:
+                pixels[i -1, l ] = black
 
-img.show()
+    img.show()
+else:
+    for i in range(1, x+1):    # for every pixel:
+        col = source[i]
+        if col:
+            for l in range(0, y+1):
+                if l in col:
+                    print l,
+                else:
+                    print " ",
+            print ""
+        else:
+            print ""
+
+    print("You don't have Image installed! Printing to terminal")
+    print("Please note: this is not optimal. Install Image")
