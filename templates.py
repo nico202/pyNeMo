@@ -10,5 +10,5 @@ RandomSpiking = [(0.2, 0.5, -65, 8, 20, -10, -65)]
 
 #Synapes
 FastLearn = (1, 20, True)
-InhibitoryTypeI = (2, -20, True)
-ExcitatoryTypeI = (1, +20, True)
+InhibitoryTypeI = (2, -200, True)
+ExcitatoryTypeI = (1, +2, True)

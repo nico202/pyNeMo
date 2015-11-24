@@ -82,8 +82,8 @@ if __name__ == "__main__":
         # Neurons
         neuron_list = config.neurons[0]
         for nidx in range(len(neuron_list)):
-            a, b, c, d, s, u, v = neuron_list[nidx] #FIXME: add the other parameters
-            net.add_neuron(iz, nidx, a, b, c, d, s, u, v) #What is u, v ?
+            a, b, c, d, s, u, v = neuron_list[nidx]
+            net.add_neuron(iz, nidx, a, b, c, d, s, u, v)
 
         #Synapses
         for sidx in range(len(config.synapses)):
@@ -118,6 +118,8 @@ if __name__ == "__main__":
         tot = t
 
         output_firings = {}
+        membrane_output = {}
+
         if general_config._OUTPUT: #I keep them separate to reduce the overhead
             while not t == 0:
                 general_config.steps
@@ -133,16 +135,14 @@ if __name__ == "__main__":
                 to_save = config.save
             except:
                 to_save = []
+            for i in to_save:
+                membrane_output[i] = []
             if to_save: #Every optimization here matters
                 while not t == 0:
                     general_config.steps
                     fired = sim.step()
-                    for neuron in to_save:
-                        value = net.get_neuron_state(neuron, 1)
-                        if value != -65.0:
-                            print value
-                        else:
-                            print "same"
+                    for neuron in to_save: #Save membrane potential
+                        membrane_output[neuron].append(sim.get_membrane_potential(neuron))
                     output_firings[t] = [ i for i in fired ]
                     t -= 1
             else:
@@ -154,8 +154,9 @@ if __name__ == "__main__":
     end = time.time()
 
     if not bypass:
-        #TODO/FIXME: if this is slow for big networks, replace with pickle
+        #TODO: if this is slow for big networks, replace with pickle
         saveKey(general_config_hash + config_hash, output_firings)
+        saveKey(general_config_hash + config_hash + '_membrane', membrane_output)
 
     total_time = end - start
     step_time = total_time / general_config.steps

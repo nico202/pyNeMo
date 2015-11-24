@@ -10,7 +10,6 @@ except:
     print("You don't have Image installed! Printing to terminal")
     print("Please note: this is not optimal. Install Image")
 
-
 black = (0, 0, 0)
 red =   (255, 0, 0)
 green = (0, 255, 0)
@@ -19,7 +18,12 @@ white = (255, 255, 255)
 try:
     output_file = argv[1]
 except:
-    exit("Usage: %s output_file" % (argv[0]))
+    exit("Usage: %s output_file [--force-terminal]" % (argv[0]))
+
+try:
+    have_Image = argv[2] != "--force-terminal"
+except:
+    pass
 
 source = ast.literal_eval((open(output_file, 'r').readline()))
 
