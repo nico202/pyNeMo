@@ -1,5 +1,5 @@
 from templates import * #For ease of use, this line is mandatory
-
+name = "CPG_2014_Ambroise"
 #neurons
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
      FastSpiking * 8

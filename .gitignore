@@ -1,3 +1,4 @@
 /*.pyc
 /nets/*.pyc
 .store
+__pycache__/

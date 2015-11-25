@@ -2,6 +2,9 @@
 
 from sys import argv, exit
 import ast #load saved dict
+
+from InAndOut import importer
+
 try:
     import Image
     have_Image = True
@@ -25,7 +28,7 @@ try:
 except:
     pass
 
-source = ast.literal_eval((open(output_file, 'r').readline()))
+source = importer(output_file)
 
 #Could get the following from the config which generated them
 x = len(source) #Number of spikes

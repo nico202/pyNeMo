@@ -1,12 +1,11 @@
 from templates import * #For ease of use, this line is mandatory
-
+name = "NET_CONFIG_TEST"
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
      FastSpiking * 8,
      SlowSpiking * 3,
 ]
 
 #synapses:
-weight_factor = 5.1
 #From, to, (delay, weight, plastic)
 #"To" can be both an array or a single value
 #"Weight" can be both an array or a single value. If it point "To" many neurons,

@@ -29,6 +29,10 @@ if __name__ == "__main__":
         print("DEBUG: Unknown error")
         raise
 
+    try:
+        net_name = config.name
+    except AttributeError:
+        print("You have not defined a name in your network! It is suggested to have it")
     #"--force" argument. Disable computation bypass
     try:
         force_run = argv[2]
@@ -77,7 +81,7 @@ if __name__ == "__main__":
         if general_config._GPU:
             try:
                 nemo_config.set_cuda_backend(general_config._BACKEND_NUMBER)
-            except RuntimeError:
+            except RuntimeError: #FIXME: save to log that we used CPU instead
                 print("No CUDA-GPU found: using CPU instead")
                 nemo_config.set_cpu_backend()
         else:

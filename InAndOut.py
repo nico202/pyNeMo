@@ -1,7 +1,7 @@
 import os
 from sys import exit
-import hashlib          #We use it to check different configurations
-import shutil           #Backup every config used
+
+#require ast (dict import), shutil (copy config), hashlib (Hash configs)
 
 def startup_check(output_dir = ".store"):
     if not os.path.isdir(output_dir):
@@ -17,8 +17,9 @@ def startup_check(output_dir = ".store"):
         return True
 
 def hashIt(module): #We use this to check if configuration changed
+    import hashlib
     key_string = str({key: value for key, value in module.__dict__.iteritems()
-        if not (key.startswith('__') or key.startswith('_'))})
+            if not (key.startswith('__') or key.startswith('_'))})
 
     return key_string, hashlib.sha1(key_string).hexdigest()
 
@@ -37,6 +38,7 @@ def saveKey(file_hash, values):
         return False
 
 def saveFile(file_name, file_hash):
+    import shutil
     output_name = '.' + file_hash + '.py'
     if not os.path.isfile(output_name):
         try:
@@ -47,3 +49,7 @@ def saveFile(file_name, file_hash):
         return True
     else:
         return False
+
+def importer(filename):
+    import ast
+    return ast.literal_eval((open(filename, 'r').readline()))
