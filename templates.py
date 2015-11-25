@@ -1,7 +1,8 @@
-#This files is use for quickly add neurons /synapses to a net_config
-from FasterPresets import _typicalN, _typicalS
-
 #IF YOU EDIT THIS FILE, PLEASE run "git commit -a" OR YOU'LL FACE WRONG CONFIGS
+
+#This files is use for quickly add neurons /synapses to a net_config
+from libs.FasterPresets import _typicalN, _typicalS
+
 #IF testing new nets, use the option "--force"
 
 #Parameters IZ: http://www.izhikevich.org/publications/spikes.pdf

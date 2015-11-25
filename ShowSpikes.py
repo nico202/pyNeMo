@@ -3,7 +3,7 @@
 from sys import argv, exit
 import ast #load saved dict
 
-from InAndOut import importer
+from libs.InAndOut import importer
 
 try:
     import Image

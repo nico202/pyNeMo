@@ -24,7 +24,7 @@ Show the resulting spikes:
 `cat .store/history`  
 find the name of the latest generated file
 
-`python2 ShowSpikes.py .store/.HASH_OF_THE_NEWLY_CREATED_FILE`
+`python2 ShowSpikes.py .store/.HASH_1 + HASH_2`
 
 Hack!
 -----

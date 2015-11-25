@@ -12,7 +12,7 @@ import general_config
 #Various
 from sys import argv, exit
 
-from InAndOut import *
+from libs.InAndOut import *
 
 if __name__ == "__main__":
     # Load user-defined config file

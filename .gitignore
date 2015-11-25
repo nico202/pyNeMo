@@ -2,3 +2,4 @@
 /nets/*.pyc
 .store
 __pycache__/
+/libs/*.pyc
