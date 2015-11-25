@@ -32,7 +32,7 @@ if __name__ == "__main__":
     try:
         net_name = config.name
     except AttributeError:
-        print("You have not defined a name in your network! It is suggested to have it")
+        print("Having a name in the network will be mandatory in the first version. Fix it NOW")
     #"--force" argument. Disable computation bypass
     try:
         force_run = argv[2]

@@ -19,6 +19,9 @@ except IOError:
 
 now = time.time(); results = False
 n = 0
+
+#TODO: code cleanup. It's ugly
+#FIXME: add git version selection
 used_hash = {"config":[], "general":[]}
 mapping = {}
 for sim_hist in history:
@@ -27,8 +30,10 @@ for sim_hist in history:
     elif sim_hist[3] not in used_hash["config"]:
         used_hash["general"].append(sim_hist[2])
     else:
+        del history[n]
         n += 1
         break
+
     general_config_name, config_name = sim_hist[2:4]
     membrane_file = _history_dir + '/.' + general_config_name + config_name
     general_config_file = _history_dir + '/.' + general_config_name
@@ -39,18 +44,24 @@ for sim_hist in history:
     general_config = importer(general_config_file)
     commit_version, steps = general_config["commit_version"], general_config["steps"]
     neurons = config["neurons"][0]
+
+    try: #Fix for older version. Remove in v2
+        name = config["name"]
+    except:
+        name = "NoName"
     synapse_number = len([
         b for sub in [s[1] for s in config["synapses"]] for b in sub
     ])
 
-    if float(sim_hist[0]) + 10000 > now:
+    if float(sim_hist[0]) + 10000 > now: #TODO: add command line parameters
         results = True
-        print("[%s] %s, steps = %d, # of neurons: %d, # of synapses: %d" % (
+        print("[%s] %s, steps = %d, # of neurons: %d, # of synapses: %d, name: %s" % (
             n,
             datetime.datetime.fromtimestamp(int(float(sim_hist[0]))).strftime('%Y-%m-%d %H:%M:%S'),
             steps,
             len(neurons),
-            synapse_number
+            synapse_number,
+            name
             )
         )
         n += 1
