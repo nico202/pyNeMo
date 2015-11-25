@@ -25,14 +25,15 @@ def hashIt(module): #We use this to check if configuration changed
 
 def saveKey(file_hash, values):
     output_name = '.' + file_hash
+
     if not os.path.isfile(output_name):
         try:
             output = open(output_name, 'w')
             output.write("%s" % values)
             output.close()
         except:
+            print("Probem writing file?! DEBUG me")
             raise
-            exit("Probem writing file?! DEBUG me")
         return True
     else:
         return False

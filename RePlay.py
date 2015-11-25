@@ -40,10 +40,15 @@ for sim_hist in history:
     config_file = _history_dir + '/.' + config_name
 
     #Import configs
-    config = importer(config_file)
-    general_config = importer(general_config_file)
-    commit_version, steps = general_config["commit_version"], general_config["steps"]
-    neurons = config["neurons"][0]
+    try:
+        config = importer(config_file)
+        general_config = importer(general_config_file)
+        commit_version, steps = general_config["commit_version"], general_config["steps"]
+        neurons = config["neurons"][0]
+    except:
+        print("File %d broken" % n)
+        n += 1
+        continue
 
     try: #Fix for older version. Remove in v2
         name = config["name"]
@@ -53,7 +58,7 @@ for sim_hist in history:
         b for sub in [s[1] for s in config["synapses"]] for b in sub
     ])
 
-    if float(sim_hist[0]) + 10000 > now: #TODO: add command line parameters
+    if float(sim_hist[0]) + 1000000 > now: #TODO: add command line parameters
         results = True
         print("[%s] %s, steps = %d, # of neurons: %d, # of synapses: %d, name: %s" % (
             n,
