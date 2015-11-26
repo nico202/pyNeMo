@@ -53,36 +53,112 @@ def saveFile(file_name, file_hash):
 
 def importer(filename):
     import ast
-    return ast.literal_eval((open(filename, 'r').readline()))
+    try:
+        ret = ast.literal_eval((open(filename, 'r').readline()))
+    except SyntaxError:
+        exit("Wrong input file!")
+    return ret
 
-def showImage(image_name):
+def showSourceImage(image_name):
     import Image
     img = Image.open(image_name)
     img.show()
 
-def saveImage(source, image_name):
+def saveRawImage(img, name, close = True):
     import Image
-    color_map = {
-        "black": (0, 0, 0),
-        "red": (255, 0, 0),
-        "green": (0, 255, 0),
-        "blu": (0, 0, 255),
-        "white": (255, 255, 255)
-    }
-    x = len(source) #Number of spikes
-    y = 0 #Number of neurons
-    for l in source:
-        for i in source[l]:
-            y = max(i, y)
+    try:
+        img.save(name)
+    except AttributeError:
+        try:
+            img.savefig(name)
+            if close:
+                img.close()
+        except:
+            raise
 
-    img = Image.new( 'RGB', (x,y+1), "white") # create a new black image
+def saveSourceImage(source, image_name):
+    try:
+        from neuronpy.graphics import spikeplot
+        spikes_dict = {}
+        spikes = []
+        for ms in source:
+            for neuron in source[ms]:
+                if neuron in spikes_dict:
+                    spikes_dict[neuron].append(ms)
+                else:
+                    spikes_dict[neuron] = [ms]
+        for key in spikes_dict:
+            spikes.append(spikes_dict[key])
+        sp = spikeplot.SpikePlot(savefig=True)
+        sp.set_fig_name(image_name)
+        sp.set_linestyle('-')
+        sp.set_markerscale(0.5)
+        sp.plot_spikes(spikes, draw=False)
+
+    except ImportError:
+        print ("You should install neuronpy (pip2 install neuronpy).\n\
+        It provides better graphics. Falling back to ugly one")
+        import Image
+        color_map = {
+            "black": (0, 0, 0),
+            "red": (255, 0, 0),
+            "green": (0, 255, 0),
+            "blu": (0, 0, 255),
+            "white": (255, 255, 255)
+        }
+        x = len(source) #Number of spikes
+        y = 0 #Number of neurons
+        for l in source:
+            for i in source[l]:
+                y = max(i, y)
+
+        img = Image.new( 'RGB', (x,y+1), "white") # create a new black image
+        pixels = img.load() # create the pixel map
+
+        for i in range(1, x+1):    # for every pixel:
+            col = source[i]
+            if col:
+                for l in col:
+                    pixels[i -1, l ] = color_map["black"]
+
+        img.save(image_name)
+
+
+def membraneImage(Vm_list):
+    '''
+        Output an image of the membrane potential from a list of Membrane values.
+        zoom = (stretch_x, stretch_y) means the stretch that is applied to x and y axes
+    '''
+    import matplotlib.pyplot as plt
+    import numpy as np
+    plt.clf()
+    plt.cla()
+    x = len(Vm_list)
+    x = np.array(range (0, x))
+    plt.plot(x, np.array(Vm_list))
+    return plt
+
+def allNeuronsMembrane(Vm_lists):
+    '''
+        Show an image where every line is a neuron
+        and the color is the membrane value
+    '''
+    import Image
+
+    y = len(Vm_lists)
+    x = len(Vm_lists[0])
+
+    img = Image.new( 'RGB', (x,y), "white") # create a new black image
     pixels = img.load() # create the pixel map
 
-    for i in range(1, x+1):    # for every pixel:
-        col = source[i]
-        if col:
-            for l in col:
-                pixels[i -1, l ] = color_map["black"]
-
-    img.save(image_name)
-    return x, y
+    for neuron in Vm_lists:
+        xi = 0
+        Vms = Vm_lists[neuron]
+        maximum = max(Vms)
+        minimum = min(Vms)
+        Vm_range = maximum - minimum
+        for Vm in Vms:
+            print int( Vm_range - abs(Vm) )
+            pixels[xi, neuron] = (int( Vm_range - abs(Vm) ) * 255, 0, 255 - int( Vm_range - abs(Vm) ) * 255)
+            xi += 1
+    return img

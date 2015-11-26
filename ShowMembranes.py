@@ -1,6 +1,6 @@
 #!/bin/python2
 from sys import argv, exit
-from libs.InAndOut import importer, membraneImage
+from libs.InAndOut import importer, membraneImage, allNeuronsMembrane
 
 if __name__ == "__main__":
     try:
@@ -13,5 +13,4 @@ if __name__ == "__main__":
     else:
         exit("Not a membrane potential file")
 
-    for neuron in source:
-        membraneImage(source[neuron]).show()
+    allNeuronsMembrane(source).show()

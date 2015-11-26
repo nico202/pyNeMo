@@ -57,23 +57,24 @@ if __name__ == "__main__":
         history.close()
 
         #If any of the following False, we can bypass the computation and print previously-saved run
-        if not any([
-            saveKey(general_config_hash, general_config_key),
-            saveKey(config_hash, config_key),
-            saveFile(script_dir + '/' + "general_config.py", general_config_hash),
-            saveFile(script_dir + '/' + config_name, config_hash), #TODO: FIX this.
-            not os.path.isfile('./.' + general_config_hash + config_hash)
-        ]):
-            old_output = '.' + general_config_hash + config_hash
-            if general_config._OUTPUT:
-                print open(old_output, 'r').readlines()
-            else:
-                print("Simulation has previously been executed!")
-                print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
-                loaded_img = importer(old_output)
-                saveImage(loaded_img, old_output + ".png")
-                showImage(old_output + ".png")
-                bypass = True and not force_run
+        if not force_run:
+            if not any([
+                saveKey(general_config_hash, general_config_key),
+                saveKey(config_hash, config_key),
+                saveFile(script_dir + '/' + "general_config.py", general_config_hash),
+                saveFile(script_dir + '/' + config_name, config_hash), #TODO: FIX this.
+                not os.path.isfile('./.' + general_config_hash + config_hash)
+            ]):
+                old_output = '.' + general_config_hash + config_hash
+                if general_config._OUTPUT:
+                    print open(old_output, 'r').readlines()
+                else:
+                    print("Simulation has previously been executed!")
+                    print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
+                    loaded_img = importer(old_output)
+                    saveSourceImage(loaded_img, old_output + ".png")
+                    showSourceImage(old_output + ".png")
+                    bypass = True and not force_run
 
     if not bypass:
         net = nemo.Network()
@@ -167,10 +168,24 @@ if __name__ == "__main__":
         saveKey(general_config_hash + config_hash, output_firings)
         saveKey(general_config_hash + config_hash + '_membrane', membrane_output)
         #Save spiking:
-        saveImage(output_firings, "." + general_config_hash + config_hash + '.png')
+        saveSourceImage(output_firings, '.' + general_config_hash + config_hash + '.png')
+        for neuron in to_save:
+            saveRawImage(membraneImage(membrane_output[neuron]),
+                '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
+        for neuron in to_save:
+            saveRawImage(membraneImage(membrane_output[neuron]),
+                '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '_Mixed.png', close = False)
+
+
+        print("Output file is: %s" % ('.' + general_config_hash + config_hash))
         #Show spiking:
-        if general_config._OPEN_IMAGE_ON_SAVE:
-            showImage("." + general_config_hash + config_hash + '.png')
+        if general_config._SHOW_IMAGE_ON_SAVE:
+            if general_config._SHOW_SPIKES:
+                showSourceImage("." + general_config_hash + config_hash + '.png')
+            if general_config._SHOW_MEMBRANE:
+                for neuron in to_save:
+                    showSourceImage('.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
+
 
 
     total_time = end - start

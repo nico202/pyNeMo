@@ -4,7 +4,7 @@ from sys import argv, exit
 import ast #load saved dict
 import os
 
-from libs.InAndOut import importer, showImage, saveImage
+from libs.InAndOut import importer, showSourceImage, saveSourceImage
 
 try:
     import Image
@@ -25,21 +25,18 @@ if __name__ == "__main__":
     except:
         pass
 
-    try:
-        source = importer(output_file)
-    except SyntaxError:
-        exit("Wrong input file!")
+    source = importer(output_file)
 
     #Could get the following from the config which generated them. What is better?
 
     image_name = output_file + '.png'
     if os.path.isfile(image_name):
         print("Image already created, showing!")
-        showImage(image_name)
+        showSourceImage(image_name)
     else:
         if have_Image:
-            saveImage(source, image_name)
-            showImage(image_name)
+            saveSourceImage(source, image_name)
+            showSourceImage(image_name)
         else:
             for i in range(1, x+1):    # for every pixel:
                 col = source[i]

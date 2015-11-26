@@ -17,7 +17,7 @@ from libs.FasterPresets import _typicalN, _typicalS
 FastSpiking = [(0.2, 0.5, -65, 8, 5, 0.2 * -65, -65)]
 SlowSpiking = [(0.002, 0.4, -65, 8, 0, 0.2 * -65, -65)]
 RandomSpiking = [(0.2, 0.5, -65, 8, 20, -10, -65)]
-CaoticSpiking = [(0.2, 2, -56, -16)] #http://www.izhikevich.org/publications/whichmod.pdf
+#http://www.izhikevich.org/publications/whichmod.pdf
 #Examples: http://www.izhikevich.org/publications/spikes.pdf
 #Excitatory
 RS = _typicalN(c = -65, d = 8) #regular spiking
@@ -30,5 +30,5 @@ LTS = _typicalN(b = 0.25) #low-treshold spiking
 
 #Synapes
 FastLearn = (1, 20, True)
-InhibitoryTypeI = (2, -200, True)
+InhibitoryTypeI = (2, -20, True)
 ExcitatoryTypeI = (1, +2, True)

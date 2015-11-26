@@ -2,7 +2,8 @@ from templates import * #For ease of use, this line is mandatory
 name = "Watts"
 #neurons
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
-     IB * 2
+     LTS
+     + FastSpiking
 ]
 
 save = [0, 1]
