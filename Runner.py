@@ -49,12 +49,6 @@ if __name__ == "__main__":
         os.chdir(general_config._history_dir)
         config_key, config_hash = hashIt(config)
         general_config_key, general_config_hash = hashIt(general_config)
-        history = open("history.log", 'a')
-        history.write("%f, %s, %s, %s, " % (time.time(),
-                                            "GPU" if general_config._GPU else "CPU",
-                                            general_config_hash,
-                                            config_hash))
-        history.close()
 
         #If any of the following False, we can bypass the computation and print previously-saved run
         if not force_run:
@@ -85,8 +79,10 @@ if __name__ == "__main__":
         if general_config._GPU:
             try:
                 nemo_config.set_cuda_backend(general_config._BACKEND_NUMBER)
+                GPU = True
             except RuntimeError: #FIXME: save to log that we used CPU instead
                 print("No CUDA-GPU found: using CPU instead")
+                GPU = False
                 nemo_config.set_cpu_backend()
         else:
             nemo_config.set_cpu_backend()
@@ -191,7 +187,12 @@ if __name__ == "__main__":
     total_time = end - start
     step_time = total_time / general_config.steps
     history = open("history.log", 'a') #Update the history with results timing
-    history.write("%f, %f\n" % (total_time, step_time))
+    history.write("%f, %s, %s, %s %f, %f\n, " % (time.time(),
+                                        "GPU" if GPU else "CPU",
+                                        general_config_hash,
+                                        config_hash,
+                                        total_time,
+                                        step_time))
     history.close()
     #Debug stats
     if general_config._DEBUG:
