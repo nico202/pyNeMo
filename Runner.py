@@ -70,6 +70,9 @@ if __name__ == "__main__":
             else:
                 print("Simulation has previously been executed!")
                 print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
+                loaded_img = importer(old_output)
+                saveImage(loaded_img, old_output + ".png")
+                showImage(old_output + ".png")
                 bypass = True and not force_run
 
     if not bypass:
@@ -163,13 +166,18 @@ if __name__ == "__main__":
         #TODO: if this is slow for big networks, replace with pickle
         saveKey(general_config_hash + config_hash, output_firings)
         saveKey(general_config_hash + config_hash + '_membrane', membrane_output)
+        #Save spiking:
+        saveImage(output_firings, "." + general_config_hash + config_hash + '.png')
+        #Show spiking:
+        if general_config._OPEN_IMAGE_ON_SAVE:
+            showImage("." + general_config_hash + config_hash + '.png')
+
 
     total_time = end - start
     step_time = total_time / general_config.steps
     history = open("history.log", 'a') #Update the history with results timing
     history.write("%f, %f\n" % (total_time, step_time))
     history.close()
-
     #Debug stats
     if general_config._DEBUG:
         print("DEBUG: total_time = %f" % (total_time))

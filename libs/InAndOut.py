@@ -54,3 +54,35 @@ def saveFile(file_name, file_hash):
 def importer(filename):
     import ast
     return ast.literal_eval((open(filename, 'r').readline()))
+
+def showImage(image_name):
+    import Image
+    img = Image.open(image_name)
+    img.show()
+
+def saveImage(source, image_name):
+    import Image
+    color_map = {
+        "black": (0, 0, 0),
+        "red": (255, 0, 0),
+        "green": (0, 255, 0),
+        "blu": (0, 0, 255),
+        "white": (255, 255, 255)
+    }
+    x = len(source) #Number of spikes
+    y = 0 #Number of neurons
+    for l in source:
+        for i in source[l]:
+            y = max(i, y)
+
+    img = Image.new( 'RGB', (x,y+1), "white") # create a new black image
+    pixels = img.load() # create the pixel map
+
+    for i in range(1, x+1):    # for every pixel:
+        col = source[i]
+        if col:
+            for l in col:
+                pixels[i -1, l ] = color_map["black"]
+
+    img.save(image_name)
+    return x, y
