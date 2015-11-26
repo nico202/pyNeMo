@@ -2,7 +2,7 @@ from templates import * #For ease of use, this line is mandatory
 name = "Lewis_2005"
 
 #neurons
-_neuron_type = LFS #Faster!
+_neuron_type = FS #Faster!
 
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
     _neuron_type * 4
