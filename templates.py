@@ -2,7 +2,7 @@
 
 #This files is use for quickly add neurons /synapses to a net_config
 from libs.FasterPresets import _typicalN, _typicalS
-
+from random import random as rand
 #IF testing new nets, use the option "--force"
 
 #Parameters IZ: http://www.izhikevich.org/publications/spikes.pdf
@@ -28,10 +28,13 @@ CH = _typicalN(c = -50, d = 2) #chattering
 FS = _typicalN(a = 0.1) #Fast spiking
 LTS = _typicalN(b = 0.25) #low-treshold spiking
 
+LFS = _typicalN(a = 0.01, b = 0.22, v = -65*rand()) #Fast spiking
+
 #Synapes
 FastLearn = (1, 20, True)
 FastNoLearn = (1, 20, False)
 SlowNoLearn = (3, 20, False)
+InhSlowNoLearn = (5, -25, False)
 
 InhibitoryTypeI = (2, -20, True)
 ExcitatoryTypeI = (1, +2, True)

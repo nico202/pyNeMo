@@ -174,7 +174,7 @@ if __name__ == "__main__":
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '_Mixed.png', close = False)
 
 
-        print("Output file is: %s" % ('.' + general_config_hash + config_hash))
+        print("Output file is: %s" % (general_config._history_dir + '/' + '.' + general_config_hash + config_hash))
         #Show spiking:
         if general_config._SHOW_IMAGE_ON_SAVE:
             if general_config._SHOW_SPIKES:
@@ -188,7 +188,7 @@ if __name__ == "__main__":
     total_time = end - start
     step_time = total_time / general_config.steps
     history = open("history.log", 'a') #Update the history with results timing
-    history.write("%f, %s, %s, %s %f, %f\n, " % (time.time(),
+    history.write("%f, %s, %s, %s %f, %f\n" % (time.time(),
                                         "GPU" if GPU else "CPU",
                                         general_config_hash,
                                         config_hash,
