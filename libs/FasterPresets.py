@@ -4,13 +4,13 @@ from random import random
 #On function defined here, the "_" is mandatory
 
 def _typicalN( #DO NOT TOUCH
-    a = 0.02,
-    b = 0.2,
-    c = -65,
-    d = 2,
-    s = 0,
-    u = False, #default calculated down here
-    v = -65 #Don't know too
+    a = 0.02,   # time scale of recovery variable (u)
+    b = 0.2,    # sensitivity of recovery variable (u) on subtreshold
+    c = -65,    # after-spike reset value
+    d = 2,      # after-spike recovery variable (u)
+    s = 3,      # input bias picked from gaussian [0, s)
+    u = False,  # default calculated down here
+    v = -65     # Initial membrane potential
     ):
     if not u:
         u = b * v

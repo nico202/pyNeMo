@@ -68,7 +68,8 @@ if __name__ == "__main__":
                     loaded_img = importer(old_output)
                     saveSourceImage(loaded_img, old_output + ".png")
                     showSourceImage(old_output + ".png")
-                    bypass = True and not force_run
+                bypass = True and not force_run
+                GPU = general_config._GPU
 
     if not bypass:
         net = nemo.Network()
@@ -80,7 +81,7 @@ if __name__ == "__main__":
             try:
                 nemo_config.set_cuda_backend(general_config._BACKEND_NUMBER)
                 GPU = True
-            except RuntimeError: #FIXME: save to log that we used CPU instead
+            except RuntimeError:
                 print("No CUDA-GPU found: using CPU instead")
                 GPU = False
                 nemo_config.set_cpu_backend()
@@ -169,7 +170,7 @@ if __name__ == "__main__":
             saveRawImage(membraneImage(membrane_output[neuron]),
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
         for neuron in to_save:
-            saveRawImage(membraneImage(membrane_output[neuron]),
+            saveRawImage(membraneImage(membrane_output[neuron], close = False),
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '_Mixed.png', close = False)
 
 

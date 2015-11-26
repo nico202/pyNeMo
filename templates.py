@@ -30,5 +30,8 @@ LTS = _typicalN(b = 0.25) #low-treshold spiking
 
 #Synapes
 FastLearn = (1, 20, True)
+FastNoLearn = (1, 20, False)
+SlowNoLearn = (3, 20, False)
+
 InhibitoryTypeI = (2, -20, True)
 ExcitatoryTypeI = (1, +2, True)

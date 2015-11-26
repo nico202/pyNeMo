@@ -2,8 +2,7 @@ from templates import * #For ease of use, this line is mandatory
 name = "Watts"
 #neurons
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
-     LTS
-     + FastSpiking
+    FS * 2
 ]
 
 save = [0, 1]
@@ -14,7 +13,6 @@ save = [0, 1]
 #"Weight" can be both an array or a single value. If it point "To" many neurons,
 #   the value will be used for all
 synapses = [
-    [0, [1], ExcitatoryTypeI],
-    [0, [0], InhibitoryTypeI],
-    [1, [0], InhibitoryTypeI]
+    [0, [1], (1, 20, True)],
+    [1, [0], (1, 20, True)]
 ]

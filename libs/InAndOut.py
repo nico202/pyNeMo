@@ -38,12 +38,16 @@ def saveKey(file_hash, values):
     else:
         return False
 
-def saveFile(file_name, file_hash):
+def saveFile(file_name, file_hash, notouch = False):
     import shutil
     output_name = '.' + file_hash + '.py'
     if not os.path.isfile(output_name):
         try:
-            shutil.copy2(file_name, '.' + file_hash + '.py')
+            if not notouch:
+                out = '.' + file_hash + '.py'
+            else:
+                out = file_hash
+            shutil.copy2(file_name, out)
         except:
             raise
             exit("Probem copying file?! DEBUG me")
@@ -61,8 +65,11 @@ def importer(filename):
 
 def showSourceImage(image_name):
     import Image
-    img = Image.open(image_name)
-    img.show()
+    try:
+        img = Image.open(image_name)
+        img.show()
+    except IOError:
+        print("Cannot load image: file not exists")
 
 def saveRawImage(img, name, close = True):
     import Image
@@ -89,11 +96,15 @@ def saveSourceImage(source, image_name):
                     spikes_dict[neuron] = [ms]
         for key in spikes_dict:
             spikes.append(spikes_dict[key])
-        sp = spikeplot.SpikePlot(savefig=True)
-        sp.set_fig_name(image_name)
-        sp.set_linestyle('-')
-        sp.set_markerscale(0.5)
-        sp.plot_spikes(spikes, draw=False)
+        if len(spikes): #If no data, it does not save image
+            sp = spikeplot.SpikePlot(savefig=True)
+            sp.set_fig_name(image_name)
+            sp.set_linestyle('-')
+            sp.set_markerscale(0.5)
+            sp.plot_spikes(spikes, draw=False)
+        else: #save it however
+            saveFile("../.noSpikes.png", image_name, notouch = True)
+
 
     except ImportError:
         print ("You should install neuronpy (pip2 install neuronpy).\n\
@@ -124,15 +135,16 @@ def saveSourceImage(source, image_name):
         img.save(image_name)
 
 
-def membraneImage(Vm_list):
+def membraneImage(Vm_list, close = True):
     '''
         Output an image of the membrane potential from a list of Membrane values.
         zoom = (stretch_x, stretch_y) means the stretch that is applied to x and y axes
     '''
     import matplotlib.pyplot as plt
     import numpy as np
-    plt.clf()
-    plt.cla()
+    if close:
+        plt.clf()
+        plt.cla()
     x = len(Vm_list)
     x = np.array(range (0, x))
     plt.plot(x, np.array(Vm_list))

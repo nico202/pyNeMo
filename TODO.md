@@ -5,9 +5,6 @@ TODO:
  - Explore history more rapidly  
  - YARP?
 
-FIXME:  
- - Saved membrane potential graph  
- - FIXME: add interpolation
+FIXME:
 
-DONE:  
- - [Flag?] Save membrane potential
+DONE:

@@ -12,3 +12,4 @@ _BACKEND_NUMBER = -1  #Used for GPU only. -1 = Default
 _SHOW_IMAGE_ON_SAVE = True #Disable if running batch
 _SHOW_SPIKES = True   #Show a file with all the neurons
 _SHOW_MEMBRANE = False #Show as many pictures as neurons marked as "save"
+_FILE_EXT = ".png"  #Still to add
