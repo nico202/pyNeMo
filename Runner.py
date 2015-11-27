@@ -11,16 +11,24 @@ import general_config
 
 #Various
 import argparse
-from sys import exit
+from sys import exit, stderr
 
 from libs.InAndOut import *
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Run NeMo simulations')
-    parser.add_argument('config_name', help = 'Network file to use')
+    class MyParser(argparse.ArgumentParser):
+        def error(self, message):
+            if message == "too few arguments":
+                message = "You must provide a network file!"
+            stderr.write('error: %s\n' % message)
+            self.print_help()
+            exit(2)
+
+    parser = MyParser(description='Run NeMo simulations')
+    parser.add_argument('network_file', help = 'Network file to use')
     parser.add_argument('--force',
         action = 'store_true',
-        help = 'Bypass previously computed simulation',
+        help = 'Bypass previously computed simulation; run it again (debugging)',
         dest = 'force_run')
     parser.add_argument('--steps',
         help = 'Steps to run. Default loaded in general config\nDefault ms. Can use s and m (ie. 10s, 3m)',
@@ -57,7 +65,7 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    config_name, force_run, steps = args.config_name, args.force_run, args.steps
+    config_name, force_run, steps = args.network_file, args.force_run, args.steps
 
     if steps:
         try:
@@ -159,8 +167,7 @@ if __name__ == "__main__":
                     weights = weights * len(dests)
                 else:
                     exit("Malformed synapse line %d" % (sidx + 1))
-
-            net.add_synapse(source, dests, delay, weights, plastic);
+            net.add_synapse(source, dests, delay, weights, plastic)
 
         conf = nemo.Configuration()
         sim = nemo.Simulation(net, conf)

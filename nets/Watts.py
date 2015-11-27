@@ -13,6 +13,6 @@ save = [0, 1]
 #"Weight" can be both an array or a single value. If it point "To" many neurons,
 #   the value will be used for all
 synapses = [
-    [0, [1], (1, 20, True)],
-    [1, [0], (1, 20, True)]
+    [0, [1], (1, 100, False)],
+    [1, [0], (1, 100, False)]
 ]
