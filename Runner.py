@@ -10,21 +10,71 @@ import imp #import the network config
 import general_config
 
 #Various
-from sys import argv, exit
+import argparse
+from sys import exit
 
 from libs.InAndOut import *
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Run NeMo simulations')
+    parser.add_argument('config_name', help = 'Network file to use')
+    parser.add_argument('--force',
+        action = 'store_true',
+        help = 'Bypass previously computed simulation',
+        dest = 'force_run')
+    parser.add_argument('--steps',
+        help = 'Steps to run. Default loaded in general config\nDefault ms. Can use s and m (ie. 10s, 3m)',
+        dest = 'steps')
+
+    processing = parser.add_mutually_exclusive_group()
+    processing.add_argument('--gpu',
+        action='store_true',
+        help = 'Overwrite config GPU settings (force GPU)',
+        dest = 'GPU',
+        default = None
+    )
+    processing.add_argument('--cpu',
+        action='store_false',
+        help = 'Overwrite config GPU settings (force CPU)',
+        dest = 'GPU'
+    )
+
+    images = parser.add_mutually_exclusive_group()
+    images.add_argument( '--show-all',
+        action= 'store_true',
+        help = 'Force show saved images',
+        dest = 'SHOW_ALL'
+    )
+    images.add_argument( '--spikes-only',
+        action= 'store_true',
+        help = 'Show spikes image only',
+        dest = 'SHOW_SPIKES_ONLY'
+    )
+    images.add_argument( '--show-none',
+        action= 'store_false',
+        help = 'Don\'t show images upon creation. Useful for batch',
+        dest = 'SHOW_IMAGE'
+    )
+
+    args = parser.parse_args()
+    config_name, force_run, steps = args.config_name, args.force_run, args.steps
+
+    if steps:
+        try:
+            if 'm' in steps:
+                steps = int(steps.strip('m')) * 60 * 1000
+            elif 's' in steps:
+                steps = int(steps.strip('s')) * 1000
+        except ValueError:
+            exit("Steps parameter can contain either 'm' (minutes) or 's' (seconds)")
+        general_config.steps = int(steps)
+
     # Load user-defined config file
     try:
-        config_name = argv[1]
         config = imp.load_source('*', config_name)
         script_dir = os.getcwd()
     except SyntaxError:
         exit("Config file: Syntax Error")
-    except IndexError:
-        print("You must provide a config file!")
-        exit("Usage: %s network.py" % (argv[0]))
     except:
         print("DEBUG: Unknown error")
         raise
@@ -33,15 +83,6 @@ if __name__ == "__main__":
         net_name = config.name
     except AttributeError:
         print("Having a name in the network will be mandatory in the first version. Fix it NOW")
-    #"--force" argument. Disable computation bypass
-    try:
-        force_run = argv[2]
-        if force_run == "--force":
-            force_run = True
-        else:
-            force_run = False
-    except:
-        force_run = False
 
     start = 0.0; end = 0.0 #Initialize it here to enable bypass
     bypass = False
@@ -69,7 +110,10 @@ if __name__ == "__main__":
                     saveSourceImage(loaded_img, old_output + ".png")
                     showSourceImage(old_output + ".png")
                 bypass = True and not force_run
-                GPU = general_config._GPU
+        if args.GPU == None:
+            GPU = general_config._GPU
+        else:
+            GPU = args.GPU
 
     if not bypass:
         net = nemo.Network()
@@ -176,14 +220,12 @@ if __name__ == "__main__":
 
         print("Output file is: %s" % (general_config._history_dir + '/' + '.' + general_config_hash + config_hash))
         #Show spiking:
-        if general_config._SHOW_IMAGE_ON_SAVE:
-            if general_config._SHOW_SPIKES:
+        if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY:
+            if general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL:
                 showSourceImage("." + general_config_hash + config_hash + '.png')
-            if general_config._SHOW_MEMBRANE:
+            if general_config._SHOW_MEMBRANE or args.SHOW_ALL:
                 for neuron in to_save:
                     showSourceImage('.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
-
-
 
     total_time = end - start
     step_time = total_time / general_config.steps
