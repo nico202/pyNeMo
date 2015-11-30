@@ -135,19 +135,29 @@ def saveSourceImage(source, image_name):
         img.save(image_name)
 
 
-def membraneImage(Vm_list, close = True):
+def membraneImage(values, title = False, close = True, scales = []): #TODO: Add stimulation trace
     '''
         Output an image of the membrane potential from a list of Membrane values.
         zoom = (stretch_x, stretch_y) means the stretch that is applied to x and y axes
     '''
     import matplotlib.pyplot as plt
     import numpy as np
+    Vm_list, Stim_list = values
     if close:
         plt.clf()
         plt.cla()
     x = len(Vm_list)
     x = np.array(range (0, x))
-    plt.plot(x, np.array(Vm_list))
+    fig, ax1 = plt.subplots()
+    ax1.plot(x, np.array(Vm_list))
+    ax1.set_xlabel('time (ms)')
+    ax1.set_ylabel('Membrane Potential\n(mV)')
+    ax2 = ax1.twinx()
+    ax2.plot(Stim_list, color = 'r')
+    ax2.set_ylabel('Stimulation\n(mA)')
+    ax2.set_ylim(0,100)
+    if title:
+        plt.title(title)
     return plt
 
 def allNeuronsMembrane(Vm_lists):

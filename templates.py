@@ -26,11 +26,12 @@ RS = _typicalN(a = 0.02, b = 0.2, c = -65, d = 8) #regular spiking (Ambroise 201
 #DO_NOT_TOUCH
 IB = _typicalN(c = -55, d = 4) #intrinsically bursting
 #DO_NOT_TOUCH
-CH = _typicalN(c = -50, d = 2) #chattering
-
+CH = _typicalN(c = -50) #chattering
+#DO NOT TOUCH
+TC = _typicalN(b = 0.25, d = 0.05)
 RS1 = _typicalN(a = 0.02, b = 0.2, c = -65, d = 8)
 RS2 = _typicalN(a = 0.02, b = 0.3, c = -65, d = 8)
-
+RZ = _typicalN(a = 0.1, b = 0.25)
 #Inhibitory
 #DO_NOT_TOUCH
 FS = _typicalN(a = 0.1) #Fast spiking

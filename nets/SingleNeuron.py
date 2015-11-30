@@ -1,10 +1,11 @@
 from templates import * #For ease of use, this line is mandatory
 from libs.FasterPresets import _S, _stimuli
-name = "Single_TEST"
+name = "RS"
 #neurons
+
 N = 1
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
-     LTS_no_spontaneous
+     RS
 ]
 
 save = range(0, N)
@@ -12,7 +13,7 @@ save = range(0, N)
 
 step_input = _stimuli(
     [
-        [0, 100, 10, 20],
+        [0, 10, 200, 400]
     ]
 )
 step_spike = {}
@@ -23,5 +24,4 @@ step_spike = {}
 #   the value will be used for all
 
 synapses = [
-
 ]

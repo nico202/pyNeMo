@@ -65,6 +65,11 @@ if __name__ == "__main__":
         help = 'Don\'t show images upon creation. Useful for batch',
         dest = 'SHOW_IMAGE'
     )
+    images.add_argument( '--membrane-only',
+        action= 'store_true',
+        help = 'Show membrane potential onlt',
+        dest = 'SHOW_MEMBRANE_ONLY'
+    )
 
     args = parser.parse_args()
     config_name, force_run, steps = args.network_file, args.force_run, args.steps
@@ -201,19 +206,32 @@ if __name__ == "__main__":
         #Save spiking:
         saveSourceImage(output_firings, '.' + general_config_hash + config_hash + '.png')
         for neuron in to_save:
-            saveRawImage(membraneImage(membrane_output[neuron]),
+            stims = []
+            n = 0
+            for n in range(0, general_config.steps):
+                if n in config.step_input:
+                    for s in config.step_input[n]:
+                        if s[0] == neuron:
+                            stims.append(s[1])
+                            found = True
+                    if not found:
+                        stims.append(0)
+                else:
+                    stims.append(0)
+
+            saveRawImage(membraneImage((membrane_output[neuron], stims), title = config.name + ' - neuron ' + str(neuron)),
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
         for neuron in to_save:
-            saveRawImage(membraneImage(membrane_output[neuron], close = False),
+            saveRawImage(membraneImage((membrane_output[neuron], stims), close = False, title = config.name),
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '_Mixed.png', close = False)
 
 
         print("Output file is: %s" % (general_config._history_dir + '/' + '.' + general_config_hash + config_hash))
         #Show spiking:
-        if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY:
-            if general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL:
+        if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY or args.SHOW_MEMBRANE_ONLY:
+            if (general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL) and not args.SHOW_MEMBRANE_ONLY:
                 showSourceImage("." + general_config_hash + config_hash + '.png')
-            if general_config._SHOW_MEMBRANE or args.SHOW_ALL:
+            if general_config._SHOW_MEMBRANE or args.SHOW_ALL or args.SHOW_MEMBRANE_ONLY:
                 for neuron in to_save:
                     showSourceImage('.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '.png')
 

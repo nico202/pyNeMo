@@ -3,15 +3,15 @@ from libs.FasterPresets import _S, _stimuli
 name = "Watts"
 #neurons
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
-    RS1 +
-    RS2
+    IB +
+    IB
 ]
 
-save = range(0, len(neurons))
+save = range(0, len(neurons) + 1)
 
 step_input = _stimuli(
     [
-        [[0,1], 10, 10, 20],
+        [0, 10, 200, 300],
     ]
 )
 step_spike = {}
@@ -23,7 +23,7 @@ step_spike = {}
 #   the value will be used for all
 
 synapses = [
-    [0, [1], _S("WeakExc")],
-    [1, [0], _S("MediumInh")],
-    [0, [0], _S("MediumInh")]
+    [0, [1], _S("StrongExc")],
+    [1, [0], _S("StrongInhSlow")],
+    [0, [0], _S("StrongInh")]
 ]
