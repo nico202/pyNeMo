@@ -1,24 +1,28 @@
 from templates import * #For ease of use, this line is mandatory
-name = "CPG_2014_Ambroise"
+from libs.FasterPresets import _S
+name = "Ambroise_2014"
 #neurons
+N = 1
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
-     FastSpiking * 8
+     RS * N
 ]
 
-save = [0, 1, 2, 3, 4, 5, 6]
+save = range(0, N)
 
 #synapses:
 #From, to, (delay, weight, plastic)
 #"To" can be both an array or a single value
 #"Weight" can be both an array or a single value. If it point "To" many neurons,
 #   the value will be used for all
+_etero_synapse_inh = _S("StrongInhSlowNoLearn")
+
 synapses = [
-    [0, [3], FastLearn],
-    [1, [2], FastLearn],
-    [2, [0, 6], FastLearn],
-    [3, [1, 7], FastLearn],
-    [4, [7], FastLearn],
-    [5, [6], FastLearn],
-    [6, [4, 2], FastLearn],
-    [7, [5, 3], FastLearn],
+    [0, [3], _etero_synapse_inh],
+    [1, [2], _etero_synapse_inh],
+    [2, [0, 6], _etero_synapse_inh],
+    [3, [1, 7], _etero_synapse_inh],
+    [4, [7], _etero_synapse_inh],
+    [5, [6], _etero_synapse_inh],
+    [6, [4, 2], _etero_synapse_inh],
+    [7, [5, 3], _etero_synapse_inh],
 ]

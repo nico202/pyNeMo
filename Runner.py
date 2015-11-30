@@ -1,3 +1,4 @@
+
 #!/usr/bin/python2
 #Simulation
 import nemo
@@ -14,6 +15,7 @@ import argparse
 from sys import exit, stderr
 
 from libs.InAndOut import *
+from libs.simulation import *
 
 if __name__ == "__main__":
     class MyParser(argparse.ArgumentParser):
@@ -70,9 +72,9 @@ if __name__ == "__main__":
     if steps:
         try:
             if 'm' in steps:
-                steps = int(steps.strip('m')) * 60 * 1000
+                steps = float(steps.strip('m')) * 60 * 1000
             elif 's' in steps:
-                steps = int(steps.strip('s')) * 1000
+                steps = float(steps.strip('s')) * 1000
         except ValueError:
             exit("Steps parameter can contain either 'm' (minutes) or 's' (seconds)")
         general_config.steps = int(steps)
@@ -114,9 +116,17 @@ if __name__ == "__main__":
                 else:
                     print("Simulation has previously been executed!")
                     print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
-                    loaded_img = importer(old_output)
-                    saveSourceImage(loaded_img, old_output + ".png")
-                    showSourceImage(old_output + ".png")
+                    #Show spiking: #FIX
+                    if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY:
+                        if general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL:
+                            loaded_img = importer(old_output)
+                            showSourceImage("." + general_config_hash + config_hash + '.png')
+                        #FIXME: fix the following, to save is not defined. Where to read all?
+                        #if general_config._SHOW_MEMBRANE or args.SHOW_ALL:
+                        #    for neuron in to_save:
+                        #        loaded_img = importer(old_output + '_membrane' + str(neuron) + '.png')
+                        #        showSourceImage(loaded_img)
+
                 bypass = True and not force_run
         if args.GPU == None:
             GPU = general_config._GPU
@@ -129,7 +139,7 @@ if __name__ == "__main__":
         nemo_config = nemo.Configuration()
 
         #TODO: for small networks, cpu is faster, use it (if config permits)
-        if general_config._GPU:
+        if GPU:
             try:
                 nemo_config.set_cuda_backend(general_config._BACKEND_NUMBER)
                 GPU = True
@@ -173,43 +183,16 @@ if __name__ == "__main__":
         sim = nemo.Simulation(net, conf)
 
         start = time.time()
+        to_save = config.save
+        output_firings, membrane_output =\
+        simulation(
+            Nsim = sim,
+            save = to_save,
+            steps = general_config.steps,
+            stims = config.step_input,
+            fspikes = config.step_spike
+        )
 
-        t = general_config.steps or -1 #if == 0, run indefinitely
-        tot = t
-
-        output_firings = {}
-        membrane_output = {}
-
-        if general_config._OUTPUT: #I keep them separate to reduce the overhead
-            while not t == 0:
-                general_config.steps
-                fired = sim.step()
-                t -= 1
-                if (t < 0):
-                    T = abs(t)
-                else:
-                    T = tot - t
-                print T, ":", fired
-        else:
-            try:
-                to_save = config.save
-            except:
-                to_save = []
-            for i in to_save:
-                membrane_output[i] = [] #We save the dict containing neurons_Vm
-            if to_save: #Every optimization here matters
-                while not t == 0:
-                    fired = sim.step()
-                    for neuron in to_save: #Save membrane potential
-                        membrane_output[neuron].append(sim.get_membrane_potential(neuron))
-                    output_firings[t] = [ i for i in fired ]
-                    t -= 1
-            else:
-                while not t == 0:
-                    general_config.steps
-                    fired = sim.step()
-                    output_firings[t] = [ i for i in fired ]
-                    t -= 1
         end = time.time()
 
         #TODO: if this is slow for big networks, replace with pickle

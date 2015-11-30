@@ -1,5 +1,5 @@
 /*.pyc
 /nets/*.pyc
+/libs/*.pyc
 .store
 __pycache__/
-/libs/*.pyc

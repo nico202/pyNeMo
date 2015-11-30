@@ -1,7 +1,7 @@
 #IF YOU EDIT THIS FILE, PLEASE run "git commit -a" OR YOU'LL FACE WRONG CONFIGS
 
 #This files is use for quickly add neurons /synapses to a net_config
-from libs.FasterPresets import _typicalN, _typicalS
+from libs.FasterPresets import _typicalN, _typicalS, _S
 #from random import random as _rand
 #IF testing new nets, use the option "--force"
 
@@ -17,25 +17,38 @@ from libs.FasterPresets import _typicalN, _typicalS
 FastSpiking = [(0.2, 0.5, -65, 8, 5, 0.2 * -65, -65)]
 SlowSpiking = [(0.002, 0.4, -65, 8, 0, 0.2 * -65, -65)]
 RandomSpiking = [(0.2, 0.5, -65, 8, 20, -10, -65)]
+
 #http://www.izhikevich.org/publications/whichmod.pdf
 #Examples: http://www.izhikevich.org/publications/spikes.pdf
 #Excitatory
-RS = _typicalN(c = -65, d = 8) #regular spiking
+#DO_NOT_TOUCH
+RS = _typicalN(a = 0.02, b = 0.2, c = -65, d = 8) #regular spiking (Ambroise 2014)
+#DO_NOT_TOUCH
 IB = _typicalN(c = -55, d = 4) #intrinsically bursting
+#DO_NOT_TOUCH
 CH = _typicalN(c = -50, d = 2) #chattering
 
+RS1 = _typicalN(a = 0.02, b = 0.2, c = -65, d = 8)
+RS2 = _typicalN(a = 0.02, b = 0.3, c = -65, d = 8)
+
 #Inhibitory
+#DO_NOT_TOUCH
 FS = _typicalN(a = 0.1) #Fast spiking
+#DO_NOT_TOUCH
 LTS = _typicalN(b = 0.25) #low-treshold spiking
-LTSS = _typicalN(b = 0.3) #low-treshold spiking
 
-LFS = _typicalN(a = 0.01, b = 0.22, v = -65) #Fast spiking
-
+LTSS = _typicalN(b = 0.27) #low-treshold spiking
+LFS = _typicalN(a = 0.01, b = 0.05, d = 10) #Fast spiking
+LTS_no_spontaneous = _typicalN(a = 0.01, b = 0.05, d = 10, s = 0)
 #Synapes
 FastLearn = (1, 20, True)
 FastNoLearn = (1, 20, False)
 SlowNoLearn = (3, 20, False)
 InhSlowNoLearn = (5, -25, False)
+InhFastNoLearn = (1, -25, False)
+SmallInhFastNoLearn = (1, -1, False)
+MediumInhFastNoLearn = (1, -20, False)
+BigInhFastNoLearn = (1, -100, False)
 
 InhibitoryTypeI = (2, -20, True)
 ExcitatoryTypeI = (1, +2, True)
