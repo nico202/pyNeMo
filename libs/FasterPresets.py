@@ -13,8 +13,7 @@ def _typicalN( #DO NOT TOUCH
     v = -65     # Initial membrane potential
     ):
     if not u:
-        u = 0
-#        u = b * v
+        u = b * v
     return [(a, b, c, d, s, u, v)]
 
 def _typicalS (d = 1, w = 10, l = False): #TODO: not tested
@@ -53,7 +52,9 @@ def _S (Stype = "SmallInhFastNoLearn"):
 
     #Inhibitory/Excitatory
     if 'Inh' in Stype:
-        weight = 0 - weight
+        weight = - weight
+    elif 'Exc' in Stype:
+        weight = abs(weight)
 
     #Learn?
     if 'NoLearn' in Stype:
@@ -72,6 +73,11 @@ def _stimuli(input_list):
         to a dict:
             {step: [(neuron#, value), (..), ..]}
     '''
+#    try:
+#
+#        input_list = _proportional_stimuli(input_list)
+#    except IndexError:
+#        pass
     output_dict = {}
     for stimul in input_list:
         for step in range(stimul[2], stimul[3]):
@@ -84,3 +90,28 @@ def _stimuli(input_list):
                 stim_tuple = (neuron, float(input_value))
                 output_dict[step].append(stim_tuple)
     return output_dict
+
+def _proportional_stimuli(input_list):
+    '''
+        [
+            [neuron#, (step, offset, multi), stimul from, stimul to]
+        ]
+        is converted to the default list that feeds _stimulti
+    '''
+    output = []
+    n = 0
+    for stimul in input_list:
+        neuron, (value, offset, multi), start, stop = stimul
+
+        for i in range(0, stop - start):
+            output.append(
+                [
+                    neuron,
+                    multi * (value * (i + 1)) + offset,
+                    i + start,
+                    (i + 1) + start,
+                ]
+            )
+
+        n += 1
+    return output

@@ -11,12 +11,40 @@ from libs.FasterPresets import _typicalN, _typicalS, _S
 #c: typ = -65       after-spike reset value
 #d: typ = 2         after-spike recovery variable (u)
 #s: typ = 0         input bias picked from gaussian [0, s)
+#u: typ = b * v
+#v: typ = -65
 #Right now using function requires the conversion to list (to prevent saving it as a pointer to function)
 #YES, 2 brackets. This allow us to use NeuronType * Nuber
 #neurons: a, b, c, d, s, u, v
-FastSpiking = [(0.2, 0.5, -65, 8, 5, 0.2 * -65, -65)]
-SlowSpiking = [(0.002, 0.4, -65, 8, 0, 0.2 * -65, -65)]
-RandomSpiking = [(0.2, 0.5, -65, 8, 20, -10, -65)]
+#http://www.izhikevich.org/publications/figure1.m
+#DO_NOT_TOUCH
+TonicSpiking = _typicalN(d = 6, v = -70, u = 0.2 * -65)
+#DO_NOT_TOUCH
+PhasicSpiking = _typicalN(b= 0.25, d = 6, v = -64)
+#DO_NOT_TOUCH
+TonicBursting = _typicalN(c = -50, d = 2, v = -70)
+#DO_NOT_TOUCH
+PhasicBursting = _typicalN(b = 0.25, c = -55, d = 0.05, v = -64)
+#DO_NOT_TOUCH
+MixedMode = _typicalN(c = -55, d = 4, v = -70)
+#DO_NOT_TOUCH
+SpikeFreqAdapt = _typicalN(a=0.01, d = 8, v = -70)
+#DO_NOT_TOUCH
+#NOT WORKING
+ClassIExc = _typicalN(b=-0.1, c= -55, d = 6, v = -60)
+#DO_NOT_TOUCH
+ClassIIExc = _typicalN(a=0.2, b=0.26, c=-65, d = 0, v = -64)
+#DO_NOT_TOUCH
+SpikeLatency = _typicalN(a=0.02, d = 6, v = -70)
+#DO_NOT_TOUCH
+SubtresholdOSC = _typicalN(a=0.05,b=0.26,c=-60, d=0,v=-62)
+#DO_NOT_TOUCH
+Resonator = _typicalN(a=0.1, b=0.26, c=-60, d=-1, v=-62)
+#DO_NOT_TOUCH
+Accomodation = _typicalN(b=1, c=-55, d=4, v=-65, u=-16)
+
+#DO_NOT_TOUCH
+Bistability = _typicalN(a=0.1, b=0.26, c=-60, d=0, v=-61)
 
 #http://www.izhikevich.org/publications/whichmod.pdf
 #Examples: http://www.izhikevich.org/publications/spikes.pdf
@@ -29,9 +57,12 @@ IB = _typicalN(c = -55, d = 4) #intrinsically bursting
 CH = _typicalN(c = -50) #chattering
 #DO NOT TOUCH
 TC = _typicalN(b = 0.25, d = 0.05)
+#DO NOT TOUCH
+RZ = _typicalN(a = 0.1, b = 0.25)
+
 RS1 = _typicalN(a = 0.02, b = 0.2, c = -65, d = 8)
 RS2 = _typicalN(a = 0.02, b = 0.3, c = -65, d = 8)
-RZ = _typicalN(a = 0.1, b = 0.25)
+
 #Inhibitory
 #DO_NOT_TOUCH
 FS = _typicalN(a = 0.1) #Fast spiking
@@ -40,7 +71,6 @@ LTS = _typicalN(b = 0.25) #low-treshold spiking
 
 LTSS = _typicalN(b = 0.27) #low-treshold spiking
 LFS = _typicalN(a = 0.01, b = 0.05, d = 10) #Fast spiking
-LTS_no_spontaneous = _typicalN(a = 0.01, b = 0.05, d = 10, s = 0)
 #Synapes
 FastLearn = (1, 20, True)
 FastNoLearn = (1, 20, False)

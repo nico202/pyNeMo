@@ -1,5 +1,6 @@
 import os
 from sys import exit
+from libs.VUEtoPy import *
 
 #require ast (dict import), shutil (copy config), hashlib (Hash configs)
 
@@ -155,7 +156,7 @@ def membraneImage(values, title = False, close = True, scales = []): #TODO: Add 
     ax2 = ax1.twinx()
     ax2.plot(Stim_list, color = 'r')
     ax2.set_ylabel('Stimulation\n(mA)')
-    ax2.set_ylim(0,100)
+    ax2.set_ylim(min(-10, min(Stim_list)),max(100,max(Stim_list)))
     if title:
         plt.title(title)
     return plt

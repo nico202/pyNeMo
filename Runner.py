@@ -1,4 +1,3 @@
-
 #!/usr/bin/python2
 #Simulation
 import nemo
@@ -16,6 +15,7 @@ from sys import exit, stderr
 
 from libs.InAndOut import *
 from libs.simulation import *
+import libs.VUEtoPy as VUEtoPy
 
 if __name__ == "__main__":
     class MyParser(argparse.ArgumentParser):
@@ -35,6 +35,9 @@ if __name__ == "__main__":
     parser.add_argument('--steps',
         help = 'Steps to run. Default loaded in general config\nDefault ms. Can use s and m (ie. 10s, 3m)',
         dest = 'steps')
+    parser.add_argument('--output-dir',
+        help = 'Override config-defined output dir',
+        dest = 'forced_output')
 
     processing = parser.add_mutually_exclusive_group()
     processing.add_argument('--gpu',
@@ -85,11 +88,17 @@ if __name__ == "__main__":
         general_config.steps = int(steps)
 
     # Load user-defined config file
+    if ".vue" in config_name:
+        print("Converting input VUE to py")
+        VUEtoPy.VUEtoPyConverter(config_name)
+        config_name = "".join((config_name.split(".")[:-1]))
+        config_name += ".py"
     try:
         config = imp.load_source('*', config_name)
         script_dir = os.getcwd()
     except SyntaxError:
-        exit("Config file: Syntax Error")
+        print("Config file: Syntax Error")
+        raise
     except:
         print("DEBUG: Unknown error")
         raise
@@ -107,32 +116,31 @@ if __name__ == "__main__":
         general_config_key, general_config_hash = hashIt(general_config)
 
         #If any of the following False, we can bypass the computation and print previously-saved run
-        if not force_run:
-            if not any([
-                saveKey(general_config_hash, general_config_key),
-                saveKey(config_hash, config_key),
-                saveFile(script_dir + '/' + "general_config.py", general_config_hash),
-                saveFile(script_dir + '/' + config_name, config_hash), #TODO: FIX this.
-                not os.path.isfile('./.' + general_config_hash + config_hash)
-            ]):
-                old_output = '.' + general_config_hash + config_hash
-                if general_config._OUTPUT:
-                    print open(old_output, 'r').readlines()
-                else:
-                    print("Simulation has previously been executed!")
-                    print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
-                    #Show spiking: #FIX
-                    if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY:
-                        if general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL:
-                            loaded_img = importer(old_output)
-                            showSourceImage("." + general_config_hash + config_hash + '.png')
-                        #FIXME: fix the following, to save is not defined. Where to read all?
-                        #if general_config._SHOW_MEMBRANE or args.SHOW_ALL:
-                        #    for neuron in to_save:
-                        #        loaded_img = importer(old_output + '_membrane' + str(neuron) + '.png')
-                        #        showSourceImage(loaded_img)
+        if not any([
+            saveKey(general_config_hash, general_config_key),
+            saveKey(config_hash, config_key),
+            saveFile(script_dir + '/' + "general_config.py", general_config_hash),
+            saveFile(script_dir + '/' + config_name, config_hash), #TODO: FIX this.
+            not os.path.isfile('./.' + general_config_hash + config_hash)
+        ]):
+            old_output = '.' + general_config_hash + config_hash
+            if general_config._OUTPUT:
+                print open(old_output, 'r').readlines()
+            else:
+                print("Simulation has previously been executed!")
+                print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
+                #Show spiking: #FIX
+                if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY:
+                    if general_config._SHOW_SPIKES or args.SHOW_SPIKES_ONLY or args.SHOW_ALL:
+                        loaded_img = importer(old_output)
+                        showSourceImage("." + general_config_hash + config_hash + '.png')
+                    #FIXME: fix the following, to save is not defined. Where to read all?
+                    #if general_config._SHOW_MEMBRANE or args.SHOW_ALL:
+                    #    for neuron in to_save:
+                    #        loaded_img = importer(old_output + '_membrane' + str(neuron) + '.png')
+                    #        showSourceImage(loaded_img)
 
-                bypass = True and not force_run
+            bypass = True and not force_run
         if args.GPU == None:
             GPU = general_config._GPU
         else:
@@ -154,6 +162,7 @@ if __name__ == "__main__":
                 nemo_config.set_cpu_backend()
         else:
             nemo_config.set_cpu_backend()
+
         # Neurons
         neuron_list = config.neurons[0]
         for nidx in range(len(neuron_list)):
@@ -167,7 +176,7 @@ if __name__ == "__main__":
             try: #dests is a single value or a list?
                 dests = int(dests)
                 dests = [ dests ]
-            except TypeError:
+            except TypeError: #Is already a list :)
                 pass
 
             try: #if weight length is 1, apply it to all synapses
@@ -210,6 +219,7 @@ if __name__ == "__main__":
             n = 0
             for n in range(0, general_config.steps):
                 if n in config.step_input:
+                    found = False
                     for s in config.step_input[n]:
                         if s[0] == neuron:
                             stims.append(s[1])
@@ -238,7 +248,7 @@ if __name__ == "__main__":
     total_time = end - start
     step_time = total_time / general_config.steps
     history = open("history.log", 'a') #Update the history with results timing
-    history.write("%f, %s, %s, %s %f, %f\n" % (time.time(),
+    history.write("%f, %s, %s, %s, %f, %f\n" % (time.time(),
                                         "GPU" if GPU else "CPU",
                                         general_config_hash,
                                         config_hash,
