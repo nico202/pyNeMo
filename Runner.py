@@ -38,6 +38,11 @@ if __name__ == "__main__":
     parser.add_argument('--output-dir',
         help = 'Override config-defined output dir',
         dest = 'forced_output')
+    parser.add_argument('--save-all',
+        action = 'store_true',
+        help = 'Save all neurons (override config)',
+        dest = 'save_all',
+        default = False)
 
     processing = parser.add_mutually_exclusive_group()
     processing.add_argument('--gpu',
@@ -75,7 +80,8 @@ if __name__ == "__main__":
     )
 
     args = parser.parse_args()
-    config_name, force_run, steps = args.network_file, args.force_run, args.steps
+    config_name, force_run, steps, save_all\
+  = args.network_file, args.force_run, args.steps, args.save_all
 
     if steps:
         try:
@@ -102,6 +108,9 @@ if __name__ == "__main__":
     except:
         print("DEBUG: Unknown error")
         raise
+
+    if save_all:
+        config.save = range(0, len(config.neurons[0]))
 
     try:
         net_name = config.name
@@ -197,6 +206,7 @@ if __name__ == "__main__":
         sim = nemo.Simulation(net, conf)
 
         start = time.time()
+
         to_save = config.save
         output_firings, membrane_output =\
         simulation(

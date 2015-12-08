@@ -31,9 +31,17 @@ def VUEtoPyConverter(input_vue):
     to_save = []
     tree = ET.fromstring(xml)
     for child in tree.findall("child"):
+        is_stim = False
         if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.attrib:
             if child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "node":
-                if not "Stim" in child.attrib["label"]:
+                if child.findall("shape"):
+                    if child.findall("shape")[0] == "":
+                        print "No"
+                    else:
+                        if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.findall("shape")[0].attrib:
+                            if child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "rectangle":
+                                is_stim = True
+                if not is_stim or (not is_stim and not "Stim" in child.attrib["label"]):
                     node_neuron_map[child.attrib["ID"]] = len(neurons)
                     new = neuron(child.attrib["ID"])
                     new.neuron_type(child.attrib["label"])
@@ -50,10 +58,13 @@ def VUEtoPyConverter(input_vue):
                         else:
                             conn_type = "undefined"
                         #print "Connection is: %s" % conn_type
-                else:
+                else: #Stim
                     if not child.attrib["ID"] in stims:
                         stims[child.attrib["ID"]] = []
-                    stims[child.attrib["ID"]].append(child.attrib["label"].split(":")[1].split(","))
+                    try:
+                        stims[child.attrib["ID"]].append(child.attrib["label"].split(":")[1].split(","))
+                    except IndexError:
+                        stims[child.attrib["ID"]].append(child.attrib["label"].split(","))
 
             elif child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "link":
                 for x_from in child.findall("ID1"):
@@ -123,9 +134,13 @@ from libs.FasterPresets import _S, _stimuli\n"
     t = 0
     for s in synapses:
         t += 1
-        net_content +=  "    [ %s, [%s], _S(\"%s\")" % (node_neuron_map[s.x_from],
+        try:
+            net_content +=  "    [ %s, [%s], _S(\"%s\")" % (node_neuron_map[s.x_from],
                                                 node_neuron_map[s.x_to],
                                                 s.s_type)
+        except KeyError:
+            exit("ERROR: Remembrer not to use labels on Stimulation arrows\nFix the config")
+
         net_content += "]"
         if t != tot:
             net_content += ",\n"
