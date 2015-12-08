@@ -31,7 +31,7 @@ def simulation(
 
         for neuron in save: #Save membrane potential
             membrane_output[neuron].append(Nsim.get_membrane_potential(neuron))
-        output_firings[steps] = [ i for i in fired ]
+        output_firings[total - steps] = [ i for i in fired ]
         steps -= 1
     #Loop ended. Returns
     return output_firings, membrane_output

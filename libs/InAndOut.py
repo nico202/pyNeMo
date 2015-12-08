@@ -97,7 +97,6 @@ def saveSourceImage(source, image_name):
                     spikes_dict[neuron] = [ms]
         for key in spikes_dict:
             spikes.append(spikes_dict[key])
-        print spikes
         if len(spikes): #If no data, it does not save image
             sp = spikeplot.SpikePlot(savefig=True)
             sp.set_fig_name(image_name)
