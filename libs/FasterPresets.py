@@ -39,6 +39,8 @@ def _S (Stype = "SmallInhFastNoLearn"):
     #Weight:
     if 'Weak' in Stype:
         weight = 1
+    elif 'WeaMed' in Stype:
+        weight = 5
     elif 'Medium' in Stype:
         weight = 10
     elif 'Strongest' in Stype:

@@ -56,7 +56,7 @@ def saveFile(file_name, file_hash, notouch = False):
     else:
         return False
 
-def importer(filename):
+def importer(filename, replace_pattern = False):
     import ast
     try:
         ret = ast.literal_eval((open(filename, 'r').readline()))

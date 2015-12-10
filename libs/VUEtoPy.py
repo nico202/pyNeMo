@@ -29,9 +29,11 @@ def VUEtoPyConverter(input_vue):
     stims_link = {}
     stims = {}
     to_save = []
+    sensory_neurons = {}
+    sens_map = {}; sens_rev_map = {}
     tree = ET.fromstring(xml)
     for child in tree.findall("child"):
-        is_stim = False
+        is_stim = False; is_sensory = False
         if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.attrib:
             if child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "node":
                 if child.findall("shape"):
@@ -41,7 +43,11 @@ def VUEtoPyConverter(input_vue):
                         if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.findall("shape")[0].attrib:
                             if child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "rectangle":
                                 is_stim = True
-                if not is_stim or (not is_stim and not "Stim" in child.attrib["label"]):
+                            elif child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "chevron":
+                                is_sensory = True
+                if is_sensory:
+                    sensory_neurons[child.attrib["ID"]] = child.attrib["label"]
+                elif not is_stim or (not is_stim and not "Stim" in child.attrib["label"]):
                     node_neuron_map[child.attrib["ID"]] = len(neurons)
                     new = neuron(child.attrib["ID"])
                     new.neuron_type(child.attrib["label"])
@@ -71,16 +77,24 @@ def VUEtoPyConverter(input_vue):
                     link_from = x_from.text
                 for x_to in child.findall("ID2"):
                     link_to = x_to.text
-                syn = False
+                syn = False; sens = False
                 try:
                     s_type = child.attrib["label"]
-                    syn = True
+                    if not s_type == "Spike":
+                        syn = True; sens = False
+                    else:
+                        syn = False; sens = True
                 except KeyError:
-                    syn = False
+                    syn = False; sens = False
                 if syn:
                     new = synapse((link_from, link_to))
                     new.synapse_type(s_type)
                     synapses.append(new)
+                elif sens:
+                    sens_map[link_to] = link_from
+                    if not link_from in sens_rev_map:
+                        sens_rev_map[link_from] = []
+                    sens_rev_map[link_from].append(link_to)
                 else:
                     if not link_from in stims_link:
                         stims_link[link_from] = []
@@ -105,11 +119,18 @@ from libs.FasterPresets import _S, _stimuli\n"
             net_content += " +\n"
     net_content += "]\n"
 
+    #sensory_neurons
+    net_content += "sensory_neurons = [\n"
+    for key, val in sensory_neurons.iteritems():
+        for s in sens_rev_map[key]:
+            net_content += "\t[ " + "".join(val) + ", " +str(node_neuron_map[s]) +" ],\n"
+    net_content += "]\n\n"
+
     #Save all
 
     #net_content += "save = range(0, len(neurons[0]))\n"
     #Don't save whited nodes
-    net_content += "save = [" + " ,".join([ str(node_neuron_map[ts]) for ts in to_save]) + "]\n\n"
+    net_content += "save = [ " + ", ".join([ str(node_neuron_map[ts]) for ts in to_save]) + " ]\n\n"
     #No input right now
     net_content += "step_input = _stimuli([\n"
     tot = len(stims_link)
@@ -126,7 +147,7 @@ from libs.FasterPresets import _S, _stimuli\n"
                 net_content += ",\n"
 
     net_content += "\n])\n"
-    net_content += "step_spike = {}\n"
+    net_content += "step_spike = {}\n" #TODO: implement
 
     #Synapses
     net_content += "synapses = [\n"

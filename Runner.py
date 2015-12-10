@@ -17,6 +17,10 @@ from libs.InAndOut import *
 from libs.simulation import *
 import libs.VUEtoPy as VUEtoPy
 
+#YARP and "iSpike" helpers
+import libs.pYARP
+import libs.pySpike
+
 if __name__ == "__main__":
     class MyParser(argparse.ArgumentParser):
         def error(self, message):
@@ -43,7 +47,15 @@ if __name__ == "__main__":
         help = 'Save all neurons (override config)',
         dest = 'save_all',
         default = False)
-
+    parser.add_argument('--replace-variables',
+        help = '''Fast change variables marked with %% Use --replace-help for other infos''',
+        dest = 'replaced'
+    )
+    parser.add_argument('--replace-help',
+        action = 'store_true',
+        help = '''Show replace-variables usage and exit.''',
+        dest = 'replace_help'
+    )
     processing = parser.add_mutually_exclusive_group()
     processing.add_argument('--gpu',
         action='store_true',
@@ -82,6 +94,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     config_name, force_run, steps, save_all\
   = args.network_file, args.force_run, args.steps, args.save_all
+    if args.replace_help:
+        '''Well... I don't know how to implement this right now.
+        (config file is imported with "import". )'''
+        exit('''--replace-variables can be used to replace any value
+        that gets evaluated in the config file. Those values must be marked with
+        % (ie. %VAR_A%) and can be replaced here (ie. with: VAR_A=0.02,VAR_B=0.2)''')
 
     if steps:
         try:
@@ -158,6 +176,8 @@ if __name__ == "__main__":
     if not bypass:
         net = nemo.Network()
         iz = net.add_neuron_type('Izhikevich')
+        #km = net.add_neuron_type('Kuramoto')
+
         nemo_config = nemo.Configuration()
 
         #TODO: for small networks, cpu is faster, use it (if config permits)
@@ -177,7 +197,8 @@ if __name__ == "__main__":
         for nidx in range(len(neuron_list)):
             a, b, c, d, s, u, v = neuron_list[nidx]
             net.add_neuron(iz, nidx, a, b, c, d, s, u, v)
-
+        sensory_neuron_list = config.sensory_neurons
+        #TODO: write here
         #Synapses
         for sidx in range(len(config.synapses)):
             source, dests, synaptic_prop = config.synapses[sidx]
