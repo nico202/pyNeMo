@@ -77,6 +77,8 @@ class sensNetOut():
         dof = 0, #Degree of freedom of joint.
         integration_steps = 10  #Step after which integration occurs (1step = 1ms)
     ):
+        if neuron_number < 2:
+            exit("FATAL ERROR: You need at least 2 neurons")
         angle_dist = (max_angle - min_angle) / (neuron_number - 1)
         current_variables = [0] * neuron_number
         current_variable_angles = [0] * neuron_number
@@ -111,7 +113,7 @@ class sensNetOut():
             elif new_angle < self.min_angle:
                 print("ERROR: new angle (%d) < minimum" % (new_angle))
             self.current_angle = new_angle
-            
+
             self.missing_steps = self.integration_steps
         else:
             pattern = [1 if n in fired else 0 for n in range(self.neuron_number)]

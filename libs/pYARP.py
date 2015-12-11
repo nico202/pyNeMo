@@ -19,13 +19,15 @@ class YARPInterface():
         ):
         import yarp
         import time
+        import random
         from sys import exit
         self.YARP = yarp
         self.YARP.Network.init()
         self.props = self.YARP.Property()
         self.props.put("device","remote_controlboard")
-        self.props.put("local","/client/body")
-        self.props.put("remote",robot)
+        #FIXME: better namings XD
+        self.props.put("local","/client/" + str(random.random())) #prevent conflict
+        self.props.put("remote", robot)
         # create remote driver
         self.armDriver = self.YARP.PolyDriver(self.props)
 
@@ -46,19 +48,22 @@ class YARPInterface():
         speed=self.YARP.Vector(self.jnts,self.encs.data())
         acc=self.YARP.Vector(self.jnts,self.encs.data())
 
+        self.angles = [0] * self.jnts
         # Set Ref Acceleration and Speed
         for i in range(self.jnts):
             speed.set(i, speed_val)
             self.iPos.setRefSpeed(i,ref_speed)
             acc.set(i, acc_val)
+            self.angles[i] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(i)
         self.iPos.setRefAccelerations(acc.data())
 
     def read(self, jnt):
-        value = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(jnt)
-        print value
-        return value
+        self.angles[jnt] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(jnt)
+        return self.angles[jnt]
 
     def write(self, jnt, angle):
+        if angle is False:
+            angle = self.angles[jnt]
         success = False
         try:
             tmp  = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data())
@@ -72,7 +77,7 @@ class YARPInterface():
     def reach(self):
         import time
         while not self.iPos.isMotionDone():
-            time.sleep(10)
+            time.sleep(1)
         return True
 
     #Implement

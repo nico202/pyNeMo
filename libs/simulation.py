@@ -7,11 +7,10 @@ def simulation(
     stims = {},
     fspikes = {},
     sensory_in = {},
-    sensory_out = [] #List of lists of ids
+    sensory_out = [] #List of [port_name, out_dof, [ids]]
 ):
     if sensory_in or sensory_out: #import only if needed
         import libs.pySpike
-        import libs.pYARP
         import sys
         #FIXME: pass robot name as paramater to simulation()
         robot = libs.pYARP.YARPInterface('/doublePendulumGazebo/body')
@@ -35,9 +34,15 @@ def simulation(
         #FIXME: add other params
         sens_net = libs.pySpike.sensNetIn(neuron_number = len(sensory_in))
         sens_net_out = []
-        for nid in range(len(sens_net_out)):
-            sens_net_out[nid] = libs.pySpike.sensNetOut()
-
+        sens_robot_out = []
+        for nid in range(0, len(sensory_out)):
+            sens_net_out.append(
+                libs.pySpike.sensNetOut(neuron_number = len(sensory_out[nid][2]))
+            )
+            sens_robot_out.append(
+                [libs.pYARP.YARPInterface(sensory_out[nid][0]), sensory_out[nid][1]]
+            )
+    angles = [ [0] ] * len(sensory_out)#Used for analysis
     while steps: #go until 0 or indefinitely
 #FIXME: How to sync yarp/gazebo time? If possible we should trigger a step here
         loop = total - steps
@@ -60,9 +65,11 @@ def simulation(
             fired = Nsim.step()
         #Update YARP
         nid = 0
-        for s_out in sensory_out:
-            sensory_fired = list(set(fired) & set(s_out))
-            sens_net_out[nid].step(sensory_fired)
+        for s_out in sensory_out: #List of lists
+            sensory_fired = list(set(fired) & set(s_out[2]))
+            angle = sens_net_out[nid].step(sensory_fired)
+            sens_robot_out[nid][0].write(sens_robot_out[nid][1], angle)
+            angles[nid].append(angle) #Analysis
             nid += 1
 
         for neuron in save: #Save membrane potential
@@ -70,4 +77,4 @@ def simulation(
         output_firings[loop] = [ i for i in fired ]
         steps -= 1
     #Loop ended. Returns
-    return output_firings, membrane_output, stims
+    return output_firings, membrane_output, stims, angles

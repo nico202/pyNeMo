@@ -225,20 +225,26 @@ if __name__ == "__main__":
         sensory_neuron_list = config.sensory_neurons
 
         #create the array of neuron that should be passed to pySpike/pYARP
-        sensory_neurons_map = {}
-        for sensory_array in sensory_neuron_list:
-            n_number = sensory_array[0]
-            a, b, c, d, s, u, v = sensory_array[2][0]
+        sensory_neurons_map_in = {}
+        for sensory_array_in in sensory_neuron_list[0]:
+            n_number = sensory_array_in[0]
+            a, b, c, d, s, u, v = sensory_array_in[2][0]
             for nn in range(0, n_number):
                 nidx +=1
                 net.add_neuron(iz, nidx, a, b, c, d, s, u, v)
-                dest = sensory_array[3]
-                delay, weights, plastic = sensory_array[4]
+                dest = sensory_array_in[3]
+                delay, weights, plastic = sensory_array_in[4]
                 net.add_synapse(nidx, dests, delay, weights, plastic)
-                sensory_neurons_map[nidx] = nn
+                sensory_neurons_map_in[nidx] = nn
 
-
-        #TODO: write here
+        nsens_port_map = []
+        for sensory_array_out in sensory_neuron_list[1]:
+            port_name = sensory_array_out[0]
+            out_dof = sensory_array_out[1]
+            sens_conn_out = sensory_array_out[2]
+            n_number = len(sens_conn_out)
+            #TODO: add other params needed
+            nsens_port_map.append([port_name, out_dof, sens_conn_out])
 
         conf = nemo.Configuration()
         sim = nemo.Simulation(net, conf)
@@ -246,17 +252,16 @@ if __name__ == "__main__":
         start = time.time()
 
         to_save = config.save
-        output_firings, membrane_output, config.step_input =\
+        output_firings, membrane_output, config.step_input, angles =\
         simulation(
             Nsim = sim,
             save = to_save,
             steps = general_config.steps,
             stims = config.step_input,
             fspikes = config.step_spike,
-            sensory_in = sensory_neurons_map,
-            sensory_out = [] #FIXME: add it XD
+            sensory_in = sensory_neurons_map_in,
+            sensory_out = nsens_port_map
         ) #Returns step_input too, cause it can be edited by the yarp interaction
-
 
         end = time.time()
 
@@ -285,8 +290,8 @@ if __name__ == "__main__":
         for neuron in to_save:
             saveRawImage(membraneImage((membrane_output[neuron], stims), close = False, title = config.name),
                 '.' + general_config_hash + config_hash + '_membrane' + str(neuron) + '_Mixed.png', close = False)
-
-
+        #TODO: add "angles" (is a list of lists of angles for every sensory neuron)
+        saveKey(general_config_hash + config_hash + '_angles', angles)
         print("Output file is: %s" % (general_config._history_dir + '/' + '.' + general_config_hash + config_hash))
         #Show spiking:
         if general_config._SHOW_IMAGE_ON_SAVE or args.SHOW_ALL or args.SHOW_SPIKES_ONLY or args.SHOW_MEMBRANE_ONLY:

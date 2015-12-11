@@ -130,25 +130,23 @@ from libs.FasterPresets import _S, _stimuli\n"
 
     #sensory_neurons
     net_content += "sensory_neurons = [ #0 = ins, #1 = outs\n"
-    try:
-        net_content += "[ #ins\n"
-        for key, val in sensory_neurons.iteritems():
+
+    net_content += "[ #ins (output#, std, NueronType, SynapseType)\n"
+    for key, val in sensory_neurons.iteritems():
+        if key in sens_rev_map_in:
             outs = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_in[key]])
             values = val.split(", ")
             syn_type = "_S( \"" + values[3] + "\" )"
             net_content += "\t[ " + ", ".join(values[0:3]) + ", [" + outs + "], " + syn_type + " ],\n"
-    except KeyError:
-        pass
+
     net_content += "],\n"
     net_content += "[ #outs (yarp port, dof, [inputs])\n"
-    try:
-        for key, val in sensory_neurons.iteritems(): #FIXME: output neurons
-            if key in sens_rev_map_out:
-                ins = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_out[key]])
-                net_content += "\t[ " + sensory_neurons[key] + ", [" + ins + "] ],\n"
-    except KeyError:
-        raise
-        pass
+
+    for key, val in sensory_neurons.iteritems(): #FIXME: output neurons
+        if key in sens_rev_map_out:
+            ins = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_out[key]])
+            net_content += "\t[ " + sensory_neurons[key] + ", [" + ins + "] ],\n"
+
     net_content += "]\n"
 
     net_content += "]\n\n"
