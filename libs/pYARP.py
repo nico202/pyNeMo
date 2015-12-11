@@ -17,6 +17,7 @@ class YARPInterface():
             acc_val = 50,
             ref_speed = 1
         ):
+        #TODO: dof?
         import yarp
         import time
         import random

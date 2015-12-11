@@ -67,6 +67,7 @@ def simulation(
         nid = 0
         for s_out in sensory_out: #List of lists
             sensory_fired = list(set(fired) & set(s_out[2]))
+            print sensory_fired, sens_robot_out[nid][1]
             angle = sens_net_out[nid].step(sensory_fired)
             sens_robot_out[nid][0].write(sens_robot_out[nid][1], angle)
             angles[nid].append(angle) #Analysis

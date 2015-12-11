@@ -13,7 +13,7 @@ class sensNetIn():
     from sys import exit
 
     def __init__(self,
-        dof = 0,
+        dof = 0, #FIXME: NOT USED
         std = 0.5,
         min_angle = -90,
         max_angle = 90,
@@ -74,7 +74,7 @@ class sensNetOut():
         decay_rate = 0.25, #The rate of decay of the angle variables
         current_increment = 10, #The amount by which the input current to the neurons is incremented by each spike
         neuron_number = 10, #
-        dof = 0, #Degree of freedom of joint.
+        dof = 0, #Degree of freedom of joint. FIXME: NOT USED
         integration_steps = 10  #Step after which integration occurs (1step = 1ms)
     ):
         if neuron_number < 2:
