@@ -1,0 +1,153 @@
+Description of Nicolo NN simulation software
+
+--------------------------------------------
+
+
+
+
+
+
+
+Network configuration:
+
+ - the network is configured with a network configuration python script (e.g. SimpleCoordinated.py)
+
+ - the network configuration python script can be generated using a GUI (VUE) together   
+
+   with a python script (VUEtoPy.py ) that convert the xlm output of the GUI into the
+
+   network configuration script.
+
+ - network configuration python script defining network using standard neurons or synapes defined in
+
+   templates  FasterPresets.py (utility functions to define neurons and templates) and templates.py 
+
+   (neurons parameter).  Execution of this script in main program creates a network configuration 
+
+   file (saved with hash in store folder) 
+
+
+
+todo: document define syntax of
+
+
+
+
+
+Visual Understanding Environment (VUE): GUI to generate an xml file describing neural networl
+
+  - VUE is a GUI conceptual map, 
+
+  - xml output 
+
+
+
+VUEtoPy.py:
+
+  - convert xlm output of VUE into a network configuration python script
+
+
+
+Argument command line
+
+  - network configuration python script
+
+  - store directory
+
+  - steps : number of simulation steps 
+
+  - ...
+
+
+
+General configuration file
+
+
+
+
+
+pySpike.py:  reimplementation of ispike writer and reader
+
+ - step( )
+
+
+
+PYARP.py: interface with yarp python bindings 
+
+ - define robot control interface (currently IPositionControl()) 
+
+ - angles = read(joints)
+
+ - write(joints, angles)
+
+
+
+Runner.py:  main program
+
+ + initialization:
+
+   - argument line processing
+
+   - VUEtoPy.VUEtoPYConverter(config file): convert VUE into python config ule
+
+   - Execution of network configuration python script to create configuration file ('config')
+
+   - Initialization of NeMo network ('net') using configuration file
+
+   - Add input output neurons to NeMo network ('net')
+
+ + simulation
+
+   - create NeMo simulation object ('sim') 
+
+   - call to function simulation(sim) in simulation.py
+
+ + save output
+
+
+
+simulation.py: network simulation
+
+ + depends on pySpike.py and Yarp for input and outpyt
+
+ 
+
+ + loop over steps
+
+   - read angle values with PYARP.read()
+
+   - convert angles in currents with pSpike.getCurrent() for each input neuron
+
+   - fired = Nsim.step(istim)
+
+        call NeMo step function to execution one simulation step with current as argument
+
+   - convert Nemo output neurons in angle with angle = pSpike.step(...)
+
+   - write angle values with PYARP.write() 
+
+   - save network state (optional)
+
+ 
+
+ISSUES:
+
+------
+
+
+
+ + synchronization with GAZEBO
+
+   - executime is about 20x slower than real time (on Nicolo Machine)
+
+   - check wall clock synchronization mechanism
+
+   - is implementation of simulation in C++ needed for velocity ?
+
+
+
+ + robot control interface: position vs torque vs impedance
+
+ + 
+
+
