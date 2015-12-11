@@ -197,8 +197,7 @@ if __name__ == "__main__":
         for nidx in range(len(neuron_list)):
             a, b, c, d, s, u, v = neuron_list[nidx]
             net.add_neuron(iz, nidx, a, b, c, d, s, u, v)
-        sensory_neuron_list = config.sensory_neurons
-        #TODO: write here
+
         #Synapses
         for sidx in range(len(config.synapses)):
             source, dests, synaptic_prop = config.synapses[sidx]
@@ -223,20 +222,41 @@ if __name__ == "__main__":
                     exit("Malformed synapse line %d" % (sidx + 1))
             net.add_synapse(source, dests, delay, weights, plastic)
 
+        sensory_neuron_list = config.sensory_neurons
+
+        #create the array of neuron that should be passed to pySpike/pYARP
+        sensory_neurons_map = {}
+        for sensory_array in sensory_neuron_list:
+            n_number = sensory_array[0]
+            a, b, c, d, s, u, v = sensory_array[2][0]
+            for nn in range(0, n_number):
+                nidx +=1
+                net.add_neuron(iz, nidx, a, b, c, d, s, u, v)
+                dest = sensory_array[3]
+                delay, weights, plastic = sensory_array[4]
+                net.add_synapse(nidx, dests, delay, weights, plastic)
+                sensory_neurons_map[nidx] = nn
+
+
+        #TODO: write here
+
         conf = nemo.Configuration()
         sim = nemo.Simulation(net, conf)
 
         start = time.time()
 
         to_save = config.save
-        output_firings, membrane_output =\
+        output_firings, membrane_output, config.step_input =\
         simulation(
             Nsim = sim,
             save = to_save,
             steps = general_config.steps,
             stims = config.step_input,
-            fspikes = config.step_spike
-        )
+            fspikes = config.step_spike,
+            sensory_in = sensory_neurons_map,
+            sensory_out = [] #FIXME: add it XD
+        ) #Returns step_input too, cause it can be edited by the yarp interaction
+
 
         end = time.time()
 

@@ -53,34 +53,39 @@ class YARPInterface():
             acc.set(i, acc_val)
         self.iPos.setRefAccelerations(acc.data())
 
-        #while not iPos.isMotionDone():
-        #    print " .",
-
     def read(self, jnt):
-        return self.YARP.Vector(self.jnts,self.encs.data()).get(jnt)
+        value = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(jnt)
+        print value
+        return value
 
     def write(self, jnt, angle):
         success = False
         try:
-            tmp  = self.YARP.Vector(self.jnts, self.encs.data())
+            tmp  = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data())
             tmp.set(jnt, angle)
-            tmp.set(1, 0)
             self.iPos.positionMove(tmp.data())
             success = True
         except:
             raise
         return success
 
+    def reach(self):
+        import time
+        while not self.iPos.isMotionDone():
+            time.sleep(10)
+        return True
+
     #Implement
     def changeRefSpeed(self, ref_speed, jnt = 'All'):
         if jnt == 'All':
             for i in range(self.jnts):
-                self.iPos.setRefSpeed(i,ref_speed)
+                self.iPos.setRefSpeed(i, ref_speed)
         else:
-            self.iPos.setRefSpeed(jnt,ref_speed)
+            self.iPos.setRefSpeed(jnt, ref_speed)
+
     def changeRefAcc(self, ref_acc, jnt = 'All'):
         if jnt == 'All':
             for i in range(self.jnts):
                 self.iPos.setRefAcceleration(i,ref_acc)
         else:
-            self.iPos.setRefAcceleration(jnt,ref_acc)
+            self.iPos.setRefAcceleration(jnt, ref_acc)

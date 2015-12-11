@@ -122,8 +122,14 @@ from libs.FasterPresets import _S, _stimuli\n"
     #sensory_neurons
     net_content += "sensory_neurons = [\n"
     for key, val in sensory_neurons.iteritems():
-        for s in sens_rev_map[key]:
-            net_content += "\t[ " + "".join(val) + ", " +str(node_neuron_map[s]) +" ],\n"
+        try:
+            for s in sens_rev_map[key]:
+                values = val.split(", ")
+
+                syn_type = "_S( \"" + values[3] + "\" )"
+                net_content += "\t[ " + ", ".join(values[0:3]) + ", " +str(node_neuron_map[s]) + ", " + syn_type + " ],\n"
+        except KeyError:
+            print key
     net_content += "]\n\n"
 
     #Save all
