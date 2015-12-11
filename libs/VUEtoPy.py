@@ -30,7 +30,8 @@ def VUEtoPyConverter(input_vue):
     stims = {}
     to_save = []
     sensory_neurons = {}
-    sens_map = {}; sens_rev_map = {}
+    sens_map_in = {}; sens_rev_map_in = {};
+    sens_map_out = {}; sens_rev_map_out = {};
     tree = ET.fromstring(xml)
     for child in tree.findall("child"):
         is_stim = False; is_sensory = False
@@ -57,13 +58,14 @@ def VUEtoPyConverter(input_vue):
                         max_component = max(color)
                         if max_component:
                             to_save.append(child.attrib["ID"])
-                        if colors.MAP[color.index(max_component)] == "R":
-                            conn_type = "excitatory"
-                        elif colors.MAP[color.index(max_component)] == "B":
-                            conn_type = "inhibitory"
-                        else:
-                            conn_type = "undefined"
-                        #print "Connection is: %s" % conn_type
+                        #Unused
+#                        if colors.MAP[color.index(max_component)] == "R":
+#                            conn_type = "excitatory"
+#                        elif colors.MAP[color.index(max_component)] == "B":
+#                            conn_type = "inhibitory"
+#                        else:
+#                            conn_type = "undefined"
+
                 else: #Stim
                     if not child.attrib["ID"] in stims:
                         stims[child.attrib["ID"]] = []
@@ -91,10 +93,17 @@ def VUEtoPyConverter(input_vue):
                     new.synapse_type(s_type)
                     synapses.append(new)
                 elif sens:
-                    sens_map[link_to] = link_from
-                    if not link_from in sens_rev_map:
-                        sens_rev_map[link_from] = []
-                    sens_rev_map[link_from].append(link_to)
+                    if link_from in sensory_neurons: #has output, is an input
+                        sens_map_in[link_to] = link_from
+                        if not link_from in sens_rev_map_in:
+                            sens_rev_map_in[link_from] = []
+                        sens_rev_map_in[link_from].append(link_to)
+                    elif link_to in sensory_neurons: #has input, is an output
+                        sens_map_out[link_from] = link_to
+                        if not link_to in sens_rev_map_out:
+                            sens_rev_map_out[link_to] = []
+                        sens_rev_map_out[link_to].append(link_from)
+
                 else:
                     if not link_from in stims_link:
                         stims_link[link_from] = []
@@ -120,18 +129,29 @@ from libs.FasterPresets import _S, _stimuli\n"
     net_content += "]\n"
 
     #sensory_neurons
-    net_content += "sensory_neurons = [\n"
-    for key, val in sensory_neurons.iteritems():
-        try:
-            for s in sens_rev_map[key]:
-                values = val.split(", ")
+    net_content += "sensory_neurons = [ #0 = ins, #1 = outs\n"
+    try:
+        net_content += "[ #ins\n"
+        for key, val in sensory_neurons.iteritems():
+            outs = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_in[key]])
+            values = val.split(", ")
+            syn_type = "_S( \"" + values[3] + "\" )"
+            net_content += "\t[ " + ", ".join(values[0:3]) + ", [" + outs + "], " + syn_type + " ],\n"
+    except KeyError:
+        pass
+    net_content += "],\n"
+    net_content += "[ #outs (yarp port, dof, [inputs])\n"
+    try:
+        for key, val in sensory_neurons.iteritems(): #FIXME: output neurons
+            if key in sens_rev_map_out:
+                ins = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_out[key]])
+                net_content += "\t[ " + sensory_neurons[key] + ", [" + ins + "] ],\n"
+    except KeyError:
+        raise
+        pass
+    net_content += "]\n"
 
-                syn_type = "_S( \"" + values[3] + "\" )"
-                net_content += "\t[ " + ", ".join(values[0:3]) + ", " +str(node_neuron_map[s]) + ", " + syn_type + " ],\n"
-        except KeyError:
-            print key
     net_content += "]\n\n"
-
     #Save all
 
     #net_content += "save = range(0, len(neurons[0]))\n"
