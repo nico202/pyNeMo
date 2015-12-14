@@ -23,6 +23,7 @@ def VUEtoPyConverter(input_vue):
         if started:
             xml += line
 
+    variables_load = ""
     node_neuron_map = {}
     neurons = []
     synapses = []
@@ -34,7 +35,7 @@ def VUEtoPyConverter(input_vue):
     sens_map_out = {}; sens_rev_map_out = {};
     tree = ET.fromstring(xml)
     for child in tree.findall("child"):
-        is_stim = False; is_sensory = False
+        is_stim = False; is_sensory = False; is_none = False; is_neuron = False
         if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.attrib:
             if child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "node":
                 if child.findall("shape"):
@@ -46,9 +47,14 @@ def VUEtoPyConverter(input_vue):
                                 is_stim = True
                             elif child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "chevron":
                                 is_sensory = True
+                            elif child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "rhombus":
+                                variables_load = child.attrib["label"]
+                                is_none = True
+                            else:
+                                is_neuron = True
                 if is_sensory:
                     sensory_neurons[child.attrib["ID"]] = child.attrib["label"]
-                elif not is_stim or (not is_stim and not "Stim" in child.attrib["label"]):
+                elif is_neuron:
                     node_neuron_map[child.attrib["ID"]] = len(neurons)
                     new = neuron(child.attrib["ID"])
                     new.neuron_type(child.attrib["label"])
@@ -111,12 +117,14 @@ def VUEtoPyConverter(input_vue):
 
     net_content = ""
     #Init
-    net_content += "from templates import * #For ease of use, this line is mandatory\n\
+    net_content += "from libs.templates import * #For ease of use, this line is mandatory\n\
 from libs.FasterPresets import _S, _stimuli\n"
 
     #Name
     net_name = input_vue.split(".")[0]
     net_content += "name = \"%s\"\n" % net_name
+    #Parameters
+    net_content += "\n%s\n" % variables_load
     #Neurons
     net_content += "neurons = [\n"
     tot = len(neurons)
@@ -131,13 +139,13 @@ from libs.FasterPresets import _S, _stimuli\n"
     #sensory_neurons
     net_content += "sensory_neurons = [ #0 = ins, #1 = outs\n"
 
-    net_content += "[ #ins (output#, std, NueronType, SynapseType)\n"
+    net_content += "[ #ins (output#, std, NueronType, SynapseType, Joint)\n"
     for key, val in sensory_neurons.iteritems():
         if key in sens_rev_map_in:
             outs = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_in[key]])
             values = val.split(", ")
             syn_type = "_S( \"" + values[3] + "\" )"
-            net_content += "\t[ " + ", ".join(values[0:3]) + ", [" + outs + "], " + syn_type + " ],\n"
+            net_content += "\t[ " + ", ".join(values[0:3]) + ", [" + outs + "], " + syn_type + ", " + values[4] + " ],\n"
 
     net_content += "],\n"
     net_content += "[ #outs (yarp port, dof, [inputs])\n"
