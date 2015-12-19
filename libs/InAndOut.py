@@ -108,7 +108,7 @@ def saveSourceImage(source, image_name):
 
 
     except ImportError:
-        print ("You should install neuronpy (pip2 install neuronpy).\n\
+        print ("You should install neuronpy (pip2 install neuronpy\n pip2 install matplotlib).\n\
         It provides better graphics. Falling back to ugly one")
         import Image
         color_map = {
