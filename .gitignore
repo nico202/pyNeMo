@@ -3,3 +3,5 @@
 /libs/*.pyc
 .store
 __pycache__/
+/plugins/*.pyc
+/plugins/analysis/*.pyc

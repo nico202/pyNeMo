@@ -5,7 +5,7 @@ from general_config import _history_dir, commit_version
 from sys import exit
 
 import time, datetime
-from InAndOut import importer
+from libs.InAndOut import importer
 if __name__ == "__main__":
     #Load history
     try:

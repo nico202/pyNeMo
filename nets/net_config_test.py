@@ -1,4 +1,4 @@
-from templates import * #For ease of use, this line is mandatory
+from libs.templates import * #For ease of use, this line is mandatory
 name = "NET_CONFIG_TEST"
 neurons = [ #TODO: support other type of neurons? Right now, IZ only
      FastSpiking * 8,

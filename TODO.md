@@ -3,7 +3,6 @@
 
 TODO:
 
--	pySpike: set neuron group input  
 -	Explore history more rapidly
 
 FIXME:

@@ -70,7 +70,16 @@ if __name__ == "__main__": #if run in standalone
         if args.phase or args.duty or args.frequency or args.all:
             #Run import only if needed
             import plugins.analysis.membrane as membrane_analysis
-            print membrane_analysis.analyzeMembrane(Vm_dict)
+            results = membrane_analysis.analyzeMembrane(Vm_dict)
+            if args.all:
+                print results
+            else:
+                if args.phase:
+                    print results["phase"]
+                if args.fundamental:
+                    print results["fundamental"]
+                if args.duty_cycle:
+                    print results["duty_cycle"]
 
     import json
     data_to_json = []

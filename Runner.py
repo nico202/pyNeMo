@@ -42,10 +42,22 @@ if __name__ == "__main__":
     parser.add_argument('--output-dir',
         help = 'Override config-defined output dir',
         dest = 'forced_output')
-    parser.add_argument('--save-all',
+    parser.add_argument('--disable-sensory',
+        action = 'store_true',
+        help = 'Disable all the sensory neurons (force not to use gazebo)',
+        dest = 'disable_sensory',
+        default = False
+    )
+    saving = parser.add_mutually_exclusive_group()
+    saving.add_argument('--save-all',
         action = 'store_true',
         help = 'Save all neurons (override config)',
         dest = 'save_all',
+        default = False)
+    saving.add_argument('--save-none',
+        action = 'store_true',
+        help = 'Don\'t save membrane potential (override config). Faster',
+        dest = 'save_none',
         default = False)
     parser.add_argument('--replace-variables',
         help = '''Fast change variables marked with %% Use --replace-help for other infos''',
@@ -90,10 +102,14 @@ if __name__ == "__main__":
         help = 'Show membrane potential onlt',
         dest = 'SHOW_MEMBRANE_ONLY'
     )
+    parser.add_argument('--analyze',
+        action = 'store_true',
+        help = 'Run all available analysis at the end of the simulation')
 
     args = parser.parse_args()
-    config_name, force_run, steps, save_all\
-  = args.network_file, args.force_run, args.steps, args.save_all
+    config_name, force_run, steps, save_all, save_none, disable_sensory\
+  = args.network_file, args.force_run, args.steps, args.save_all,\
+   args.save_none, args.disable_sensory
     if args.replace_help:
         '''Well... I don't know how to implement this right now.
         (config file is imported with "import". )'''
@@ -129,6 +145,8 @@ if __name__ == "__main__":
 
     if save_all:
         config.save = range(0, len(config.neurons[0]))
+    elif save_none:
+        config.save = []
 
     try:
         net_name = config.name
@@ -141,7 +159,8 @@ if __name__ == "__main__":
         os.chdir(general_config._history_dir)
         config_key, config_hash = hashIt(config)
         general_config_key, general_config_hash = hashIt(general_config)
-
+        if disable_sensory:
+            config.sensory_neurons = [[], []]
         #If any of the following False, we can bypass the computation and print previously-saved run
         if not any([
             saveKey(general_config_hash, general_config_key),
@@ -224,9 +243,11 @@ if __name__ == "__main__":
 
         sensory_neuron_list = config.sensory_neurons
 
-        #create the array of neuron that should be passed to pySpike/pYARP
-        sensory_neurons_map_in = {}
-        for sensory_array_in in sensory_neuron_list[0]:
+        #create the array of neuron that get passed to pySpike/pYARP
+        sensory_neurons_map_in = []
+        count = 0
+        for sensory_array_in in sensory_neuron_list[0]: #for every input
+            sensory_neurons_map_in.append({})
             n_number = sensory_array_in[0]
             a, b, c, d, s, u, v = sensory_array_in[2][0]
             for nn in range(0, n_number):
@@ -235,7 +256,8 @@ if __name__ == "__main__":
                 dest = sensory_array_in[3]
                 delay, weights, plastic = sensory_array_in[4]
                 net.add_synapse(nidx, dests, delay, weights, plastic)
-                sensory_neurons_map_in[nidx] = nn
+                sensory_neurons_map_in[count][nidx] =  nn
+            count += 1
 
         nsens_port_map = []
         for sensory_array_out in sensory_neuron_list[1]:
@@ -311,7 +333,11 @@ if __name__ == "__main__":
                                         total_time,
                                         step_time))
     history.close()
+    print("Run Analysis with: python Analyze.py --general-hash %s --config-hash %s --all" % (general_config_hash, config_hash))
     #Debug stats
     if general_config._DEBUG:
         print("DEBUG: total_time = %f" % (total_time))
         print("DEBUG: step_time = %f" % (step_time))
+    if args.analyze:
+        import subprocess
+        subprocess.call("cd %s; python Analyze.py --general-hash %s --config-hash %s --all" % (script_dir, general_config_hash, config_hash), shell = True)

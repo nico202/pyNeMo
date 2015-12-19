@@ -96,10 +96,16 @@ class sensNetOut():
         self.current_angle = False
 
     def step(self, fired):
+        #same as iSpike setFiring()
+        pattern = [1 if n in fired else 0 for n in range(self.neuron_number)]
+        self.current_variables =\
+        [x + y for x, y in zip(pattern, self.current_variables)]
+        self.missing_steps -= 1
+
+        #same as iSpike step()
         if not self.missing_steps:
-            decay = []
-            for iter_n in self.current_variables:
-                decay.append(iter_n * self.decay_rate)
+            for d in range(0, len(self.current_variables)):
+                self.current_variables[d] *= self.decay_rate
             angle_sum = 0; weighted_sum = 0
             for n in range(0, self.neuron_number):
                 angle_sum += self.current_variables[n] * self.current_variable_angles[n]
@@ -113,12 +119,5 @@ class sensNetOut():
             elif new_angle < self.min_angle:
                 print("ERROR: new angle (%d) < minimum" % (new_angle))
             self.current_angle = new_angle
-
             self.missing_steps = self.integration_steps
-        else:
-            pattern = [1 if n in fired else 0 for n in range(self.neuron_number)]
-            self.current_variables =\
-            [x + y for x, y in zip(pattern, self.current_variables)]
-            self.missing_steps -= 1
-
         return self.current_angle

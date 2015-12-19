@@ -1,5 +1,3 @@
-#IF YOU EDIT THIS FILE, PLEASE run "git commit -a" OR YOU'LL FACE WRONG CONFIGS
-
 #This files is use for quickly add neurons /synapses to a net_config
 from FasterPresets import _typicalN, _typicalS, _S
 #from random import random as _rand
@@ -45,6 +43,9 @@ Accomodation = _typicalN(b=1, c=-55, d=4, v=-65, u=-16)
 
 #DO_NOT_TOUCH
 Bistability = _typicalN(a=0.1, b=0.26, c=-60, d=0, v=-61)
+
+
+TonicBurstingTesting = _typicalN(c = -50, d = 2, v = -70)
 
 #http://www.izhikevich.org/publications/whichmod.pdf
 #Examples: http://www.izhikevich.org/publications/spikes.pdf

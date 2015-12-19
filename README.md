@@ -6,7 +6,7 @@ Quick &amp; dirty interface for the NeMo python API
 Installation:
 -------------
 
-It depends on the NeMo python API and on the Image library (`pip2 install Image`\) and on neuronpy (`pip2 install neuronpy`\)
+It depends on the NeMo python API and on the Image library (`pip2 install Image`\) and on neuronpy (`pip2 install neuronpy`\) sudo apt-get install python-scipy
 
 Download it: `git clone https://github.com/nico202/pyNeMo`
 

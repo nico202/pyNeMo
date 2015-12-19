@@ -13,12 +13,16 @@ def simulation(
         import libs.pySpike
         import sys
         #FIXME: pass robot name as paramater to simulation()
-        robot = libs.pYARP.YARPInterface('/doublePendulumGazebo/body')
+        robot = libs.pYARP.YARPInterface(
+            robot = '/doublePendulumGazebo/body',
+            mode ="Torque")
         #FIXME: pass those too
         robot.changeRefSpeed(1)
         robot.changeRefAcc(1)
+        #Set robot to initial state
         robot.write(0, 0)
         robot.write(1, 0)
+        robot.reach()
 
     #FIXME:Indefinite loop?
     steps = steps or -1
@@ -31,11 +35,23 @@ def simulation(
 
     total = steps
     if sensory_in or sensory_out:
-        #FIXME: add other params
-        sens_net = libs.pySpike.sensNetIn(neuron_number = len(sensory_in))
+        #import subprocess   #We pause the world, to keep it in sync with the sim
+        #FIXME: USE pygazebo bindings
+        #subprocess.call("gz world -p 1", shell = True) #pause
+
+        sens_net_in = []
+        for nid in range(0, len(sensory_in)):
+            #FIXME: add other params
+            sens_net_in.append(
+                libs.pySpike.sensNetIn(neuron_number = len(sensory_in[nid]))
+            )
+
         sens_net_out = []
         sens_robot_out = []
+        sens_out_map = {}
         for nid in range(0, len(sensory_out)):
+            for i in range(0, len(sensory_out[nid][2])):
+                sens_out_map[sensory_out[nid][2][i]] = i
             sens_net_out.append(
                 libs.pySpike.sensNetOut(neuron_number = len(sensory_out[nid][2]))
             )
@@ -43,19 +59,23 @@ def simulation(
                 [libs.pYARP.YARPInterface(sensory_out[nid][0]), sensory_out[nid][1]]
             )
     angles = [ [0] ] * len(sensory_out)#Used for analysis
+    ##########################LOOP ############################################
     while steps: #go until 0 or indefinitely
 #FIXME: How to sync yarp/gazebo time? If possible we should trigger a step here
         loop = total - steps
         if sensory_in:
-            s_val = robot.read(1) #FIXME: DoF
-            sens_net.setInput(s_val)
-
-        for sens, nsidx in sensory_in.iteritems(): #List
-            if not loop in stims: #initialize
-                stims[loop] = []
-            # Add stimul suple list
-            injection = sens_net.getCurrent(nsidx)
-            stims[loop].append( (sens, injection) )
+            for grp in range(0, len(sensory_in)):
+                s_vals = robot.read("All")
+                sens_net_in[grp].setInput(s_vals[grp])
+        grp_n = 0
+        for grp in sensory_in:
+            for sens, nsidx in grp.iteritems(): #List
+                if not loop in stims: #initialize
+                    stims[loop] = []
+                # Add stimul suple list
+                injection = sens_net_in[grp_n].getCurrent(nsidx)
+                stims[loop].append( (sens, injection) )
+            grp_n +=1
         #Optimize this for speed if not stim given
         if loop in stims:
             fired = Nsim.step(istim = stims[loop])
@@ -67,9 +87,11 @@ def simulation(
         nid = 0
         for s_out in sensory_out: #List of lists
             sensory_fired = list(set(fired) & set(s_out[2]))
-            print sensory_fired, sens_robot_out[nid][1]
-            angle = sens_net_out[nid].step(sensory_fired)
+            angle = sens_net_out[nid].step([ sens_out_map[u] for u in sensory_fired])
+            #write joint, angle
             sens_robot_out[nid][0].write(sens_robot_out[nid][1], angle)
+            #Run a gazebo step
+            #subprocess.call("gz world -s", shell = True) #FIXME: pygazebo bindings
             angles[nid].append(angle) #Analysis
             nid += 1
 

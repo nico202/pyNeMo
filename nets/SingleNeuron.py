@@ -1,4 +1,4 @@
-from templates import * #For ease of use, this line is mandatory
+from libs.templates import * #For ease of use, this line is mandatory
 from libs.FasterPresets import _S, _stimuli, _proportional_stimuli
 name = "Accomodation"
 #neurons
