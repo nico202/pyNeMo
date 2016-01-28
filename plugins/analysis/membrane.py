@@ -34,13 +34,13 @@ def analyzeMembrane(neurons_membrane):
         #We need a ref for the phase shift. Use the first neuron, and calculate the
         #differences from the others. If the fundamental is different we should save
         #a list of shifts?
-            phase_shift_ref = angle(fft_unfiltered)[fundamental-1:fundamental+2]/(2*pi * fundamental_hz)*1000/sample_n
+            phase_shift_ref = angle(fft_unfiltered)[fundamental]/(2*pi * fundamental_hz)*1000/sample_n
             phase_freq_ref = fundamental
             first = False
         else:   #FIXME: sensible to sumple number. Fix
             if fundamental == phase_freq_ref:
-                phase_shift = (angle(fft_unfiltered)[fundamental-1:fundamental+2] - phase_shift_ref)/(2*pi * fundamental_hz)/sample_n
-
+                phase_freq_shift = angle(fft_unfiltered)[fundamental]/(2*pi * fundamental_hz)*1000/sample_n
+                phase_shift = phase_freq_shift - phase_shift_ref
             else: #Create a list?
                 phase_shift = (angle(fft_filtered) - phase_shift_ref)/(2*pi * fundamental_hz)*sample_n
                 phase_shift = list(phase_shift) #List, not numpy array

@@ -1,4 +1,5 @@
 #!/usr/bin/python2
+###Various imports
 #Simulation
 import nemo
 import random
@@ -22,6 +23,7 @@ import libs.pYARP
 import libs.pySpike
 
 if __name__ == "__main__":
+    #The parser. Read command line arguments
     class MyParser(argparse.ArgumentParser):
         def error(self, message):
             if message == "too few arguments":
@@ -108,8 +110,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     config_name, force_run, steps, save_all, save_none, disable_sensory\
-  = args.network_file, args.force_run, args.steps, args.save_all,\
-   args.save_none, args.disable_sensory
+    = args.network_file, args.force_run, args.steps, args.save_all,\
+    args.save_none, args.disable_sensory
+
     if args.replace_help:
         '''Well... I don't know how to implement this right now.
         (config file is imported with "import". )'''
@@ -117,6 +120,7 @@ if __name__ == "__main__":
         that gets evaluated in the config file. Those values must be marked with
         % (ie. %VAR_A%) and can be replaced here (ie. with: VAR_A=0.02,VAR_B=0.2)''')
 
+    #Convert step seconds/minutes to milliseconds
     if steps:
         try:
             if 'm' in steps:
@@ -127,12 +131,15 @@ if __name__ == "__main__":
             exit("Steps parameter can contain either 'm' (minutes) or 's' (seconds)")
         general_config.steps = int(steps)
 
-    # Load user-defined config file
+    ## Load user-defined config file
+    #If config file is a ".vue" graph, convert it to python
     if ".vue" in config_name:
         print("Converting input VUE to py")
         VUEtoPy.VUEtoPyConverter(config_name)
         config_name = "".join((config_name.split(".")[:-1]))
         config_name += ".py"
+
+    #Import the config file
     try:
         config = imp.load_source('*', config_name)
         script_dir = os.getcwd()
@@ -151,10 +158,13 @@ if __name__ == "__main__":
     try:
         net_name = config.name
     except AttributeError:
-        print("Having a name in the network will be mandatory in the first version. Fix it NOW")
+        net_name = "None"
+        print("Having a name in the network will be mandatory in the stable version. Fix it NOW")
 
+    #Time it :)
     start = 0.0; end = 0.0 #Initialize it here to enable bypass
     bypass = False
+
     if startup_check(general_config._history_dir):
         os.chdir(general_config._history_dir)
         config_key, config_hash = hashIt(config)
@@ -171,7 +181,7 @@ if __name__ == "__main__":
         ]):
             old_output = '.' + general_config_hash + config_hash
             if general_config._OUTPUT:
-                print open(old_output, 'r').readlines()
+                print(open(old_output, 'r').readlines())
             else:
                 print("Simulation has previously been executed!")
                 print("Watch the file %s" % (general_config._history_dir + '/' + old_output))
@@ -187,6 +197,7 @@ if __name__ == "__main__":
                     #        showSourceImage(loaded_img)
 
             bypass = True and not force_run
+
         if args.GPU == None:
             GPU = general_config._GPU
         else:
