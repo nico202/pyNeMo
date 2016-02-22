@@ -4,7 +4,8 @@ from libs.VUEtoPy import *
 
 #require ast (dict import), shutil (copy config), hashlib (Hash configs)
 
-def startup_check(output_dir = ".store"):
+def is_folder(output_dir = ".store"):
+    output_dir = str(output_dir)
     if not os.path.isdir(output_dir):
         if not os.path.exists(output_dir):
             try:
@@ -24,8 +25,8 @@ def hashIt(module): #We use this to check if configuration changed
 
     return key_string, hashlib.sha1(key_string).hexdigest()
 
-def saveKey(file_hash, values):
-    output_name = '.' + file_hash
+def saveKey(file_hash, values, out_dir = "."):
+    output_name = out_dir + '/.' + file_hash
 
     if not os.path.isfile(output_name):
         try:
@@ -185,3 +186,31 @@ def allNeuronsMembrane(Vm_lists):
             pixels[xi, neuron] = (int( Vm_range - abs(Vm) ) * 255, 0, 255 - int( Vm_range - abs(Vm) ) * 255)
             xi += 1
     return img
+
+def time_to_steps(input_time):
+    try:
+        if 'm' in input_time: #minutes
+            steps = float(input_time.strip('m')) * 60 * 1000
+        elif 's' in input_time: #Seconds
+            steps = float(input_time.strip('s')) * 1000
+        else:
+            steps = input_time
+    except ValueError:
+        exit("Steps parameter can contain either 'm' (minutes) or 's' (seconds)")
+    except TypeError:
+        return None
+
+    return int(steps)
+
+def try_load_vue(config_name, prehook):
+    if ".vue" in config_name:
+        import libs.VUEtoPy as VUEtoPy
+        print("Converting input VUE to py")
+        VUEtoPy.VUEtoPyConverter(config_name, prehook)
+        config_name = "".join((config_name.split(".")[:-1]))
+        config_name += ".py"
+    return config_name
+
+def print_if_verbose(verbosity, text):
+    if verbosity:
+        print(text)

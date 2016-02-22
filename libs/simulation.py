@@ -7,22 +7,25 @@ def simulation(
     stims = {},
     fspikes = {},
     sensory_in = {},
-    sensory_out = [] #List of [port_name, out_dof, [ids]]
+    sensory_out = [], #List of [port_name, out_dof, [ids]]
+    robot_name = '/doublePendulumGazebo/body',
+    robot_mode = "Torque",
+    reset_position = True,
 ):
     if sensory_in or sensory_out: #import only if needed
         import libs.pySpike
         import sys
-        #FIXME: pass robot name as paramater to simulation()
         robot = libs.pYARP.YARPInterface(
-            robot = '/doublePendulumGazebo/body',
-            mode ="Torque")
-        #FIXME: pass those too
+            robot = robot_name,
+            mode = robot_mode)
+        #FIXME: pass those as paramater to simulation()
         robot.changeRefSpeed(1)
         robot.changeRefAcc(1)
         #Set robot to initial state
-        robot.write(0, 0)
-        robot.write(1, 0)
-        robot.reach()
+        if reset_position:
+            robot.write(0, 0)
+            robot.write(1, 0)
+            robot.reach()
 
     #FIXME:Indefinite loop?
     steps = steps or -1

@@ -3,7 +3,7 @@
 if __name__ == "__main__": #if run in standalone
     from sys import exit
     import argparse
-    from libs.InAndOut import importer
+    from libs.InAndOut import importer, print_if_verbose, saveKey
     parser = argparse.ArgumentParser(description='Offline analysis for\
      spiking neural networks')
     #Files to open
@@ -39,8 +39,17 @@ if __name__ == "__main__": #if run in standalone
         action = 'store_true',
         help = 'Return the duty cycle for each neurons. Needs membrane data')
         # FIXME: enable this on spikes
+    parser.add_argument('--update-json',
+        action = 'store_true',
+        help = 'Save data to json (for historyGUI)',
+        default = False)
+    parser.add_argument('--batch',
+        action = 'store_true',
+        help = 'Suppress output, save to file',
+        default = False)
 
     args = parser.parse_args()
+    batch = args.batch
 
     if not args.path:
         print("WARNING:\tYou must define the store dir! Using general_config default")
@@ -63,33 +72,36 @@ if __name__ == "__main__": #if run in standalone
             Vm_dict = importer(membrane_file)
 
     if args.config_hash:
-        print("INFO: Opened file %s" % membrane_file)
-        print("INFO: This is a membrane file.")
-        print("INFO: There are %s neurons in this net, and %s samples (ms)"
-                % (len(Vm_dict), len(Vm_dict[0])))
+        if not batch:
+            print_if_verbose(not batch, "INFO: Opened file %s" % membrane_file)
+            print_if_verbose(not batch, "INFO: This is a membrane file.")
+            print_if_verbose(not batch, "INFO: There are %s neurons in this net, and %s samples (ms)"
+                    % (len(Vm_dict), len(Vm_dict[0])))
         if args.phase or args.duty or args.frequency or args.all:
             #Run import only if needed
             import plugins.analysis.membrane as membrane_analysis
             results = membrane_analysis.analyzeMembrane(Vm_dict)
             if args.all:
-                print results
+                print_if_verbose(not batch, results)
             else:
                 if args.phase:
-                    print results["phase"]
+                    print_if_verbose(not batch, results["phase"])
                 if args.fundamental:
-                    print results["fundamental"]
+                    print_if_verbose(not batch, results["fundamental"])
                 if args.duty_cycle:
-                    print results["duty_cycle"]
+                    print_if_verbose(not batch, results["duty_cycle"])
+            saveKey(args.general + args.config_hash + "_analysis", results, out_dir = args.path)
 
-    import json
-    data_to_json = []
-    for n in Vm_dict:
-        x = 0
-        neuron = []
-        for y in Vm_dict[n]:
-            point = {"x":x,"y":y}
-            x+=1
-            neuron.append(point)
-        data_to_json.append(neuron)
-    with open('./historyGUI/data.json', 'w') as outfile:
-        json.dump(data_to_json, outfile)
+    if args.update_json:
+        import json
+        data_to_json = []
+        for n in Vm_dict:
+            x = 0
+            neuron = []
+            for y in Vm_dict[n]:
+                point = {"x":x,"y":y}
+                x+=1
+                neuron.append(point)
+            data_to_json.append(neuron)
+        with open('./historyGUI/data.json', 'w') as outfile:
+            json.dump(data_to_json, outfile)

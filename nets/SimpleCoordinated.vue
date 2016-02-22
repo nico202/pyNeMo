@@ -1,26 +1,26 @@
-<!-- Tufts VUE 3.2.2 concept-map (SimpleCoordinated.vue) 2015-12-11 -->
+<!-- Tufts VUE 3.2.2 concept-map (SimpleCoordinated.vue) 2016-02-22 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/opt/vue/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Fri Dec 11 14:01:12 CET 2015 by nicolo on platform Linux 4.3.1-040301-generic in JVM 1.8.0_66-b17 -->
+<!-- Do Not Remove: Saved date Mon Feb 22 00:55:13 CET 2016 by nicolo on platform Linux 4.5.0-040500rc1-generic in JVM 1.8.0_72-b15 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built May 23 2013 at 2146 by tomadm on Linux 2.6.18-348.2.1.el5 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="SimpleCoordinated.vue" created="0" x="0.0" y="0.0"
     width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1449838872056" size="35154"
-        spec="/home/nicolo/Git/pyNeMo/nets/SimpleCoordinated.vue"
+    <resource referenceCreated="1456098913806" size="35689"
+        spec="/home/nicolo/Git/pyNeMo-revamped/nets/SimpleCoordinated.vue"
         type="1" xsi:type="URLResource">
         <title>SimpleCoordinated.vue</title>
-        <property key="File" value="/home/nicolo/Git/pyNeMo/nets/SimpleCoordinated.vue"/>
+        <property key="File" value="/home/nicolo/Git/pyNeMo-revamped/nets/SimpleCoordinated.vue"/>
     </resource>
     <fillColor>#FFFFFF</fillColor>
     <strokeColor>#404040</strokeColor>
     <textColor>#000000</textColor>
     <font>SansSerif-plain-14</font>
     <URIString>http://vue.tufts.edu/rdf/resource/6832c7827f0001013ad55cd60b0f4a2b</URIString>
-    <child ID="148" label="20, 0, 100" layerID="13"
-        created="1449240991080" x="713.3292" y="-245.90356" width="65.0"
+    <child ID="148" label="20, 0, 1000" layerID="13"
+        created="1449240991080" x="713.3292" y="-245.90356" width="72.0"
         height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#83CEFF</fillColor>
         <strokeColor>#776D6D</strokeColor>
@@ -97,18 +97,18 @@
         <URIString>http://vue.tufts.edu/rdf/resource/8379ab0b7f0001010e3a3ddb81b1d3da</URIString>
         <shape xsi:type="ellipse"/>
     </child>
-    <child ID="255" layerID="13" created="1449609728624" x="569.47253"
-        y="-243.7749" width="144.35675" height="8.231842"
+    <child ID="255" layerID="13" created="1449609728624" x="749.8938"
+        y="-223.40332" width="16.132874" height="164.48535"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/8379ab0b7f0001010e3a3ddb2d413cf1</URIString>
-        <point1 x="713.3292" y="-236.04306"/>
-        <point2 x="569.9725" y="-243.2749"/>
+        <point1 x="750.39374" y="-222.90332"/>
+        <point2 x="765.5266" y="-59.41797"/>
         <ID1 xsi:type="node">148</ID1>
-        <ID2 xsi:type="node">253</ID2>
+        <ID2 xsi:type="node">228</ID2>
     </child>
     <child ID="256" label="ExcStrongestSlowest" layerID="13"
         created="1449609740347" x="565.1902" y="-300.61646"
@@ -125,8 +125,8 @@
         <ctrlPoint0 x="636.5548" y="-259.68042" xsi:type="point"/>
     </child>
     <child ID="259" label="ExcStrongestSlowest" layerID="13"
-        created="1449609755232" x="510.80756" y="-312.08148"
-        width="106.0" height="57.15277" strokeWidth="1.0"
+        created="1449609755232" x="511.30756" y="-312.08148"
+        width="105.0" height="57.15277" strokeWidth="1.0"
         autoSized="false" controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
@@ -164,10 +164,9 @@
         <ID1 xsi:type="node">253</ID1>
         <ID2 xsi:type="node">228</ID2>
     </child>
-    <child ID="263" label="10, 0.5, RS, FastNoLearn, 1" layerID="13"
+    <child ID="263" label="0.5, 1, -180, 180" layerID="13"
         created="1449689504629" x="121.21005" y="-311.59528"
-        width="129.6" height="38.600002" strokeWidth="1.0"
-        autoSized="true" xsi:type="node">
+        width="74.4" height="23.4" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#F2AE45</fillColor>
         <strokeColor>#776D6D</strokeColor>
         <textColor>#000000</textColor>
@@ -176,35 +175,34 @@
         <shape xsi:type="chevron"/>
     </child>
     <child ID="265" label="Spike" layerID="13" created="1449689670515"
-        x="240.40187" y="-285.41763" width="508.97906"
-        height="226.49957" strokeWidth="1.0" autoSized="false"
-        controlCount="1" arrowState="2" xsi:type="link">
+        x="189.21565" y="-295.76056" width="560.1653" height="236.8425"
+        strokeWidth="1.0" autoSized="false" controlCount="1"
+        arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/883ceecc7f0001012b17ebf89aaadb19</URIString>
-        <point1 x="240.90187" y="-284.91763"/>
+        <point1 x="189.71565" y="-295.26056"/>
         <point2 x="748.8809" y="-59.41806"/>
         <ID1 xsi:type="node">263</ID1>
         <ID2 xsi:type="node">228</ID2>
         <ctrlPoint0 x="443.55478" y="-257.68042" xsi:type="point"/>
     </child>
     <child ID="266" label="Spike" layerID="13" created="1449691820888"
-        x="215.39569" y="-273.49527" width="331.71936"
-        height="214.57727" strokeWidth="1.0" autoSized="false"
+        x="176.76233" y="-288.69528" width="369.63013"
+        height="229.77725" strokeWidth="1.0" autoSized="false"
         controlCount="0" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/885dbe437f0001015cbec4beae7514c0</URIString>
-        <point1 x="215.89568" y="-272.99527"/>
-        <point2 x="546.61505" y="-59.418"/>
+        <point1 x="177.26231" y="-288.19528"/>
+        <point2 x="545.89246" y="-59.41803"/>
         <ID1 xsi:type="node">263</ID1>
         <ID2 xsi:type="node">225</ID2>
     </child>
-    <child ID="267" label="&quot;/doublePendulumGazebo/body&quot;, 1"
-        layerID="13" created="1449784291351" x="1020.5548"
-        y="-233.74942" width="333.02023" height="102.8"
+    <child ID="267" label="1" layerID="13" created="1449784291351"
+        x="1020.5548" y="-233.74942" width="333.02023" height="102.8"
         strokeWidth="1.0" autoSized="false" xsi:type="node">
         <fillColor>#F2AE45</fillColor>
         <strokeColor>#776D6D</strokeColor>
@@ -248,8 +246,8 @@
         <ctrlPoint0 x="813.5548" y="-498.68042" xsi:type="point"/>
     </child>
     <child ID="274" label="InhWeakMed" layerID="13"
-        created="1449825512762" x="652.9419" y="-603.70386"
-        width="90.63464" height="78.79761" strokeWidth="1.0"
+        created="1449825512762" x="653.4419" y="-603.70386"
+        width="90.13464" height="78.79761" strokeWidth="1.0"
         autoSized="false" controlCount="1" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
@@ -287,10 +285,9 @@
         <ID1 xsi:type="node">254</ID1>
         <ID2 xsi:type="node">272</ID2>
     </child>
-    <child ID="277" label="10, 0.5, RS, FastNoLearn, 0" layerID="13"
+    <child ID="277" label="0.5, 0, -90, 90" layerID="13"
         created="1449825555557" x="110.26965" y="-455.10333"
-        width="129.6" height="38.600002" strokeWidth="1.0"
-        autoSized="true" xsi:type="node">
+        width="65.2" height="22.2" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#F2AE45</fillColor>
         <strokeColor>#776D6D</strokeColor>
         <textColor>#000000</textColor>
@@ -298,10 +295,9 @@
         <URIString>http://vue.tufts.edu/rdf/resource/90569f6b7f00010114e5bdefb200d010</URIString>
         <shape xsi:type="chevron"/>
     </child>
-    <child ID="278" label="&quot;/doublePendulumGazebo/body&quot;, 0"
-        layerID="13" created="1449825555557" x="1011.8292" y="-347.2575"
-        width="345.7256" height="102.8" strokeWidth="1.0"
-        autoSized="false" xsi:type="node">
+    <child ID="278" label="0" layerID="13" created="1449825555557"
+        x="1011.8292" y="-347.2575" width="345.7256" height="102.8"
+        strokeWidth="1.0" autoSized="false" xsi:type="node">
         <fillColor>#F2AE45</fillColor>
         <strokeColor>#776D6D</strokeColor>
         <textColor>#000000</textColor>
@@ -323,28 +319,28 @@
         <ID2 xsi:type="node">278</ID2>
     </child>
     <child ID="281" label="Spike" layerID="13" created="1449825630064"
-        x="222.94394" y="-579.6118" width="519.4381" height="132.07794"
+        x="168.10135" y="-580.3545" width="573.1792" height="131.0047"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/90579d787f00010114e5bdef749cf981</URIString>
-        <point1 x="223.44394" y="-448.03394"/>
-        <point2 x="741.8821" y="-579.1119"/>
+        <point1 x="168.60135" y="-449.8498"/>
+        <point2 x="740.7806" y="-579.8545"/>
         <ID1 xsi:type="node">277</ID1>
         <ID2 xsi:type="node">272</ID2>
     </child>
     <child ID="282" label="Spike" layerID="13" created="1449825633651"
-        x="227.91272" y="-507.71857" width="394.21375" height="63.88437"
+        x="170.52771" y="-508.70233" width="450.9355" height="61.417908"
         strokeWidth="1.0" autoSized="false" controlCount="0"
         arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/90579d797f00010114e5bdef5e8dbd22</URIString>
-        <point1 x="228.41272" y="-444.33417"/>
-        <point2 x="621.62646" y="-507.21854"/>
+        <point1 x="171.02771" y="-447.78442"/>
+        <point2 x="620.9632" y="-508.20233"/>
         <ID1 xsi:type="node">277</ID1>
         <ID2 xsi:type="node">271</ID2>
     </child>
@@ -598,8 +594,8 @@
         <ID2 xsi:type="node">311</ID2>
     </child>
     <child ID="320" label="ExcStrongestFast" layerID="13"
-        created="1449829551793" x="804.92444" y="-45.620197"
-        width="87.0" height="14.0" strokeWidth="1.0" autoSized="false"
+        created="1449829551793" x="805.42444" y="-45.620197"
+        width="86.0" height="14.0" strokeWidth="1.0" autoSized="false"
         controlCount="0" arrowState="2" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
@@ -623,12 +619,25 @@
         <ID1 xsi:type="node">228</ID1>
         <ID2 xsi:type="node">313</ID2>
     </child>
+    <child ID="322" label="Spike" layerID="13" created="1456070088127"
+        x="167.01653" y="-437.7334" width="444.20963" height="122.73996"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/048a77007f00010167c4bbcaeeceb9ee</URIString>
+        <point1 x="167.51651" y="-437.2334"/>
+        <point2 x="610.72614" y="-315.49344"/>
+        <ID1 xsi:type="node">277</ID1>
+        <ID2 xsi:type="node">254</ID2>
+    </child>
     <layer ID="13" label="Layer 1" created="1449152123076" x="0.0"
         y="0.0" width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/6832c78d7f0001013ad55cd620b39e7c</URIString>
     </layer>
-    <userZoom>1.0</userZoom>
-    <userOrigin x="-485.44522" y="-853.6804"/>
+    <userZoom>1.5</userZoom>
+    <userOrigin x="44.284096" y="-939.46277"/>
     <presentationBackground>#202020</presentationBackground>
     <PathwayList currentPathway="0" revealerIndex="-1">
         <pathway ID="0" label="Percorso senza titolo" created="0"
@@ -680,6 +689,6 @@
     </PathwayList>
     <date>2015-12-02</date>
     <modelVersion>6</modelVersion>
-    <saveLocation>/home/nicolo/Git/pyNeMo/nets</saveLocation>
-    <saveFile>/home/nicolo/Git/pyNeMo/nets/SimpleCoordinated.vue</saveFile>
+    <saveLocation>/home/nicolo/Git/pyNeMo-revamped/nets</saveLocation>
+    <saveFile>/home/nicolo/Git/pyNeMo-revamped/nets/SimpleCoordinated.vue</saveFile>
 </LW-MAP>

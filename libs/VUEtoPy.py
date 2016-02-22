@@ -1,6 +1,6 @@
 from sys import argv, exit
 import xml.etree.ElementTree as ET
-import libs.colors as colors
+from libs.IO import rgb
 output_folder = "."
 class neuron():
     def __init__(self, number):
@@ -14,9 +14,10 @@ class synapse():
     def synapse_type(self, st):
         self.s_type = st
 
-def VUEtoPyConverter(input_vue):
+def VUEtoPyConverter(input_vue, prehook):
     xml = ""
     started = False
+    #Clean garbage
     for line in open(input_vue, 'r'):
         if "<?xml" in line:
             started = True
@@ -60,7 +61,7 @@ def VUEtoPyConverter(input_vue):
                     new.neuron_type(child.attrib["label"])
                     neurons.append(new)
                     for prop in child.findall("fillColor"):
-                        color = colors.rgb(prop.text.replace("#",""))
+                        color = rgb(prop.text.replace("#",""))
                         max_component = max(color)
                         if max_component:
                             to_save.append(child.attrib["ID"])
@@ -115,13 +116,18 @@ def VUEtoPyConverter(input_vue):
                         stims_link[link_from] = []
                     stims_link[link_from].append(link_to)
 
-    net_content = ""
     #Init
-    net_content += "from libs.templates import * #For ease of use, this line is mandatory\n\
+    net_content = "from libs.templates import * #For ease of use, this line is mandatory\n\
 from libs.FasterPresets import _S, _stimuli\n"
-
+    #PreHook
+    net_content += prehook + "\n"
     #Name
-    net_name = input_vue.split(".")[0]
+    for filename in input_vue.split("."):
+        if filename:
+            net_name = filename
+            break
+
+
     net_content += "name = \"%s\"\n" % net_name
     #Parameters
     net_content += "\n%s\n" % variables_load
@@ -139,16 +145,15 @@ from libs.FasterPresets import _S, _stimuli\n"
     #sensory_neurons
     net_content += "sensory_neurons = [ #0 = ins, #1 = outs\n"
 
-    net_content += "[ #ins (output#, std, NueronType, SynapseType, Joint)\n"
+    net_content += "[ #ins (std, Joint, min_angle, max_angle, [dests])\n"
     for key, val in sensory_neurons.iteritems():
         if key in sens_rev_map_in:
             outs = ", ".join([str(node_neuron_map[i]) for i in sens_rev_map_in[key]])
             values = val.split(", ")
-            syn_type = "_S( \"" + values[3] + "\" )"
-            net_content += "\t[ " + ", ".join(values[0:3]) + ", [" + outs + "], " + syn_type + ", " + values[4] + " ],\n"
+            net_content += "\t[ " + ", ".join(values[0:2]) + " ," + values[2] + ", " + values[3] + ", [" + outs + "], ],\n"
 
     net_content += "],\n"
-    net_content += "[ #outs (yarp port, dof, [inputs])\n"
+    net_content += "[ #outs (joint, [inputs])\n"
 
     for key, val in sensory_neurons.iteritems(): #FIXME: output neurons
         if key in sens_rev_map_out:
@@ -203,4 +208,4 @@ from libs.FasterPresets import _S, _stimuli\n"
 
     out_content = open(output_folder + "/" + net_name + ".py", 'w+')
     out_content.write(net_content)
-    print "File created: %s%s.py" % (output_folder, net_name )
+    print "File created: %s/%s.py" % (output_folder, net_name )
