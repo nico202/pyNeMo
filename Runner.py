@@ -164,11 +164,13 @@ if __name__ == "__main__":
     to_save = networks[1][0]
     neuron_number = networks[1][1]
     stimuli_dict = networks[1][2]
+
     if not disable_sensory:
         sensory_neurons_in, sensory_neurons_out  = networks[1][3]
     else:
-        sensory_neurons_in, sensory_neurons_out = ([],[])
-
+        sensory_neurons_in = []
+        sensory_neurons_out = []
+    
     neurons = networks[1][4]
     synapses = networks[1][5]
     network_name = networks[1][6]
