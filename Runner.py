@@ -164,7 +164,11 @@ if __name__ == "__main__":
     to_save = networks[1][0]
     neuron_number = networks[1][1]
     stimuli_dict = networks[1][2]
-    sensory_neurons_in, sensory_neurons_out  = networks[1][3]
+    if not disable_sensory:
+        sensory_neurons_in, sensory_neurons_out  = networks[1][3]
+    else:
+        sensory_neurons_in, sensory_neurons_out = ([],[])
+
     neurons = networks[1][4]
     synapses = networks[1][5]
     network_name = networks[1][6]
@@ -177,12 +181,11 @@ if __name__ == "__main__":
         , "step_input": stimuli_dict
         , "synapses": synapses
         , "name": network_name
-        , "disable-sensory": disable_sensory
     }
     saveKey(hashDict(dict_config) + "_input", dict_config, output_dir)
 
     #Define robot
-    if (sensory_neurons_in or sensory_neurons_out) and not disable_sensory:
+    if (sensory_neurons_in or sensory_neurons_out):
         robot = RobotYARP ()
     else:
         robot = None
