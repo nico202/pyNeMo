@@ -5,3 +5,6 @@
 __pycache__/
 /plugins/*.pyc
 /plugins/analysis/*.pyc
+plugins/*~
+plugins/images/*.pyc
+plugins/images/*~

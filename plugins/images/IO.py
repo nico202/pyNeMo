@@ -65,24 +65,27 @@ def ImageFromMembrane(
         , Vm_list
         , save = False
         , show = True
-        , stimuli = []
+        , stimuli = [0, 0]
         , title = ""
 ):
     import matplotlib.pyplot as plt
     import numpy as np
     x = len(Vm_list)
     x = np.array(range (0, x))
+    print x
+    print Vm_list
     fig, ax1 = plt.subplots()
     ax1.plot(x, np.array(Vm_list))
     ax1.set_xlabel('time (ms)')
     ax1.set_ylabel('Membrane Potential\n(mV)')
+    
     ax2 = ax1.twinx()
     ax2.plot(stimuli, color = 'r')
     ax2.set_ylabel('Stimulation\n(mA)')
     max_val = 20
     ax2.set_ylim(
-        min(-5, min(stimuli) if stimuli else 0)
-        ,max(max_val, max(stimuli) if stimuli else max_val)
+        min(-5, min(stimuli))
+        ,max(max_val, max(stimuli))
     )
     if title:
         plt.title(title)
