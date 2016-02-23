@@ -189,7 +189,8 @@ def main_simulation_run (
         except KeyboardInterrupt:
             keep_running = False
 
-    global_output["pySpike"] = pySpike_simulation.get_output()
+    if yarp_robot:
+        global_output["pySpike"] = pySpike_simulation.get_output()
     global_output["NeMo"] = nemo_simulation.get_output()
     #FIXME: enable
     #global_output["YARP"] = yarp_robot.get_output()

@@ -217,9 +217,13 @@ if __name__ == "__main__":
     saveKey(uniqueId + "_output", output, output_dir)
 
     if args.show_images:
-        from libs.IO import membraneImage as MI
-        for i in output["NeMo"][0]:
-            MI(output["NeMo"][0][i])
+        from plugins.images import IO as ImageIO
+        ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
+        #from libs.IO import membraneImage as MI
+        #for i in output["NeMo"][0]:
+        #    MI(output["NeMo"][0][i])
+        ImageIO.ImageFromMembranes(output["NeMo"][0])
+
         
     #Print some statistic
     #TODO: verbosity

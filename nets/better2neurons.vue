@@ -1,17 +1,18 @@
-<!-- Tufts VUE 3.2.2 concept-map (better2neurons.vue) 2016-02-20 -->
+<!-- Tufts VUE 3.2.2 concept-map (better2neurons.vue) 2016-02-23 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/opt/vue/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Sat Feb 20 05:08:51 CET 2016 by nicolo on platform Linux 4.5.0-040500rc1-generic in JVM 1.8.0_72-b15 -->
+<!-- Do Not Remove: Saved date Tue Feb 23 09:27:13 CET 2016 by nicolo on platform Linux 4.5.0-040500rc1-generic in JVM 1.8.0_72-b15 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built May 23 2013 at 2146 by tomadm on Linux 2.6.18-348.2.1.el5 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0"
     label="better2neurons.vue" created="0" x="0.0" y="0.0"
     width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1455941331780" size="10150"
-        spec="/home/nicolo/Git/pyNeMo/nets/better2neurons.vue" type="1" xsi:type="URLResource">
+    <resource referenceCreated="1456216033580" size="10151"
+        spec="/home/nicolo/Git/temp/pyNeMo/nets/better2neurons.vue"
+        type="1" xsi:type="URLResource">
         <title>better2neurons.vue</title>
-        <property key="File" value="/home/nicolo/Git/pyNeMo/nets/better2neurons.vue"/>
+        <property key="File" value="/home/nicolo/Git/temp/pyNeMo/nets/better2neurons.vue"/>
     </resource>
     <fillColor>#FFFFFF</fillColor>
     <strokeColor>#404040</strokeColor>
@@ -67,7 +68,7 @@
         <ctrlPoint0 x="989.59106" y="-363.15585" xsi:type="point"/>
     </child>
     <child ID="274"
-        label="#_stim_a = 5&#xa;_stim_b = 20&#xa;_stim_lenght = 10&#xa;_stim_distance = 100"
+        label="#_stim_a = 5&#xa;#_stim_b = 20&#xa;_stim_lenght = 10&#xa;_stim_distance = 100"
         layerID="13" created="1450118219835" x="1290.9021" y="-196.4411"
         width="182.5" height="115.5" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#FEFD8C</fillColor>
@@ -127,7 +128,7 @@
         y="0.0" width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/6832c78d7f0001013ad55cd620b39e7c</URIString>
     </layer>
-    <userZoom>0.7739051916435242</userZoom>
+    <userZoom>1.0</userZoom>
     <userOrigin x="510.0868" y="-716.6953"/>
     <presentationBackground>#202020</presentationBackground>
     <PathwayList currentPathway="0" revealerIndex="-1">
@@ -180,6 +181,6 @@
     </PathwayList>
     <date>2015-12-02</date>
     <modelVersion>6</modelVersion>
-    <saveLocation>/home/nicolo/Git/pyNeMo/nets</saveLocation>
-    <saveFile>/home/nicolo/Git/pyNeMo/nets/better2neurons.vue</saveFile>
+    <saveLocation>/home/nicolo/Git/temp/pyNeMo/nets</saveLocation>
+    <saveFile>/home/nicolo/Git/temp/pyNeMo/nets/better2neurons.vue</saveFile>
 </LW-MAP>
