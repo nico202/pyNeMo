@@ -61,7 +61,7 @@ if __name__ == "__main__":
                             , action='store_true'
                             , help = 'Overwrite config cuda settings (force cuda)'
                             , dest = 'use_cuda'
-                            , default = False
+                            , default = None
     )
     processor.add_argument('--cpu'
                             , action='store_false'
@@ -130,7 +130,7 @@ if __name__ == "__main__":
     output_dir = args.history_dir or config_history
 
     config_cuda = config.TRY_CUDA if use_config else 0
-    use_cuda = args.use_cuda or config_cuda
+    use_cuda = args.use_cuda if args.use_cuda != None else config_cuda
 
     config_cuda_backend = config.CUDA_BACKEND if use_config else 0
     cuda_backend = args.cuda_backend or config_cuda_backend

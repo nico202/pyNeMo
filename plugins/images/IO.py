@@ -72,8 +72,6 @@ def ImageFromMembrane(
     import numpy as np
     x = len(Vm_list)
     x = np.array(range (0, x))
-    print x
-    print Vm_list
     fig, ax1 = plt.subplots()
     ax1.plot(x, np.array(Vm_list))
     ax1.set_xlabel('time (ms)')
