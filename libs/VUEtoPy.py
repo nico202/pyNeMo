@@ -35,8 +35,9 @@ def VUEtoPyConverter(input_vue, prehook):
     sens_map_in = {}; sens_rev_map_in = {};
     sens_map_out = {}; sens_rev_map_out = {};
     tree = ET.fromstring(xml)
+    self_connection = []
     for child in tree.findall("child"):
-        is_stim = False; is_sensory = False; is_none = False; is_neuron = False
+        is_stim = False; is_sensory = False; is_none = False; is_neuron = False; self_connect = False
         if "{http://www.w3.org/2001/XMLSchema-instance}type" in child.attrib:
             if child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "node":
                 if child.findall("shape"):
@@ -51,27 +52,33 @@ def VUEtoPyConverter(input_vue, prehook):
                             elif child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "rhombus":
                                 variables_load = child.attrib["label"]
                                 is_none = True
+                            elif child.findall("shape")[0].attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "flag2": #Self
+                                is_neuron = True
+                                self_connect = True                                
                             else:
                                 is_neuron = True
                 if is_sensory:
                     sensory_neurons[child.attrib["ID"]] = child.attrib["label"]
                 elif is_neuron:
-                    node_neuron_map[child.attrib["ID"]] = len(neurons)
-                    new = neuron(child.attrib["ID"])
-                    new.neuron_type(child.attrib["label"])
-                    neurons.append(new)
-                    for prop in child.findall("fillColor"):
-                        color = rgb(prop.text.replace("#",""))
-                        max_component = max(color)
-                        if max_component:
-                            to_save.append(child.attrib["ID"])
+                    if self_connect:
+                        self_connection.append(child.attrib["ID"])
+                    else:
+                        node_neuron_map[child.attrib["ID"]] = len(neurons)
+                        new = neuron(child.attrib["ID"])
+                        new.neuron_type(child.attrib["label"])
+                        neurons.append(new)
+                        for prop in child.findall("fillColor"):
+                            color = rgb(prop.text.replace("#",""))
+                            max_component = max(color)
+                            if max_component:
+                                to_save.append(child.attrib["ID"])
                         #Unused
-#                        if colors.MAP[color.index(max_component)] == "R":
-#                            conn_type = "excitatory"
-#                        elif colors.MAP[color.index(max_component)] == "B":
-#                            conn_type = "inhibitory"
-#                        else:
-#                            conn_type = "undefined"
+#                            if colors.MAP[color.index(max_component)] == "R":
+#                                conn_type = "excitatory"
+#                            elif colors.MAP[color.index(max_component)] == "B":
+#                                conn_type = "inhibitory"
+#                            else:
+#                                conn_type = "undefined"
 
                 else: #Stim
                     if not child.attrib["ID"] in stims:
@@ -80,22 +87,23 @@ def VUEtoPyConverter(input_vue, prehook):
                         stims[child.attrib["ID"]].append(child.attrib["label"].split(":")[1].split(","))
                     except IndexError:
                         stims[child.attrib["ID"]].append(child.attrib["label"].split(","))
-
+            #Link
             elif child.attrib["{http://www.w3.org/2001/XMLSchema-instance}type"] == "link":
                 for x_from in child.findall("ID1"):
                     link_from = x_from.text
                 for x_to in child.findall("ID2"):
                     link_to = x_to.text
-                syn = False; sens = False
+                if link_to in self_connection:
+                     link_to = link_from
                 try:
                     s_type = child.attrib["label"]
                     if not s_type == "Spike":
-                        syn = True; sens = False
+                       syn = True; sens = False
                     else:
                         syn = False; sens = True
                 except KeyError:
                     syn = False; sens = False
-                if syn:
+                if syn and link_to:
                     new = synapse((link_from, link_to))
                     new.synapse_type(s_type)
                     synapses.append(new)
@@ -192,17 +200,25 @@ from libs.FasterPresets import _S, _stimuli\n"
     t = 0
     for s in synapses:
         t += 1
+        added = False
         try:
+            if s.x_to in self_connection:
+                s.x_to = s.x_from
             net_content +=  "    [ %s, [%s], _S(\"%s\")" % (node_neuron_map[s.x_from],
                                                 node_neuron_map[s.x_to],
                                                 s.s_type)
-        except KeyError:
-            exit("ERROR: Remembrer not to use labels on Stimulation arrows\nFix the config")
+            net_content += "]"
+            added = True
 
-        net_content += "]"
-        if t != tot:
+        except KeyError:
+            print self_connection
+            print("ERROR: Remembrer not to use labels on Stimulation arrows\nFix the config")
+            print("Not adding synapse %s -> %s" % (s.x_from, s.x_to))
+            pass
+
+        if t != tot and added:
             net_content += ",\n"
-        else:
+        elif added:
             net_content += "\n"
     net_content += "]\n"
 
