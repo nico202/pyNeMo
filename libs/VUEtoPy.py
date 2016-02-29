@@ -125,14 +125,14 @@ def VUEtoPyConverter(input_vue, prehook):
                     stims_link[link_from].append(link_to)
 
     #Init
+    #TODO: Add a posthook? and move the pre before anything
+    net_content = "\nfrom libs.templates import * #For ease of use, this line is mandatory\n\
+from libs.FasterPresets import _S, _stimuli\n"
+
     #Load variables (contained in the rhombus) before anything else.
     #This way they can be replaced by the prehook
-    #TODO: Add a posthook? and move the pre before anything
-    net_content = "#Variables Loaded from the rhombus\n%s\n" % variables_load 
+    net_content += "#Variables Loaded from the rhombus\n%s\n" % variables_load 
 
-    #
-    net_content += "\nfrom libs.templates import * #For ease of use, this line is mandatory\n\
-from libs.FasterPresets import _S, _stimuli\n"
     #PreHook
     net_content += "\n" + prehook + "\n"
     #Name
