@@ -1,5 +1,5 @@
 #!/usr/bin/env python2
-import Image
+from PIL import Image
 
 def showImageFile(image_path):
     try:
