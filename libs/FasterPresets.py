@@ -20,7 +20,7 @@ def _typicalS (d = 1, w = 10, l = False): #TODO: not tested
     #return fixing unsupported values
     return [(d if d >= 1 else 1, w, True if l else False)]
 
-def _S (Stype = "SmallInhFastNoLearn"):
+def _S (Stype = "WeakInhFastNoLearn"):
     '''
         Convert a string into a synapse
     '''
