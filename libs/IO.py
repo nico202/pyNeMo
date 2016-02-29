@@ -157,6 +157,8 @@ def nemo_select_backend (
 
 def saveKey(filename, values, out_dir = "."):
     import os.path
+    filename = str(filename)
+    out_dir = str(out_dir)
     is_folder (out_dir)
     output_name = out_dir + '/' + filename
     if not os.path.isfile(output_name):
