@@ -228,19 +228,9 @@ if __name__ == "__main__":
     #Step is included in the output
     saveKey(uniqueId + "_output", output, output_dir)
 
-    if any([
-            args.show_images
-            , args.show_membrane
-            , args.show_spikes
-            ]):
-        print "Showing images..."
-        from plugins.images import IO as ImageIO
-        if args.show_spikes:
-            ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
-        if args.show_membrane:
-            ImageIO.ImageFromMembranes(output["NeMo"][0])
+    #Save the log
+    write_log(uniqueId, output_dir = output_dir)
 
-        
     #Print some statistic
     #TODO: verbosity
     print ("\n\nSession: %s" % (uniqueId))
@@ -255,6 +245,18 @@ Steps: %s"
               , output["ran_steps"]
           )
     )
-    #Save the log
-    write_log(uniqueId, output_dir = output_dir)
+    
+    #Show images
+    if any([
+            args.show_images
+            , args.show_membrane
+            , args.show_spikes
+            ]):
+        print "Showing images..."
+        from plugins.images import IO as ImageIO
+        if args.show_spikes:
+            ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
+        if args.show_membrane:
+            ImageIO.ImageFromMembranes(output["NeMo"][0])
 
+        
