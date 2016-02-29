@@ -192,14 +192,22 @@ from libs.FasterPresets import _S, _stimuli\n"
         try:
             if s.x_to in self_connection:
                 s.x_to = s.x_from
-            net_content +=  "    [ %s, [%s], _S(\"%s\")" % (node_neuron_map[s.x_from],
+            try: #FIXME: how to use variables in synapses?
+                #Synapse tuple or variable-name, copy as-is (removing the marker $)
+                if "," in s.s_type or "$" in s.s_type:
+                    syn_type = s.s_type.translate(None, '$')
+                else: #just a string, convert to synapse
+                    syn_type = "_S(\"%s\")" % s.s_type
+            except:
+                raise
+
+            net_content +=  "    [ %s, [%s], %s" % (node_neuron_map[s.x_from],
                                                 node_neuron_map[s.x_to],
-                                                s.s_type)
+                                                     syn_type)
             net_content += "]"
             added = True
 
         except KeyError:
-            print self_connection
             print("ERROR: Remembrer not to use labels on Stimulation arrows\nFix the config")
             print("Not adding synapse %s -> %s" % (s.x_from, s.x_to))
             pass
