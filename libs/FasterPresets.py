@@ -82,8 +82,8 @@ def _stimuli(input_list):
 #        pass
     output_dict = {}
     for stimul in input_list:
-        for step in range(stimul[2], stimul[3]):
-            neurons, input_value = stimul[0:2]
+        for step in range(stimul[1][1], stimul[1][2]):
+            neurons, input_value = stimul[0], stimul[1][0]
             if type(neurons) != list:
                 neurons = [neurons]
             for neuron in neurons:

@@ -233,7 +233,11 @@ from libs.FasterPresets import _S, _stimuli\n"
             l = 0
             for i in stims[s]:
                 l += 1
-                net_content += "\t[%s,\t%s,\t%s,\t%s]" % (stim_neuron[0], i[0], i[1], i[2])
+                if len(i) == 3:
+                    stim_values = "(\t%s,\t%s,\t%s)" % (i[0], i[1], i[2])
+                else: #It's a variable. Copy as-is
+                    stim_values = "\t%s" % (i[0])
+                net_content += "\t[%s,\t%s\t]" % (stim_neuron[0], stim_values)
                 net_content += ",\n"
 
     net_content += "\n])\n"
