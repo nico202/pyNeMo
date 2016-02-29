@@ -181,23 +181,6 @@ from libs.FasterPresets import _S, _stimuli\n"
     #net_content += "save = range(0, len(neurons[0]))\n"
     #Don't save whited nodes
     net_content += "save = [ " + ", ".join([ str(node_neuron_map[ts]) for ts in to_save]) + " ]\n\n"
-    #No input right now
-    net_content += "step_input = _stimuli([\n"
-    tot = len(stims_link)
-    t = 0
-    for s in stims_link:
-        t += 1
-        for d in stims_link[s]:
-            stim_neuron = node_neuron_map[d],
-            t2 = len(stims[s])
-            l = 0
-            for i in stims[s]:
-                l += 1
-                net_content += "\t[%s,\t%s,\t%s,\t%s]" % (stim_neuron[0], i[0], i[1], i[2])
-                net_content += ",\n"
-
-    net_content += "\n])\n"
-    net_content += "step_spike = {}\n" #TODO: implement
 
     #Synapses
     net_content += "synapses = [\n"
@@ -226,6 +209,24 @@ from libs.FasterPresets import _S, _stimuli\n"
         elif added:
             net_content += "\n"
     net_content += "]\n"
+
+    #No input right now
+    net_content += "\nstep_input = _stimuli([\n"
+    tot = len(stims_link)
+    t = 0
+    for s in stims_link:
+        t += 1
+        for d in stims_link[s]:
+            stim_neuron = node_neuron_map[d],
+            t2 = len(stims[s])
+            l = 0
+            for i in stims[s]:
+                l += 1
+                net_content += "\t[%s,\t%s,\t%s,\t%s]" % (stim_neuron[0], i[0], i[1], i[2])
+                net_content += ",\n"
+
+    net_content += "\n])\n"
+    net_content += "step_spike = {}\n" #TODO: implement
 
     out_content = open(output_folder + "/" + net_name + ".py", 'w+')
     out_content.write(net_content)
