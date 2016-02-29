@@ -155,7 +155,13 @@ def nemo_select_backend (
         else:
             nemo_config.set_cpu_backend()
 
-def saveKey(filename, values, out_dir = "."):
+def saveKey(filename, values, out_dir = ".", compress = True):
+    '''
+    Saves a dict to a file.
+    If compress enabled, saves to bz2 (size on nets reduced by\
+ more then 20X)
+    TODO if python > 3: use lzma
+    '''
     import os.path
     filename = str(filename)
     out_dir = str(out_dir)
@@ -163,6 +169,10 @@ def saveKey(filename, values, out_dir = "."):
     output_name = out_dir + '/' + filename
     if not os.path.isfile(output_name):
         try:
+            if compress:
+                import bz2
+                values = bz2.compress("%s" % values)
+                output_name = output_name + ".bz2"
             output = open(output_name, 'w')
             output.write("%s" % values)
             output.close()
