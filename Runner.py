@@ -217,11 +217,9 @@ if __name__ == "__main__":
     saveKey(uniqueId + "_output", output, output_dir)
 
     if args.show_images:
+        print "Showing images..."
         from plugins.images import IO as ImageIO
         ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
-        #from libs.IO import membraneImage as MI
-        #for i in output["NeMo"][0]:
-        #    MI(output["NeMo"][0][i])
         ImageIO.ImageFromMembranes(output["NeMo"][0])
 
         
@@ -241,3 +239,4 @@ Steps: %s"
     )
     #Save the log
     write_log(uniqueId, output_dir = output_dir)
+
