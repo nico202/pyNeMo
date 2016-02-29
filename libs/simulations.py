@@ -33,7 +33,7 @@ class nemoSimulation ():
 
         return fired
 
-    def get_output (self):
+    def get_output (self):#FIXME: return fired_history only if in to_save
         return self.membrane_history, self.fired_history
 
 class gazeboSimulation ():

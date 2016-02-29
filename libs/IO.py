@@ -30,12 +30,12 @@ def dependency_check(modules):
             found = False
         if not found: exit("Could not find required module: %s" % (module))
 
-def load_network_file (network_file, vue_prehook):
+def load_network_file (network_file, hooks):
     import imp
     try:
              
         config = imp.load_source('*',
-                                 try_load_vue (network_file, vue_prehook))
+                                 try_load_vue (network_file, hooks))
     #    script_dir = os.getcwd()
     except SyntaxError:
         print("Config file: Syntax Error")
@@ -52,18 +52,18 @@ def load_network_file (network_file, vue_prehook):
         raise
     return config
 
-def try_load_vue(config_name, prehook = ""): #FIXME: relative path etc
+def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
     if ".vue" in config_name:
         import libs.VUEtoPy as VUEtoPy
         #TODO: verbosity fix
         print("Converting input VUE to py")
-        VUEtoPy.VUEtoPyConverter(config_name, prehook)
+        VUEtoPy.VUEtoPyConverter(config_name, hooks)
         config_name = "".join((config_name.split(".")[:-1]))
         config_name += ".py"
     return "./" + config_name
 
 def import_network (
-        (network_file, vue_prehook)
+        (network_file, hooks)
         , (use_cuda, cuda_backend_number)
         , (disable_sensory)
 ):
@@ -73,7 +73,7 @@ def import_network (
     
     returns [ nemo_simulation, to_save ]
     '''
-    network_config = load_network_file (network_file, vue_prehook)
+    network_config = load_network_file (network_file, hooks)
 
     import nemo
     nemo_net = nemo.Network()

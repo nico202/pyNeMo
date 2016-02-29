@@ -43,6 +43,8 @@ def ImageFromSpikes(input_spikes, file_path = "", show = True, save = True):
     spikes = []
     for key in spikes_dict:
         spikes.append(spikes_dict[key])
+    if save:
+        print("\t*\tSaving image to %s" % file_path)
     sp = spikeplot.SpikePlot(savefig=save)
     sp.set_fig_name(file_path)
     sp.set_linestyle('-')

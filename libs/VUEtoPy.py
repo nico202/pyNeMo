@@ -14,7 +14,7 @@ class synapse():
     def synapse_type(self, st):
         self.s_type = st
 
-def VUEtoPyConverter(input_vue, prehook):
+def VUEtoPyConverter(input_vue, (prehook, posthook)):
     xml = ""
     started = False
     #Clean garbage
@@ -129,12 +129,15 @@ def VUEtoPyConverter(input_vue, prehook):
     net_content = "\nfrom libs.templates import * #For ease of use, this line is mandatory\n\
 from libs.FasterPresets import _S, _stimuli\n"
 
+    #PreHook
+    net_content += "\n" + prehook + "\n"
+
     #Load variables (contained in the rhombus) before anything else.
     #This way they can be replaced by the prehook
     net_content += "#Variables Loaded from the rhombus\n%s\n" % variables_load 
 
     #PreHook
-    net_content += "\n" + prehook + "\n"
+    net_content += "\n" + posthook + "\n"
     #Name
     for filename in input_vue.split("."):
         if filename:

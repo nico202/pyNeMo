@@ -94,9 +94,15 @@ if __name__ == "__main__":
     )
 
     parser.add_argument('--vue-prehook'
-                        , help = 'Add python commands before a vue script'
+                        , help = 'Add python commands before a vue script variable definition'
                         , dest = 'vue_prehook'
                         , default = "#No prehooks"
+    )
+
+    parser.add_argument('--vue-posthook'
+                        , help = 'Add python commands after a vue script variable definition'
+                        , dest = 'vue_posthook'
+                        , default = "#No posthooks"
     )
 
     parser.add_argument('--disable-sensory'
@@ -123,6 +129,12 @@ if __name__ == "__main__":
                         , dest = 'show_spikes'
                         , default = True
                         , action = 'store_false'
+    )
+    parser.add_argument('--save-spikes'
+                        , help = 'Save spikes images'
+                        , dest = 'save_spikes'
+                        , default = False
+                        , action = 'store_true'
     )
 
 
@@ -152,6 +164,8 @@ if __name__ == "__main__":
         exit("Error, wrong cuda_backend format. Must be a int")
 
     vue_prehook = args.vue_prehook
+    vue_posthook = args.vue_posthook
+
     #Robot args
     control_robot = args.control_robot
     robot_mode = args.robot_mode #FIXME
@@ -168,7 +182,7 @@ if __name__ == "__main__":
     #Import the network, tranform it to a valid nemo.Network object
     networks =\
         import_network (
-            (network_file, vue_prehook)
+            (network_file, (vue_prehook, vue_posthook))
             , (use_cuda, cuda_backend)
             , (disable_sensory))
 
@@ -245,18 +259,25 @@ Steps: %s"
               , output["ran_steps"]
           )
     )
-    
+    print("-------------------\n")
     #Show images
     if any([
             args.show_images
             , args.show_membrane
             , args.show_spikes
+            , args.save_spikes
             ]):
-        print "Showing images..."
+        print("Processing images...")
         from plugins.images import IO as ImageIO
-        if args.show_spikes:
-            ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
+        if args.show_spikes or args.save_spikes:
+            ImageIO.ImageFromSpikes(output["NeMo"][1]
+                        #used only if save true
+                        , file_path = output_dir + "/" + uniqueId + "_spikes.png"
+                        , show = args.show_spikes
+                        , save = args.save_spikes
+            )
         if args.show_membrane:
             ImageIO.ImageFromMembranes(output["NeMo"][0])
 
         
+print("All done, thanks!")
