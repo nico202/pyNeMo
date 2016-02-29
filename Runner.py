@@ -105,10 +105,22 @@ if __name__ == "__main__":
                         , default = False
                         , action = 'store_true'
     )
-
+    #IMAGES
     parser.add_argument('--no-show-images'
                         , help = 'Don\'t show images'
                         , dest = 'show_images'
+                        , default = True
+                        , action = 'store_false'
+    )
+    parser.add_argument('--no-show-membrane'
+                        , help = 'Don\'t show membrane images'
+                        , dest = 'show_membrane'
+                        , default = True
+                        , action = 'store_false'
+    )
+    parser.add_argument('--no-show-spikes'
+                        , help = 'Don\'t show spikes images'
+                        , dest = 'show_spikes'
                         , default = True
                         , action = 'store_false'
     )
@@ -216,11 +228,17 @@ if __name__ == "__main__":
     #Step is included in the output
     saveKey(uniqueId + "_output", output, output_dir)
 
-    if args.show_images:
+    if any([
+            args.show_images
+            , args.show_membrane
+            , args.show_spikes
+            ]):
         print "Showing images..."
         from plugins.images import IO as ImageIO
-        ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
-        ImageIO.ImageFromMembranes(output["NeMo"][0])
+        if args.show_spikes:
+            ImageIO.ImageFromSpikes(output["NeMo"][1], show = True, save = False)
+        if args.show_membrane:
+            ImageIO.ImageFromMembranes(output["NeMo"][0])
 
         
     #Print some statistic
