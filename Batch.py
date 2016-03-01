@@ -1,30 +1,56 @@
 #!/usr/bin/env python2
-
 import subprocess
 import numpy as np
 import time
 import os
+
+import re
+import string
+
 from libs.IO import is_folder
-from sys import argv
+from sys import argv, exit
 
-#Net config
-try:
-    net = argv[1]
-except IndexError:
-    net = "nets/better2neurons.vue" #Must be a vue
+print ("\n\n\n\n\n\n\n----------------")
 
-name = "iterate_small_values_a-b20"
+name = False
 
-iterated_variable = "_stim_a"
-simulation_steps = 10000
-disable_sensory = True
-show = "None"
+python = "python" #Python command
 
-#Batch config
-min = 0
-max = 12
-step_size = 0.1
+new_args = []
+for a in argv:
+    if not "-" in a:
+        a = '\'%s\'' % a
+    new_args.append(a)
 
+args = " ".join(new_args[1:])
+
+commands = []
+
+ranges = True
+
+def missing(input_string):
+    ranges = re.findall("\[(.*?)\]", input_string)
+    return ranges
+
+def substituteRanges(input_strings, commands):
+    if not commands:
+        commands = []
+    for input_string in input_strings:
+        ranges = missing(input_string)
+        if ranges:
+            r = ranges[0]
+            start, stop, step = [float(n) for n in r.split(',')]
+            steps = np.arange (start, stop, step)
+            for s in steps:
+                command = string.replace(input_string, "["+r+"]", str(s))
+                commands.append(command)
+        else:
+            return commands
+
+    return substituteRanges(commands, commands)
+
+commands = substituteRanges([args], [])
+real_commands = [ i for i in commands if not missing(i) ]
 
 #Start
 is_folder ("batch")
@@ -32,22 +58,22 @@ if not name:
     unique_id = time.time()
 else:
     unique_id = name
-output_dir = "batch/" + str(unique_id)
-is_folder (output_dir)
-print("We'll use %s as output dir" % (output_dir))
 
-steps = np.arange (min, max, step_size)
-print("I'm gonna run: %s symulations! Be prapared" % (len(steps)))
+output_dir = "batch/" + str(unique_id)
+
+is_folder (output_dir)
+
+print("We'll use %s as output dir" % (output_dir))
 
 #Let's run the simulations (surely not the best way, but does the job)
 start = time.time()
 
 lap = 0
-for value in steps:
+
+for com in real_commands:
     lap_start = time.time()
-    subprocess.call("python Runner.py %s --steps %s --disable-sensory --vue-prehook '%s=%s' --no-show-images --history-dir %s" %
-                    ( net, simulation_steps, iterated_variable, value, output_dir),
-                    shell = True)
+    print com
+    subprocess.call("%s Runner.py %s" % (python, com), shell = True)
     lap_end = time.time()
     cycle_time = lap_end - lap_start
     lap +=1
