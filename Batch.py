@@ -72,7 +72,6 @@ lap = 0
 
 for com in real_commands:
     lap_start = time.time()
-    print com
     subprocess.call("%s Runner.py %s" % (python, com), shell = True)
     lap_end = time.time()
     cycle_time = lap_end - lap_start
