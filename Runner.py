@@ -279,5 +279,14 @@ Steps: %s"
         if args.show_membrane:
             ImageIO.ImageFromMembranes(output["NeMo"][0])
 
+#Analysis:
+#from plugins.analysis import spikes
+#from plugins.importer import spikesDictToArray
+
+#for i in spikesDictToArray(output["NeMo"][1]):
+#    print spikes.neuronSpikesToSquare(i)
+#    print len(spikes.neuronSpikesToSquare(i))
+#    print sum(spikes.neuronSpikesToSquare(i))
+#    print spikes.squareMeans(spikes.neuronSpikesToSquare(i))
         
 print("All done, thanks!")
