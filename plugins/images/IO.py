@@ -25,24 +25,16 @@ def ImageFromSpikes(input_spikes, file_path = "", show = True, save = True):
     spikes = list of lists (neurons) of ms
     ie. [[1, 3, 5], [2, 4, 5]] # 2 neurons, 3 spikes/neuron, ms 1, 3...
     '''
-    from sys import exit
     try:
         from neuronpy.graphics import spikeplot
     except ImportError:
         print ("You need nepuronpy to create spikes images\n\
         (as root) pip2 install neuronpy; pip2 install matplotlib")
         return False
-    spikes_dict = {}
-    for ms in range(len(input_spikes)):
-        for neuron in input_spikes[ms]:
-            if neuron in spikes_dict:
-                spikes_dict[neuron].append(ms)
-            else:
-                spikes_dict[neuron] = [ms]
+    from plugins.importer import spikesDictToArray
 
-    spikes = []
-    for key in spikes_dict:
-        spikes.append(spikes_dict[key])
+    spikes = spikesDictToArray(input_spikes)
+
     if save:
         print("\t*\tSaving image to %s" % file_path)
     sp = spikeplot.SpikePlot(savefig=save)
