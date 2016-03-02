@@ -91,6 +91,7 @@ real_commands = set([ i for i in commands if not missing(i) ])
 #TODO:
 #Save "real_commands" hash to file + iter number (every 10?)
 #to allow loop recovery for long loops
+#FIXME: remove "--show-image" etc to prevent different hashes of same config
 session_hash = hashDict(real_commands)
 
 
@@ -103,7 +104,7 @@ print("We'll use %s as output dir" % (output_dir))
 #TODO: add the loop inside Runner?
 start = time.time()
 try:
-    run = import_history(output_dir + "/" + session_hash)
+    run = import_history(output_dir + "/" + session_hash + "_batch")
     recover_from_lap = run["cycle"]
     print("You already run this sym, recovering from %s"
           % (recover_from_lap))
@@ -133,11 +134,8 @@ for com in real_commands:
         #save only every X laps and on keyboard interrupt
         if not lap % config.BATCH_SAVE_EVERY: 
             print "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
-            write_batch_log(session_hash, lap, output_dir)
+            write_batch_log(str(session_hash) + "_batch", lap, output_dir)
             print "-------------------"
-            print session_hash
-            print lap
-            print output_dir
     except KeyboardInterrupt:
         if not forced_quit:
             write_batch_log(session_hash, lap, output_dir)
@@ -145,7 +143,7 @@ for com in real_commands:
             print ("Forced saving! Press CTRL-C again (on cue) to quit")
         else:
             #save 2 lap less to be sure sims have not been interrupted
-            write_batch_log(session_hash, lap - 2, output_dir)
+            write_batch_log(str(session_hash) + "_batch", lap - 2, output_dir)
 
             exit("Forced QUIT")
 
