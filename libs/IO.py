@@ -155,7 +155,7 @@ def nemo_select_backend (
         else:
             nemo_config.set_cpu_backend()
 
-def saveKey(filename, values, out_dir = ".", compress = True):
+def saveKey(filename, values, out_dir = ".", compress = True, force_write = False):
     '''
     Saves a dict to a file.
     If compress enabled, saves to bz2 (size on nets reduced by\
@@ -167,7 +167,7 @@ def saveKey(filename, values, out_dir = ".", compress = True):
     out_dir = str(out_dir)
     is_folder (out_dir)
     output_name = out_dir + '/' + filename
-    if not os.path.isfile(output_name):
+    if not os.path.isfile(output_name) or force_write:
         try:
             if compress:
                 import bz2
@@ -214,6 +214,14 @@ def write_log(uniqueId, output_dir = "history", name = "history.log"):
     history = open(output_dir + "/" + name, 'a') #Update the history
     history.write("%f, %s\n" % (time.time(), uniqueId))
     history.close()
+
+def write_batch_log(sessionId, cycle, output_dir = "batch"):
+    print cycle, output_dir, sessionId
+    save = {
+        "cycle":cycle
+    } #Do we need something else?
+    saveKey(str(sessionId), save, output_dir, compress = False, force_write = True)
+    
 
 def membraneImage(values, title = False, close = True, scales = []): #TODO: Add stimulation trace
     '''
