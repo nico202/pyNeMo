@@ -113,6 +113,7 @@ except IOError:
     recover_from_lap = 0
     pass
 
+last_save_time = time.time()
 next_sleep = False
 forced_quit = False
 lap = 0
@@ -132,8 +133,12 @@ for com in real_commands:
         subprocess.call("%s Runner.py %s" % (python, com), shell = True)
         lap +=1
         #save only every X laps and on keyboard interrupt
-        if not lap % config.BATCH_SAVE_EVERY: 
+        if not lap % config.BATCH_SAVE_EVERY:
+            now = time.time()
+            time_diff = now - last_save_time
+            last_save_time = now
             print "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
+            print("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
             write_batch_log(str(session_hash) + "_batch", lap, output_dir)
             print "-------------------"
     except KeyboardInterrupt:
