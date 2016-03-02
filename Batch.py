@@ -55,7 +55,6 @@ if (
 ])):
     ask("You are showing images", "Use \"--no-show-images\" and run the batch again")
 
-exit()
 args = " ".join(new_args[1:])
 
 commands = []
