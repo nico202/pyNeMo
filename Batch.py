@@ -7,7 +7,9 @@ import os
 import re
 import string
 
-from libs.IO import is_folder
+from libs.IO import is_folder, hashDict
+import config
+
 from sys import argv, exit
 
 print ("\n\n\n\n\n\n\n----------------")
@@ -22,6 +24,38 @@ for a in argv:
         a = '\'%s\'' % a
     new_args.append(a)
 
+#Get the output dir, or set it to batch if none defined
+if not "--history-dir" in argv:
+    argv.append("--history-dir")
+    argv.append("batch")
+else:
+    output_dir = argv[argv.index("--history-dir")+1]
+
+def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [y/n]"):
+    from sys import exit
+    action = "z"
+    while action.capitalize() not in ["Y","N"]:
+        action = raw_input(msg + "\n" + sure +": ")
+        if action.capitalize() == "Y":
+            break
+        else:
+            exit(exit_msg)
+    
+if (
+        config.BATCH_CONFIRM_NO_SAVE_IMAGE
+        and not "--save-spikes" in argv
+):
+    ask("You are not saving the spikes image.")
+
+if (
+        config.BATCH_CONFIRM_SHOW_IMAGE
+        and all([
+            not "--no-show-membrane" in argv or not "--no-show-spikes" in argv
+            , not "--no-show-images" in argv
+])):
+    ask("You are showing images", "Use \"--no-show-images\" and run the batch again")
+
+exit()
 args = " ".join(new_args[1:])
 
 commands = []
@@ -52,6 +86,12 @@ def substituteRanges(input_strings, commands):
 commands = substituteRanges([args], [])
 real_commands = [ i for i in commands if not missing(i) ]
 
+#TODO:
+#Save "real_commands" hash to file + iter number (every 10?)
+#to allow loop recovery for long loops
+session_hash = hashDict(real_commands)
+
+
 #Start
 is_folder ("batch")
 if not name:
@@ -79,4 +119,4 @@ for com in real_commands:
 
 end = time.time()
 
-subprocess.call("notify-send 'pyNeMo' 'batch process ended!'", shell = True)
+#subprocess.call("notify-send 'pyNeMo' 'batch process ended!'", shell = True)
