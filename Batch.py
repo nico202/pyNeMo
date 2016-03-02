@@ -21,7 +21,7 @@ python = "python" #Python command
 
 new_args = []
 for a in argv:
-    if not "-" in a:
+    if not "--" in a:
         a = '\'%s\'' % a
     new_args.append(a)
 
@@ -32,7 +32,8 @@ if not "--history-dir" in new_args:
     new_args.append(output_dir)
 else:
     output_dir = new_args[new_args.index("--history-dir")+1]
-
+if "'" in output_dir:
+    output_dir = string.replace(output_dir,"'", "")
 def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [y/n]"):
     from sys import exit
     action = "z"
@@ -59,8 +60,6 @@ if (
 
 args = " ".join(new_args[1:])
 
-commands = []
-
 ranges = True
 
 def missing(input_string):
@@ -85,8 +84,12 @@ def substituteRanges(input_strings, commands):
     return substituteRanges(commands, commands)
 
 commands = substituteRanges([args], [])
+
+#fix parentheses:
+real_commands = [ i for i in commands if not missing(i) ]
 #set just to be sure no duplicate runs
-real_commands = set([ i for i in commands if not missing(i) ])
+real_commands = set(real_commands)
+
 
 #TODO:
 #Save "real_commands" hash to file + iter number (every 10?)
@@ -118,6 +121,7 @@ next_sleep = False
 forced_quit = False
 lap = 0
 laps = len(real_commands)
+print ("We are going to run %s simulations!" % (laps))
 for com in real_commands:
     try:
         if lap < recover_from_lap:
@@ -152,6 +156,7 @@ for com in real_commands:
 
             exit("Forced QUIT")
 
+print("Batch runned successfully!")
 end = time.time()
 
 #subprocess.call("notify-send 'pyNeMo' 'batch process ended!'", shell = True)
