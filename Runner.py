@@ -261,19 +261,19 @@ Steps: %s"
     )
     print("-------------------\n")
     #Show images
-    if any([
-            args.show_images
-            , args.show_membrane
+    if (args.show_images and
+        any([
+            args.show_membrane
             , args.show_spikes
             , args.save_spikes
-            ]):
+        ])):
         print("Processing images...")
         from plugins.images import IO as ImageIO
         if args.show_spikes or args.save_spikes:
             ImageIO.ImageFromSpikes(output["NeMo"][1]
                         #used only if save true
                         , file_path = output_dir + "/" + uniqueId + "_spikes.png"
-                        , show = args.show_spikes
+                        , show = all([args.show_spikes, args.show_images])
                         , save = args.save_spikes
             )
         if args.show_membrane:
