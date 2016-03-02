@@ -195,6 +195,7 @@ def hashDict(dictionary):
     return str(hashlib.sha1(str(dictionary)).hexdigest())
 
 def is_folder(output_dir = ".store"):
+    #FIXME: allow recursive creation
     import os.path
     output_dir = str(output_dir)
     if not os.path.isdir(output_dir):
@@ -202,6 +203,7 @@ def is_folder(output_dir = ".store"):
             try:
                 os.mkdir(output_dir)
             except:
+                raise
                 exit("Unknown error creating folder")
             return True
         else:
@@ -252,3 +254,20 @@ LOWERCASE, UPPERCASE = 'x', 'X'
 MAP = {0: "R", 1: "G", 2: "B"}
 def rgb(triplet):
     return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
+
+def saveFile(file_source, file_dest):
+    '''
+    Copy file #TODO: Enable compression (bz2/_lzma_)
+    '''
+    from shutil import copy2
+    from os.path import isfile
+    output_name = file_dest
+    if not isfile(output_name):
+        try:
+            copy2(file_source, file_dest)
+        except:
+            raise
+            exit("Probem copying file?! DEBUG me")
+            return True
+    else:
+        return False

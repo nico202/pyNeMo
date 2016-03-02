@@ -17,6 +17,7 @@ from libs.IO import time_to_steps
 from libs.IO import dependency_check
 from libs.IO import import_network
 from libs.IO import saveKey, hashDict, write_log
+from libs.IO import saveFile
 
 from libs.simulations import main_simulation_run
 from libs.pYARP import RobotYARP
@@ -27,6 +28,7 @@ if __name__ == "__main__":
         , "scipy"
         , "yarp" #FIXME: not needed if no sensory
 #       , "pygazebo"
+        , "shutil"
     ]
     dependency_check(required_modules)
 
@@ -137,6 +139,12 @@ if __name__ == "__main__":
                         , action = 'store_true'
     )
 
+    parser.add_argument('--analyze-spikes-frequency'
+                        , help = 'Return frequency of spikes data'
+                        , dest = 'analyze_spikes_frequency'
+                        , default = False
+                        , action = 'store_true'
+    )
 
     #Load all the parameters (choose if/when read from CLI/config.py)
     use_config = True if os.path.isfile("config.py") else False
@@ -210,7 +218,9 @@ if __name__ == "__main__":
         , "synapses": synapses
         , "name": network_name
     }
-    saveKey(hashDict(dict_config) + "_input", dict_config, output_dir)
+    config_dict_hash = hashDict(dict_config)
+    saveKey(config_dict_hash + "_input", dict_config, output_dir)
+    saveFile(args.network_file, output_dir + "/" + config_dict_hash + "_input.py")
 
     #Define robot
     if (sensory_neurons_in or sensory_neurons_out):
@@ -261,12 +271,14 @@ Steps: %s"
     )
     print("-------------------\n")
     #Show images
-    if (args.show_images and
-        any([
-            args.show_membrane
-            , args.show_spikes
-            , args.save_spikes
-        ])):
+    if (
+            (args.show_images or args.save_spikes)
+            and
+            any([
+                args.show_membrane
+                , args.show_spikes
+                , args.save_spikes
+            ])):
         print("Processing images...")
         from plugins.images import IO as ImageIO
         if args.show_spikes or args.save_spikes:
@@ -280,13 +292,18 @@ Steps: %s"
             ImageIO.ImageFromMembranes(output["NeMo"][0])
 
 #Analysis:
-#from plugins.analysis import spikes
-#from plugins.importer import spikesDictToArray
+if args.analyze_spikes_frequency: #TODO: write all conditions etc
+    from plugins.analysis import spikes
+    from plugins.importer import spikesDictToArray
 
-#for i in spikesDictToArray(output["NeMo"][1]):
-#    print spikes.neuronSpikesToSquare(i)
-#    print len(spikes.neuronSpikesToSquare(i))
-#    print sum(spikes.neuronSpikesToSquare(i))
-#    print spikes.squareMeans(spikes.neuronSpikesToSquare(i))
+    for i in spikesDictToArray(output["NeMo"][1]):
+        #print spikes.neuronSpikesToSquare(i)
+#        print len(spikes.neuronSpikesToSquare(i))
+#        print sum(spikes.neuronSpikesToSquare(i))
+        mean = spikes.squareMeans(spikes.neuronSpikesToSquare(i))
+        print "ANALYSIS not working yet"
+#        print mean
+#        print 1. / mean[0] * 1000.
+#        print 1. / mean[1] * 1000.
         
 print("All done, thanks!")
