@@ -127,7 +127,7 @@ def VUEtoPyConverter(input_vue, (prehook, posthook)):
     #Init
     #TODO: Add a posthook? and move the pre before anything
     net_content = "\nfrom libs.templates import * #For ease of use, this line is mandatory\n\
-from libs.FasterPresets import _S, _stimuli\n"
+from libs.FasterPresets import _S, _stimuli, _typicalN\n"
 
     #PreHook
     net_content += "\n" + prehook + "\n"
