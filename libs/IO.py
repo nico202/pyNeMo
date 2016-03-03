@@ -33,10 +33,9 @@ def dependency_check(modules):
 def load_network_file (network_file, hooks):
     import imp
     try:
-             
-        config = imp.load_source('*',
-                                 try_load_vue (network_file, hooks))
-    #    script_dir = os.getcwd()
+        config_name = try_load_vue (network_file, hooks)
+        config = imp.load_source('*', config_name)
+
     except SyntaxError:
         print("Config file: Syntax Error")
         raise
@@ -50,7 +49,7 @@ def load_network_file (network_file, hooks):
     except:
         print("DEBUG: Unknown error")
         raise
-    return config
+    return config, config_name
 
 def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
     if ".vue" in config_name:
@@ -73,7 +72,7 @@ def import_network (
     
     returns [ nemo_simulation, to_save ]
     '''
-    network_config = load_network_file (network_file, hooks)
+    network_config, network_name = load_network_file (network_file, hooks)
 
     import nemo
     nemo_net = nemo.Network()
@@ -103,7 +102,7 @@ def import_network (
             , network_config.name
         )
     ]
-    )
+    ), network_name
 
 def nemo_add_neurons (net, neuron_list, start_id = 0):
     iz = net.add_neuron_type('Izhikevich')
