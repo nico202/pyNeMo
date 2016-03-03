@@ -1,8 +1,16 @@
-def import_history(file_path):
-    #FIXME: add bzip2 suppor
+def import_history(file_path, compressed = False):
+    #FIXME: automatic bzip2 support
     import ast
+    from os.path import isfile, join
     try:
-        ret = ast.literal_eval((open(file_path, 'r').readline()))
+
+        if compressed:
+            import bz2
+            opened = bz2.BZ2File(file_path)
+        else:
+            opened = open(file_path, 'r')
+
+        ret = ast.literal_eval(opened.readline())
     except SyntaxError:
         print ("FATAL ERROR: input file broken!")
         return False
