@@ -188,7 +188,7 @@ if __name__ == "__main__":
     }
 
     #Import the network, tranform it to a valid nemo.Network object
-    networks =\
+    networks, config_file_name =\
         import_network (
             (network_file, (vue_prehook, vue_posthook))
             , (use_cuda, cuda_backend)
@@ -220,7 +220,7 @@ if __name__ == "__main__":
     }
     config_dict_hash = hashDict(dict_config)
     saveKey(config_dict_hash + "_input", dict_config, output_dir)
-    saveFile(args.network_file, output_dir + "/" + config_dict_hash + "_input.py")
+    saveFile(config_file_name, output_dir + "/" + config_dict_hash + "_input.py")
 
     #Define robot
     if (sensory_neurons_in or sensory_neurons_out):
@@ -295,15 +295,15 @@ Steps: %s"
 if args.analyze_spikes_frequency: #TODO: write all conditions etc
     from plugins.analysis import spikes
     from plugins.importer import spikesDictToArray
-
+    neuron_number = 0
+    print len (spikesDictToArray(output["NeMo"][1]))
     for i in spikesDictToArray(output["NeMo"][1]):
-        #print spikes.neuronSpikesToSquare(i)
-#        print len(spikes.neuronSpikesToSquare(i))
-#        print sum(spikes.neuronSpikesToSquare(i))
-        mean = spikes.squareMeans(spikes.neuronSpikesToSquare(i))
-        print "ANALYSIS not working yet"
-#        print mean
-#        print 1. / mean[0] * 1000.
-#        print 1. / mean[1] * 1000.
+#        print "ANALYSIS not working yet"
+        freq = spikes.getFreq(spikes.squareToBitSeq(spikes.neuronSpikesToSquare(i)))
+        if freq:
+            print ("Neuron: %s, freqs: %s, %s"
+                   %
+                   (neuron_number, 1./freq[0]*1000, 1./freq[1]*1000))
+        neuron_number +=1
         
 print("All done, thanks!")
