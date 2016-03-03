@@ -1,17 +1,18 @@
-<!-- Tufts VUE 3.2.2 concept-map (lamprey.vue) 2016-03-03 -->
+<!-- Tufts VUE 3.2.2 concept-map (lamprey_YARP.vue) 2016-03-03 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/opt/vue/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Thu Mar 03 17:43:03 CET 2016 by nicolo on platform Linux 4.5.0-040500rc1-generic in JVM 1.8.0_72-b15 -->
+<!-- Do Not Remove: Saved date Thu Mar 03 17:59:40 CET 2016 by nicolo on platform Linux 4.5.0-040500rc1-generic in JVM 1.8.0_72-b15 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built May 23 2013 at 2146 by tomadm on Linux 2.6.18-348.2.1.el5 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:noNamespaceSchemaLocation="none" ID="0" label="lamprey.vue"
+    xsi:noNamespaceSchemaLocation="none" ID="0" label="lamprey_YARP.vue"
     created="1456745900425" x="0.0" y="0.0" width="1.4E-45"
     height="1.4E-45" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1457023383066" size="23890"
-        spec="/home/nicolo/Git/temp/pyNeMo/nets/lamprey.vue" type="1" xsi:type="URLResource">
-        <title>lamprey.vue</title>
-        <property key="File" value="/home/nicolo/Git/temp/pyNeMo/nets/lamprey.vue"/>
+    <resource referenceCreated="1457024380659" size="23966"
+        spec="/home/nicolo/Git/temp/pyNeMo/nets/lamprey_YARP.vue"
+        type="1" xsi:type="URLResource">
+        <title>lamprey_YARP.vue</title>
+        <property key="File" value="/home/nicolo/Git/temp/pyNeMo/nets/lamprey_YARP.vue"/>
     </resource>
     <fillColor>#FFFFFF</fillColor>
     <strokeColor>#404040</strokeColor>
@@ -19,9 +20,9 @@
     <font>SansSerif-plain-14</font>
     <URIString>http://vue.tufts.edu/rdf/resource/2cd2a5247f00010146d2456fdbb48add</URIString>
     <child ID="7"
-        label="#NEURONS&#xa;CIN = TonicBursting&#xa;EIN = PhasicBursting&#xa;MN = PhasicBursting&#xa;&#xa;#SYNAPSES&#xa;EXC0 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;EXC1 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;EXC2 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;INH0 = _S(&quot;InhFastLearnMedium&quot;)&#xa;INH1 = _S(&quot;InhFastNoLearnStrong&quot;)&#xa;INH2 = _S(&quot;InhStrongNoLearn&quot;)&#xa;&#xa;#STIMULI&#xa;_stim_a = 8&#xa;_stim_b = 8&#xa;_start_a = 0&#xa;_start_b = 100&#xa;_stop_a = 300&#xa;_stop_b = 800&#xa;&#xa;cerebellum_ctrl = (0, 0, 0)"
+        label="#NEURONS&#xa;#CIN = TonicBursting&#xa;CIN = _typicalN(c=-50.3, d=2.1, v=-72)&#xa;EIN = PhasicBursting&#xa;MN = PhasicBursting&#xa;&#xa;#SYNAPSES&#xa;EXC0 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;EXC1 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;EXC2 = _S(&quot;ExcFastNoLearnStrong&quot;)&#xa;INH0 = _S(&quot;InhFastLearnMedium&quot;)&#xa;INH1 = _S(&quot;InhFastNoLearnStrong&quot;)&#xa;INH2 = _S(&quot;InhStrongNoLearn&quot;)&#xa;&#xa;#STIMULI&#xa;_stim_a = 1.7&#xa;_stim_b = 1.4&#xa;_start_a = 0&#xa;_start_b = 57&#xa;_stop_a = 114&#xa;_stop_b = 114&#xa;&#xa;cerebellum_ctrl = (0.02,800,60000)&#xa;&#xa;min_angle = -45&#xa;max_angle = 45"
         layerID="1" created="1456745925055" x="474.88104" y="-89.81146"
-        width="323.0" height="443.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        width="332.0" height="508.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
         <fillColor>#FEFD8C</fillColor>
         <strokeColor>#776D6D</strokeColor>
         <textColor>#000000</textColor>
@@ -360,6 +361,42 @@
         <ID1 xsi:type="node">60</ID1>
         <ID2 xsi:type="node">20</ID2>
     </child>
+    <child ID="67" label="0, 0.5, min_angle, max_angle" layerID="1"
+        created="1457023285006" x="130.67336" y="263.19528"
+        width="238.0" height="83.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#F2AE45</fillColor>
+        <strokeColor>#776D6D</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/3d5b561e7f0001013cd31838c6fa04a2</URIString>
+        <shape xsi:type="chevron"/>
+    </child>
+    <child ID="68" label="Spike" layerID="1" created="1457023298656"
+        x="207.52185" y="211.15427" width="26.0" height="52.541046"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/3d5b561f7f0001013cd31838a8fcc0fd</URIString>
+        <point1 x="209.35425" y="211.65427"/>
+        <point2 x="231.68944" y="263.1953"/>
+        <ID1 xsi:type="node">23</ID1>
+        <ID2 xsi:type="node">67</ID2>
+    </child>
+    <child ID="69" label="Spike" layerID="1" created="1457023304514"
+        x="271.24054" y="211.01526" width="28.480316" height="52.679993"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/3d5b561f7f0001013cd31838fb8ba5a6</URIString>
+        <point1 x="299.2209" y="211.51526"/>
+        <point2 x="271.74057" y="263.19525"/>
+        <ID1 xsi:type="node">24</ID1>
+        <ID2 xsi:type="node">67</ID2>
+    </child>
     <layer ID="1" label="Layer 1" created="1456745900425" x="0.0"
         y="0.0" width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
         <URIString>http://vue.tufts.edu/rdf/resource/2cd2a5247f00010146d2456f1cf07c19</URIString>
@@ -419,5 +456,5 @@
     <date>2016-02-29</date>
     <modelVersion>6</modelVersion>
     <saveLocation>/home/nicolo/Git/temp/pyNeMo/nets</saveLocation>
-    <saveFile>/home/nicolo/Git/temp/pyNeMo/nets/lamprey.vue</saveFile>
+    <saveFile>/home/nicolo/Git/temp/pyNeMo/nets/lamprey_YARP.vue</saveFile>
 </LW-MAP>
