@@ -53,11 +53,13 @@ if __name__ == "__main__":
     #Update index
     loop = start_from - 1 if start_from else 0
 
+    print("Total number of analysis to be run: %s" % (len(outputs)))
     if args.number_only:
-        print("Total number of simulation to be run: %s" % (total))
         exit()
+        
     neurons_to_analyze = [4, 5] #FIXME: read from cli
     for f in outputs:
+        bypass = False
         print("Using file: %s" % f)
         neurons_info = {}
         loop += 1
@@ -69,31 +71,46 @@ if __name__ == "__main__":
             print ("Loop: %s/%s" % (loop, total))
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
-        for i in all_neurons_spikes_list:
-            if neuron_number not in neurons_to_analyze:
-                neuron_number +=1 
-                continue
+        print all_neurons_spikes_list
+        if len( all_neurons_spikes_list) < max(neurons_to_analyze):
+            neurons_info={}
+            for n in neurons_to_analyze:
+                neurons_info[n] = {}
+                neurons_info[n]={}
+                neurons_info[n]["on_time"] = 0
+                neurons_info[n]["off_time"] = 0
+                neurons_info[n]["mode"] = 3 #Dead neuron
+                neurons_info[n]["not_burst_freq"] = 0
+                neurons_info[n]["burst_freq"] = 0
+                
+            bypass = True
+            
+        if not bypass:
+            for i in all_neurons_spikes_list:
+                if neuron_number not in neurons_to_analyze:
+                    neuron_number +=1 
+                    continue
 
-            raw, tresholded = spikes.neuronSpikesToSquare(i)
-            off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
-            not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
+                raw, tresholded = spikes.neuronSpikesToSquare(i)
+                off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
+                not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
 
-            if not osc: #Not oscillating
-                state = max(off_time, on_time)
-                if state == off_time:
-                    mode = 0 #Neuron is stable OFF
-                else:
-                    mode = 2 #Neuron is stable ON
-                on_time = 0
-                off_time = 0
-            else: #Neuron IS oscillating
-                mode = 1 #Neuron is both ON and OFF
-            neurons_info[neuron_number]={}
-            neurons_info[neuron_number]["on_time"] = on_time
-            neurons_info[neuron_number]["off_time"] = off_time
-            neurons_info[neuron_number]["mode"] = mode
-            neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
-            neurons_info[neuron_number]["burst_freq"] = burst_freq
+                if not osc: #Not oscillating
+                    state = max(off_time, on_time)
+                    if state == off_time:
+                        mode = 0 #Neuron is stable OFF
+                    else:
+                        mode = 2 #Neuron is stable ON
+                        on_time = 0
+                        off_time = 0
+                else: #Neuron IS oscillating
+                    mode = 1 #Neuron is both ON and OFF
+                    neurons_info[neuron_number]={}
+                    neurons_info[neuron_number]["on_time"] = on_time
+                    neurons_info[neuron_number]["off_time"] = off_time
+                    neurons_info[neuron_number]["mode"] = mode
+                    neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
+                    neurons_info[neuron_number]["burst_freq"] = burst_freq
             neuron_number += 1
         save = open("./ANALYSIS.log", 'a')#We could open this before
 

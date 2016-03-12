@@ -18,7 +18,7 @@ def import_history(file_path, compressed = False):
 
 def spikesDictToArray(input_spikes):
     spikes_dict = {}                                                               
-    for ms in range(len(input_spikes)):                                            
+    for ms in range(len(input_spikes)):
         for neuron in input_spikes[ms]:                                            
             if neuron in spikes_dict:                                              
                 spikes_dict[neuron].append(ms)                                     
