@@ -60,8 +60,13 @@ if (
 
 args = " ".join(new_args[1:])
 
-ranges = True
+#Save args to file
+l = open("batch_history.log", 'a')
+l.write("%s, %s" % (output_dir, args))
+l.close()
 
+
+ranges = True
 def missing(input_string):
     ranges = re.findall("\[(.*?)\]", input_string)
     return ranges
@@ -74,7 +79,8 @@ def substituteRanges(input_strings, commands):
         if ranges:
             r = ranges[0]
             start, stop, step = [float(n) for n in r.split(',')]
-            steps = np.arange (start, stop, step)
+            steps = np.linspace (start, stop, (abs(stop-start)/step)+1)
+
             for s in steps:
                 command = string.replace(input_string, "["+r+"]", str(s))
                 commands.append(command)
@@ -90,12 +96,11 @@ real_commands = [ i for i in commands if not missing(i) ]
 #set just to be sure no duplicate runs
 real_commands = set(real_commands)
 
-
 #TODO:
 #Save "real_commands" hash to file + iter number (every 10?)
 #to allow loop recovery for long loops
 #FIXME: remove "--show-image" etc to prevent different hashes of same config
-session_hash = hashDict(real_commands)
+session_hash = str(hashDict(real_commands))
 
 
 #Start
@@ -122,6 +127,7 @@ forced_quit = False
 lap = 0
 laps = len(real_commands)
 print ("We are going to run %s simulations!" % (laps))
+
 for com in real_commands:
     try:
         if lap < recover_from_lap:
@@ -143,11 +149,11 @@ for com in real_commands:
             last_save_time = now
             print "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
             print("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
-            write_batch_log(str(session_hash) + "_batch", lap, output_dir)
+            write_batch_log(session_hash + "_batch", lap, output_dir)
             print "-------------------"
     except KeyboardInterrupt:
         if not forced_quit:
-            write_batch_log(session_hash, lap, output_dir)
+            write_batch_log(session_hash + "_batch", lap, output_dir)
             next_sleep = True
             print ("Forced saving! Press CTRL-C again (on cue) to quit")
         else:
