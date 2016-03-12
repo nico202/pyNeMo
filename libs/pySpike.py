@@ -72,7 +72,7 @@ class sensNetOut():
         decay_rate = 0.25, #The rate of decay of the angle variables
         current_increment = 10, #The amount by which the input current to the neurons is incremented by each spike
         dof = 0, #Degree of freedom of joint. FIXME: NOT USED
-        integration_steps = 2  #Step after which integration occurs (1step = 1ms)
+        integration_steps = 10  #Step after which integration occurs (1step = 1ms)
     ):
         self.neuron_idx = neuron_idx
         neuron_number = len(neuron_idx)
@@ -116,7 +116,7 @@ class sensNetOut():
             for n in range(0, self.neuron_number):
                 angle_sum += self.current_variables[n] * self.current_variable_angles[n]
                 weighted_sum += self.current_variables[n]
-
+            print self.current_variables
             new_angle = 0
             if weighted_sum:
                 new_angle = angle_sum / weighted_sum
@@ -129,4 +129,5 @@ class sensNetOut():
             
             self.current_angle = new_angle
             self.missing_steps = self.integration_steps
+        print self.current_angle
         return self.current_angle

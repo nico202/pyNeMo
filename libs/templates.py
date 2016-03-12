@@ -15,6 +15,8 @@ from FasterPresets import _typicalN, _typicalS, _S
 #YES, 2 brackets. This allow us to use NeuronType * Nuber
 #neurons: a, b, c, d, s, u, v
 #http://www.izhikevich.org/publications/figure1.m
+
+lamprey = _typicalN(a = 0.01, b = 0.2, c = -75, d = 9)
 #DO_NOT_TOUCH
 TonicSpiking = _typicalN(d = 6, v = -70, u = 0.2 * -65)
 #DO_NOT_TOUCH
