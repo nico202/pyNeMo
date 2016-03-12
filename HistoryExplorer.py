@@ -71,7 +71,6 @@ if __name__ == "__main__":
             print ("Loop: %s/%s" % (loop, total))
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
-        print all_neurons_spikes_list
         if len( all_neurons_spikes_list) < max(neurons_to_analyze):
             neurons_info={}
             for n in neurons_to_analyze:
