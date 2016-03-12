@@ -71,4 +71,4 @@ def getFreq(seq, steps, period = True):
         else:
             return 1000./off_period_mode, 1000./on_period_mode, True
     else: #Not oscillating. Mode (on/off) = max (state[0], state[1])
-        return state[0], state[1], False
+        return state[0][0], state[1][0], False

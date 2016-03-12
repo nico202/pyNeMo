@@ -71,7 +71,7 @@ if __name__ == "__main__":
             print ("Loop: %s/%s" % (loop, total))
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
-        if len( all_neurons_spikes_list) < max(neurons_to_analyze):
+        if len( all_neurons_spikes_list) < max(neurons_to_analyze) -1:
             neurons_info={}
             for n in neurons_to_analyze:
                 neurons_info[n] = {}
@@ -81,7 +81,7 @@ if __name__ == "__main__":
                 neurons_info[n]["mode"] = 3 #Dead neuron
                 neurons_info[n]["not_burst_freq"] = 0
                 neurons_info[n]["burst_freq"] = 0
-                
+
             bypass = True
             
         if not bypass:
@@ -89,7 +89,6 @@ if __name__ == "__main__":
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
-
                 raw, tresholded = spikes.neuronSpikesToSquare(i)
                 off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
@@ -104,13 +103,13 @@ if __name__ == "__main__":
                         off_time = 0
                 else: #Neuron IS oscillating
                     mode = 1 #Neuron is both ON and OFF
-                    neurons_info[neuron_number]={}
-                    neurons_info[neuron_number]["on_time"] = on_time
-                    neurons_info[neuron_number]["off_time"] = off_time
-                    neurons_info[neuron_number]["mode"] = mode
-                    neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
-                    neurons_info[neuron_number]["burst_freq"] = burst_freq
-            neuron_number += 1
+                neurons_info[neuron_number]={}
+                neurons_info[neuron_number]["on_time"] = on_time
+                neurons_info[neuron_number]["off_time"] = off_time
+                neurons_info[neuron_number]["mode"] = mode
+                neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
+                neurons_info[neuron_number]["burst_freq"] = burst_freq
+                neuron_number += 1
         save = open("./ANALYSIS.log", 'a')#We could open this before
 
         save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
