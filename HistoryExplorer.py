@@ -112,7 +112,7 @@ if __name__ == "__main__":
                 neuron_number += 1
         save = open("./ANALYSIS.log", 'a')#We could open this before
 
-        save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+        save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
                    %
                    (
                        f.split("_")[0] #Save somewhere to save time, used multimple times #1
@@ -142,7 +142,8 @@ if __name__ == "__main__":
                        , input_conf.CIN[0][3]
                        , input_conf.CIN[0][4]
                        , input_conf.CIN[0][5]
-                       , input_conf.CIN[0][6] #28
+                       , input_conf.CIN[0][6]
+                       , data["ran_steps"] #29
                    )
         )
         save.close() #And close it after, to speed up
