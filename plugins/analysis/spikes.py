@@ -5,12 +5,12 @@ def neuronSpikesToSquare(
         , time_window = 20
         , treshold = .05
 ):
+    import numpy as np
     raw, data = runningMean(spikes, time_window)
-    #Treshold and window debug
-#    for i in data:
-#        print i
-    tresholded = [ 1 if i > treshold else 0 for i in data ]
-#    print tresholded
+    array_np = np.asarray(data)
+    tresholded = array_np > treshold
+    #Numpy should be faster
+#    tresholded = [ 1 if i > treshold else 0 for i in data ]
     return raw, tresholded
 
 def getBurstFreq(raw, tresholded):
@@ -25,7 +25,6 @@ def getBurstFreq(raw, tresholded):
             not_bursting_time += 1
             not_bursting_spikes += raw[ms]
     return float(not_bursting_spikes)/not_bursting_time, float(bursting_spikes)/bursting_time
-
 
 def runningMean(serie, window):
     import pandas as pd
