@@ -4,6 +4,8 @@
 if __name__ == "__main__":
     import argparse
     from plugins.importer import import_history
+    from plugins.images import IO as ImageIO
+
     from os import listdir
     from os.path import isfile, join
     from sys import exit
@@ -16,33 +18,35 @@ if __name__ == "__main__":
     parser.add_argument('--history-dir',
                         help = 'Path of the history dir'
                         , dest = 'path'
-                        , default = "history"
+                        , default = False
     )
-    parser.add_argument('--start-from',
-                        help = 'Which file (loop) to start with'
-                        , dest = 'start_from'
-                        , default = 0
-    )
-    parser.add_argument('--end-to',
+    parser.add_argument('--general-hash',
                         help = 'Which file (loop) to end with'
-                        , dest = 'end_to'
+                        , dest = 'general'
                         , default = False
     )
-    parser.add_argument('--get-cycle-number',
+    parser.add_argument('--config-hash',
                         help = 'Return number of loops to be executed and exit'
-                        , dest = 'number_only'
+                        , dest = 'config'
                         , default = False
-                        , action = 'store_true'
     )
 
     args = parser.parse_args()
     path = args.path
-    start_from = int(args.start_from)
-    end_to = int(args.end_to)
-    files = [f for f in listdir(path) if isfile(join(path, f))]
+    #TODO: allow uncompressed
+    if not all([args.general, args.config, args.path]):
+        exit("Missing parameter")
+    file_name = join(path, args.general + "_" + args.config + "_output.bz2")
     #FIXME: allow uncompressed
-    outputs = [ f for f in files if "_output.bz2" in f ]
-
+    data =import_history(file_name, compressed = True)
+    print file_name
+    ImageIO.ImageFromSpikes(
+        data["NeMo"][1]
+        , file_path = ""
+        , save = False
+        , show = True
+    )
+    exit()
     #Filter out unwanted runs
     if end_to:
         outputs = outputs[start_from:end_to]
@@ -65,20 +69,7 @@ if __name__ == "__main__":
         loop += 1
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
         input_file = join(path, f.split("_")[1]) + "_input.py" #_input.bz2 could be used, but is more difficult to extract data, and is heavier
-        try:
-            input_conf = imp.load_source('*', input_file)
-        except IOError: #File _input.py missing, save name to file, will try later?
-            broken = open('ANALYSIS_FAILED.csv', 'a')
-            broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
-            broken.close()
-            print("FAILED, SKIPPING")
-            continue
-        except SyntaxError:
-            broken = open('COVERT_VUE_TO_PY.csv', 'a')
-            broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
-            broken.close()
-            print("FAILED, SKIPPING")
-            continue
+        input_conf = imp.load_source('*', input_file)
         neuron_number = 0
         if not loop % 20: #TODO: READ FROM CONFIG
             print ("Loop: %s/%s" % (loop, total))
@@ -125,7 +116,7 @@ if __name__ == "__main__":
                 neuron_number += 1
         save = open("./ANALYSIS.log", 'a')#We could open this before
 
-        save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
+        save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
                    %
                    (
                        f.split("_")[0] #Save somewhere to save time, used multimple times #1
@@ -155,8 +146,8 @@ if __name__ == "__main__":
                        , input_conf.CIN[0][3]
                        , input_conf.CIN[0][4]
                        , input_conf.CIN[0][5]
-                       , input_conf.CIN[0][6]
-                       , data["ran_steps"] #29
+                       , input_conf.CIN[0][6] #28
+#                       , data["ran_steps"] #29
                    )
         )
         save.close() #And close it after, to speed up
