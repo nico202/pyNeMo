@@ -65,7 +65,20 @@ if __name__ == "__main__":
         loop += 1
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
         input_file = join(path, f.split("_")[1]) + "_input.py" #_input.bz2 could be used, but is more difficult to extract data, and is heavier
-        input_conf = imp.load_source('*', input_file)
+        try:
+            input_conf = imp.load_source('*', input_file)
+        except IOError: #File _input.py missing, save name to file, will try later?
+            broken = open('ANALYSIS_FAILED.csv', 'a')
+            broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
+            broken.close()
+            print("FAILED, SKIPPING")
+            continue
+        except SyntaxError:
+            broken = open('COVERT_VUE_TO_PY.csv', 'a')
+            broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
+            broken.close()
+            print("FAILED, SKIPPING")
+            continue
         neuron_number = 0
         if not loop % 20: #TODO: READ FROM CONFIG
             print ("Loop: %s/%s" % (loop, total))
