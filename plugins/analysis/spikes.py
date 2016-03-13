@@ -15,16 +15,22 @@ def neuronSpikesToSquare(
 
 def getBurstFreq(raw, tresholded):
     '''Get frequency during and not during a burst'''
-    bursting_time, not_bursting_time = 0, 0
-    bursting_spikes, not_bursting_spikes = 0, 0
-    for ms in range(len(tresholded)):
-        if tresholded[ms]: #Bursting:
-            bursting_time += 1
-            bursting_spikes += raw[ms] #either 0 or 1
-        else: #not bursting
-            not_bursting_time += 1
-            not_bursting_spikes += raw[ms]
-    return float(not_bursting_spikes)/not_bursting_time, float(bursting_spikes)/bursting_time
+    import numpy as np
+    tresholded = np.asarray(tresholded)
+    raw = np.asarray(raw)
+    bursting_freq = raw[tresholded].mean() #Bursting freq
+    not_bursting_freq = raw[np.invert(tresholded)].mean() #Not bursting freq
+#    bursting_time, not_bursting_time = 0, 0
+#    bursting_spikes, not_bursting_spikes = 0, 0
+#    for ms in range(len(tresholded)):
+#        if tresholded[ms]: #Bursting:
+#            bursting_time += 1
+#            bursting_spikes += raw[ms] #either 0 or 1
+#        else: #not bursting
+#            not_bursting_time += 1
+#            not_bursting_spikes += raw[ms]
+#    return float(not_bursting_spikes)/not_bursting_time, float(bursting_spikes)/bursting_time
+    return not_bursting_freq, bursting_freq
 
 def runningMean(serie, window):
     import pandas as pd
