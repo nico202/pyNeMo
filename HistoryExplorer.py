@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
                 neurons_info[neuron_number]["burst_freq"] = burst_freq
                 neuron_number += 1
-        save = open("./ANALYSIS.log", 'a')#We could open this before
+        save = open("./ANALYSIS.csv", 'a')#We could open this before
 
         save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
                    %
