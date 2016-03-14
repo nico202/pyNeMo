@@ -42,7 +42,7 @@ if __name__ == "__main__":
     end_to = int(args.end_to)
     files = [f for f in listdir(path) if isfile(join(path, f))]
     #FIXME: allow uncompressed
-    outputs = [ f for f in files if "_output.bz2" in f ]
+    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
 
     #Filter out unwanted runs
     if end_to:
@@ -103,7 +103,7 @@ if __name__ == "__main__":
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
-                raw, tresholded = spikes.neuronSpikesToSquare(i)
+                raw, tresholded = spikes.neuronSpikesToSquare(i, data["ran_steps"])
                 off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
 
@@ -113,8 +113,8 @@ if __name__ == "__main__":
                         mode = 0 #Neuron is stable OFF
                     else:
                         mode = 2 #Neuron is stable ON
-                        on_time = 0
-                        off_time = 0
+                        #on_time = 0
+                        #off_time = 0
                 else: #Neuron IS oscillating
                     mode = 1 #Neuron is both ON and OFF
                 neurons_info[neuron_number]={}
@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
                 neurons_info[neuron_number]["burst_freq"] = burst_freq
                 neuron_number += 1
-        save = open("./ANALYSIS.log", 'a')#We could open this before
+        save = open("./ANALYSIS.csv", 'a')#We could open this before
 
         save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
                    %
