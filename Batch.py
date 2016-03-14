@@ -8,6 +8,7 @@ import re
 import string
 
 from libs.IO import is_folder, hashDict, write_batch_log
+from libs.IO import cprint
 from plugins.importer import import_history
 import config
 
@@ -42,7 +43,8 @@ def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [
         if action.capitalize() == "Y":
             break
         else:
-            exit(exit_msg)
+            cprint(exit_msg, 'warning')
+            exit()
     
 if (
         config.BATCH_CONFIRM_NO_SAVE_IMAGE
@@ -114,8 +116,8 @@ start = time.time()
 try:
     run = import_history(output_dir + "/" + session_hash + "_batch")
     recover_from_lap = run["cycle"]
-    print("You already run this sym, recovering from %s"
-          % (recover_from_lap))
+    cprint("You already run this sym, recovering from %s"
+           % (recover_from_lap), 'okblue')
 except IOError:
     print("First time you run this exact sim")
     recover_from_lap = 0
@@ -126,7 +128,7 @@ next_sleep = False
 forced_quit = False
 lap = 0
 laps = len(real_commands)
-print ("We are going to run %s simulations!" % (laps))
+cprint ("We are going to run %s simulations!" % (laps), 'okblue')
 
 for com in real_commands:
     try:
@@ -135,7 +137,7 @@ for com in real_commands:
             continue
         if next_sleep:
             forced_quit = True
-            print("Press CTRL-C NOW! (trice) to quit")
+            cprint("Press CTRL-C NOW! (trice) to quit", 'warning')
             time.sleep(5)
             forced_quit = False
             next_sleep = False
@@ -147,22 +149,22 @@ for com in real_commands:
             now = time.time()
             time_diff = now - last_save_time
             last_save_time = now
-            print "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
-            print("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
+            cprint "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
+            cprint("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
             write_batch_log(session_hash + "_batch", lap, output_dir)
-            print "-------------------"
+            cprint "-------------------"
     except KeyboardInterrupt:
         if not forced_quit:
             write_batch_log(session_hash + "_batch", lap, output_dir)
             next_sleep = True
-            print ("Forced saving! Press CTRL-C again (on cue) to quit")
+            cprint ("Forced saving! Press CTRL-C again (on cue) to quit", 'warning')
         else:
             #save 2 lap less to be sure sims have not been interrupted
             write_batch_log(str(session_hash) + "_batch", lap - 2, output_dir)
+            cprint("Forced QUIT", 'error')
+            exit()
 
-            exit("Forced QUIT")
-
-print("Batch runned successfully!")
+cprint("Batch runned successfully!", 'okgreen')
 end = time.time()
 
 #subprocess.call("notify-send 'pyNeMo' 'batch process ended!'", shell = True)
