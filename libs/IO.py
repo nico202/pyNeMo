@@ -254,6 +254,17 @@ MAP = {0: "R", 1: "G", 2: "B"}
 def rgb(triplet):
     return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
 
+def cprint(text, color = "okblue"):
+    colors = {
+        'okblue': '\033[94m'
+        , 'okgreen': '\033[92m'
+        , 'endc': '\033[0m'
+        , 'warning': '\033[93m'
+        , 'fail': '\033[91m'
+    }
+    print(colors[color]+text+colors['endc'])
+    
+    
 def saveFile(file_source, file_dest):
     '''
     Copy file #TODO: Enable compression (bz2/_lzma_)

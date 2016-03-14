@@ -4,6 +4,7 @@
 if __name__ == "__main__":
     import argparse
     from plugins.importer import import_history
+    from libs.IO import cprint
     from os import listdir
     from os.path import isfile, join
     from sys import exit
@@ -70,18 +71,18 @@ if __name__ == "__main__":
             broken = open('ANALYSIS_FAILED.csv', 'a')
             broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
             broken.close()
-            print("FAILED, SKIPPING")
+            cprint("FAILED, SKIPPING", 'fail')
             continue
         except SyntaxError:
             broken = open('CONVERT_VUE_TO_PY.csv', 'a')
             broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
             broken.close()
-            print("FAILED, SKIPPING")
+            cprint("FAILED, SKIPPING", 'fail')
             continue
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
         neuron_number = 0
         if not loop % 20: #TODO: READ FROM CONFIG
-            print ("Loop: %s/%s" % (loop, total))
+            cprint ("Loop: %s/%s" % (loop, total), 'okblue')
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
         if len( all_neurons_spikes_list) < max(neurons_to_analyze) -1:
