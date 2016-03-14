@@ -103,7 +103,7 @@ if __name__ == "__main__":
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
-                raw, tresholded = spikes.neuronSpikesToSquare(i)
+                raw, tresholded = spikes.neuronSpikesToSquare(i, data["ran_steps"])
                 off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
 

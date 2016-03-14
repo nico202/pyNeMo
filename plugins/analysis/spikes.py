@@ -2,11 +2,12 @@
 
 def neuronSpikesToSquare(
         spikes
+        , steps
         , time_window = 20
         , treshold = .05
 ):
     import numpy as np
-    raw, data = runningMean(spikes, time_window)
+    raw, data = runningMean(spikes, time_window, steps)
     array_np = np.asarray(data)
     tresholded = array_np > treshold
     #Numpy should be faster
@@ -32,7 +33,7 @@ def getBurstFreq(raw, tresholded):
 #    return float(not_bursting_spikes)/not_bursting_time, float(bursting_spikes)/bursting_time
     return not_bursting_freq, bursting_freq
 
-def runningMean(serie, window):
+def runningMean(serie, window, steps):
     import pandas as pd
     import numpy as np
     spike_series = []
@@ -40,6 +41,7 @@ def runningMean(serie, window):
     for t in serie:
         spike_series += [0] * ((t-prev) -1) + [1] #Lenght will be ms of last spike
         prev = t
+    spike_series += (steps - len(spike_series)) * [0]
     #StackOverflow: 13728392
     return spike_series, pd.rolling_mean(np.array(spike_series), window)
 
@@ -49,14 +51,15 @@ def getFreq(seq, steps, period = True):
     last_state = seq[0]
     last_change = 0
     i = 1
+    
     for frame in seq[1:]:
         if frame != last_state:
             state[last_state].append(i - last_change)
             last_change=i
-        last_state = frame
+            last_state = frame
         i += 1
     else:
-         state[0].append(steps - i)
+        state[last_state].append(i - last_change)
 #        state[last_state].append(steps - i)
 #         print state
 #         print steps, len(seq), steps - i
