@@ -42,7 +42,7 @@ if __name__ == "__main__":
     end_to = int(args.end_to)
     files = [f for f in listdir(path) if isfile(join(path, f))]
     #FIXME: allow uncompressed
-    outputs = [ f for f in files if "_output.bz2" in f ]
+    outputs = set([ f for f in files if "_output.bz2" in f ])
 
     #Filter out unwanted runs
     if end_to:
