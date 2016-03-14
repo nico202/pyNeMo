@@ -113,8 +113,8 @@ if __name__ == "__main__":
                         mode = 0 #Neuron is stable OFF
                     else:
                         mode = 2 #Neuron is stable ON
-                        on_time = 0
-                        off_time = 0
+                        #on_time = 0
+                        #off_time = 0
                 else: #Neuron IS oscillating
                     mode = 1 #Neuron is both ON and OFF
                 neurons_info[neuron_number]={}

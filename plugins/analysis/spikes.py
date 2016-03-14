@@ -56,14 +56,21 @@ def getFreq(seq, steps, period = True):
         last_state = frame
         i += 1
     else:
-        if steps:
-            state[last_state].append(steps - i)
+         state[0].append(steps - i)
+#        state[last_state].append(steps - i)
+#         print state
+#         print steps, len(seq), steps - i
 
     off_period = Counter(state[0])
     on_period = Counter(state[1])
-
-    off_sample = off_period.most_common(1)[0][1]
-    on_sample = on_period.most_common(1)[0][1]
+    try:
+        off_sample = off_period.most_common(1)[0][1]
+    except IndexError:
+        off_sample = 0
+    try:
+        on_sample = on_period.most_common(1)[0][1]
+    except IndexError:
+        on_sample = 0
     if (on_sample > 1) and (off_sample > 1):
         try:
             off_period_mode = off_period.most_common(1)[0][0]
@@ -76,4 +83,12 @@ def getFreq(seq, steps, period = True):
         else:
             return 1000./off_period_mode, 1000./on_period_mode, True
     else: #Not oscillating. Mode (on/off) = max (state[0], state[1])
-        return state[0][0], state[1][0], False
+        try:
+            off_state = max(state[0])
+        except ValueError:
+            off_state = 0
+        try:
+            on_state = max(state[1])
+        except ValueError:
+            on_state = 0
+        return off_state, on_state, False
