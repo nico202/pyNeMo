@@ -54,7 +54,7 @@ if __name__ == "__main__":
     #Update index
     loop = start_from - 1 if start_from else 0
 
-    print("Total number of analysis to be run: %s" % (len(outputs)))
+    cprint("Total number of analysis to be run: %s" % (len(outputs)), 'okblue')
     if args.number_only:
         exit()
         
