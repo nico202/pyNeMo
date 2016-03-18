@@ -7,7 +7,7 @@ import os
 import re
 import string
 
-from libs.IO import is_folder, hashDict, write_batch_log
+from libs.IO import is_folder, hashDict, write_batch_log, saveKey
 from libs.IO import cprint
 from plugins.importer import import_history
 import config
@@ -70,8 +70,12 @@ l.close()
 
 ranges = True
 def missing(input_string):
+    #TODO: check [ number + , + number + , + number ]
     ranges = re.findall("\[(.*?)\]", input_string)
-    return ranges
+    if ranges:
+        return ranges[0]
+    else:
+        return False
 
 def substituteRanges(input_strings, commands):
     if not commands:
@@ -79,14 +83,13 @@ def substituteRanges(input_strings, commands):
     for input_string in input_strings:
         ranges = missing(input_string)
         if ranges:
-            r = ranges[0]
-            start, stop, step = [float(n) for n in r.split(',')]
+            start, stop, step = [float(n) for n in ranges.split(',')]
             steps = np.linspace (start, stop, (abs(stop-start)/step)+1)
-
             for s in steps:
-                command = string.replace(input_string, "["+r+"]", str(s))
+                command = string.replace(input_string, "["+ranges+"]", str(s))
                 commands.append(command)
         else:
+            commands.append(input_string)
             return commands
 
     return substituteRanges(commands, commands)
@@ -94,16 +97,21 @@ def substituteRanges(input_strings, commands):
 commands = substituteRanges([args], [])
 
 #fix parentheses:
-real_commands = [ i for i in commands if not missing(i) ]
+commands = [ i for i in commands if not missing(i) ]
+
 #set just to be sure no duplicate runs
-real_commands = set(real_commands)
+real_commands = set(commands)
 
 #TODO:
-#Save "real_commands" hash to file + iter number (every 10?)
-#to allow loop recovery for long loops
 #FIXME: remove "--show-image" etc to prevent different hashes of same config
 session_hash = str(hashDict(real_commands))
 
+#Save commands list
+commands_file = "./" + session_hash + "_commands"
+print ("Saving %s commands to file: %s" % (len(real_commands), commands_file))
+saveKey(commands_file, commands)
+cprint("Running in 5s", "warning")
+time.sleep(5)
 
 #Start
 is_folder (output_dir)
@@ -124,6 +132,7 @@ except IOError:
     pass
 
 last_save_time = time.time()
+start_time = last_save_time
 next_sleep = False
 forced_quit = False
 lap = 0
@@ -149,10 +158,10 @@ for com in real_commands:
             now = time.time()
             time_diff = now - last_save_time
             last_save_time = now
-            cprint "\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n"
+            cprint("\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n")
             cprint("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
             write_batch_log(session_hash + "_batch", lap, output_dir)
-            cprint "-------------------"
+            cprint("-------------------")
     except KeyboardInterrupt:
         if not forced_quit:
             write_batch_log(session_hash + "_batch", lap, output_dir)
@@ -164,7 +173,9 @@ for com in real_commands:
             cprint("Forced QUIT", 'error')
             exit()
 
-cprint("Batch runned successfully!", 'okgreen')
+TODO:
+run_time = start_time - time.time()
+cprint("Batch runned successfully in %s!" % (run_time), 'okgreen')
 end = time.time()
 
 #subprocess.call("notify-send 'pyNeMo' 'batch process ended!'", shell = True)
