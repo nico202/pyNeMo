@@ -26,7 +26,7 @@ if __name__ == "__main__":
     required_modules = [
         "nemo"
         , "scipy"
-        , "yarp" #FIXME: not needed if no sensory
+#        , "yarp" #FIXME: not needed if no sensory
 #       , "pygazebo"
         , "shutil"
     ]

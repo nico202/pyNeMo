@@ -10,6 +10,7 @@ with import <nixpkgs> {};
          python27Packages.pillow
          python27Packages.numpy
          python27Full
+	 yarp
          ];
       src = null;
     }
