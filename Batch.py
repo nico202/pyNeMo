@@ -173,7 +173,6 @@ for com in real_commands:
             cprint("Forced QUIT", 'error')
             exit()
 
-TODO:
 run_time = start_time - time.time()
 cprint("Batch runned successfully in %s!" % (run_time), 'okgreen')
 end = time.time()
