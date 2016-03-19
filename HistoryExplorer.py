@@ -4,9 +4,9 @@ def main_loop(outputs):
     #TODO: add loop count
     for f in outputs:
         bypass = False
-        print("Using file: %s" % f)
+        total = 0
+        print("[%s/%s]\tUsing file: %s" % (0, 0, f))
         neurons_info = {}
-#        loop += 1
         #_input.bz2 could be used, but is more difficult to extract, and is heavier
         input_file = join(path, f.split("_")[1]) + "_input.py"
         try:
@@ -23,7 +23,7 @@ def main_loop(outputs):
             broken.close()
             cprint("FAILED, SKIPPING", 'fail')
             continue
-        data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
+        data = import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
 
         if args.save_images:
             cprint("Saving image",'info')
@@ -37,12 +37,9 @@ def main_loop(outputs):
                 continue
 
         neuron_number = 0
-        #TODO: re-enable when adding count loop
-#        if not loop % 20: #TODO: READ FROM CONFIG
-#            cprint ("Loop: %s/%s" % (loop, total), 'okblue')
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
-        if len( all_neurons_spikes_list) < max(neurons_to_analyze) -1:
+        if len(all_neurons_spikes_list) < max(neurons_to_analyze) -1:
             neurons_info={}
             for n in neurons_to_analyze:
                 neurons_info[n] = {}
@@ -80,7 +77,9 @@ def main_loop(outputs):
                 neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
                 neurons_info[neuron_number]["burst_freq"] = burst_freq
                 neuron_number += 1
-        save = open("./ANALYSIS.csv", 'a')#We could open this before
+
+        #        is_folder("analysis") TODO: better dir organization
+        save = open("ANALYSIS.csv", 'a')#We could open this before
 
         save.write("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n"
                    %
@@ -117,7 +116,6 @@ def main_loop(outputs):
                    )
         )
         save.close() #And close it after, to speed up
-
 
 #Multiprocessing: https://gist.github.com/baojie/6047780
 def chunks(l, n):
@@ -230,13 +228,9 @@ if __name__ == "__main__":
            else 'red'
            
     )
-    if args.number_only:
+    if args.number_only: #Print simulations number and exit!
         exit()
         
     neurons_to_analyze = [4, 5] #FIXME: read from cli
-
-    dispatch_jobs(outputs, core_number)
-
-
-        
     
+    dispatch_jobs(outputs, core_number)

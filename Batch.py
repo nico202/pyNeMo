@@ -107,7 +107,8 @@ real_commands = set(commands)
 session_hash = str(hashDict(real_commands))
 
 #Save commands list
-commands_file = "./" + session_hash + "_commands"
+if_folder("./commands")
+commands_file = "./commands/" + session_hash + "_commands"
 print ("Saving %s commands to file: %s" % (len(real_commands), commands_file))
 saveKey(commands_file, commands)
 cprint("Running in 5s", "warning")
