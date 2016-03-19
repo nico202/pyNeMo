@@ -261,6 +261,7 @@ def cprint(text, color = "okblue"):
         , 'endc': '\033[0m'
         , 'warning': '\033[93m'
         , 'fail': '\033[91m'
+        , 'red': '\033[91m' #=fail
     }
     print(colors[color]+text+colors['endc'])
     
