@@ -186,12 +186,21 @@ if __name__ == "__main__":
 
     cprint("Total number of analysis to be run: %s" % (len(outputs)), 'okblue')
     
-    cprint("And we are going to use %s %s" %
-           (
-               core_number
+    cprint("And we are going to use %s%s %s"
+           %
+           ( #Style :D
+               "even " if core_number >= 8 \
+               else "well " if core_number >= 4 \
+               else "just " if core_number <= 2 \
+               else ""
+               , core_number
                , "core" if core_number == 1 else "cores"
-           )
-           , 'okgreen' if core_number >= 4 else 'okblue' if core_number >= 2 else 'warning' #Style :D
+           ) #Style again XD
+           , 'okgreen' if core_number >= 4 \
+           else 'okblue' if core_number >= 3 \
+           else 'warning' if core_number >= 2 \
+           else 'red'
+           
     )
     if args.number_only:
         exit()
