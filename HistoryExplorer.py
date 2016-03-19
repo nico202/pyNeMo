@@ -26,11 +26,12 @@ def main_loop(outputs):
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
 
         if args.save_images:
+            cprint("Saving image",'info')
             ImageIO.ImageFromSpikes(
                 data["NeMo"][1]
-                , file_path = ""
-                , save = False
-                , show = True
+                , file_path = "./latest.png" #FIXME: set wright path
+                , save = True
+                , show = False #Quite useless if True, right?
             )
             if args.images_only:
                 continue

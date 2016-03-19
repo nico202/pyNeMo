@@ -13,6 +13,8 @@ with import <nixpkgs> {};
          python27Packages.matplotlib
          python27Full
 	 yarp
+         #Enable image show
+         imagemagick
          ];
       src = null;
     }

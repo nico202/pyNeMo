@@ -257,6 +257,7 @@ def rgb(triplet):
 def cprint(text, color = "okblue"):
     colors = {
         'okblue': '\033[94m'
+        , 'info': '\033[94m'
         , 'okgreen': '\033[92m'
         , 'endc': '\033[0m'
         , 'warning': '\033[93m'
