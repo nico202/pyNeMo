@@ -1,12 +1,12 @@
 #!/usr/bin/env python2
 from PIL import Image
-
+from libs.IO import cprint
 def showImageFile(image_path):
     try:
         img = Image.open(image_path)
         img.show()
     except IOError:
-        print ("ERROR: cannot load image (Image file does not exists)")
+        cprint ("ERROR: cannot load image (Image file does not exists)", 'fail')
 
 def saveRawImage(img, name, close = True):
     try:
@@ -28,15 +28,15 @@ def ImageFromSpikes(input_spikes, file_path = "", show = True, save = True):
     try:
         from neuronpy.graphics import spikeplot
     except ImportError:
-        print ("You need nepuronpy to create spikes images\n\
-        (as root) pip2 install neuronpy; pip2 install matplotlib")
+        cprint ("You need nepuronpy to create spikes images\n\
+        (as root) pip2 install neuronpy; pip2 install matplotlib", 'fail')
         return False
     from plugins.importer import spikesDictToArray
 
     spikes = spikesDictToArray(input_spikes)
 
     if save:
-        print("\t*\tSaving image to %s" % file_path)
+        cprint("\t*\tSaving image to %s" % file_path, 'info')
     sp = spikeplot.SpikePlot(savefig=save)
     sp.set_fig_name(file_path)
     sp.set_linestyle('-')
