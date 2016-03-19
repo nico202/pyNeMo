@@ -19,3 +19,6 @@ BATCH_CONFIRM_SHOW_IMAGE = True
 BATCH_CONFIRM_NO_SAVE_IMAGE = True
 #How frequently we should save batch step
 BATCH_SAVE_EVERY = 10
+
+#Deploy system:
+MULTIPLIER = 2
