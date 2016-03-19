@@ -24,6 +24,17 @@ def main_loop(outputs):
             cprint("FAILED, SKIPPING", 'fail')
             continue
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
+
+        if args.save_images:
+            ImageIO.ImageFromSpikes(
+                data["NeMo"][1]
+                , file_path = ""
+                , save = False
+                , show = True
+            )
+            if args.images_only:
+                continue
+
         neuron_number = 0
         #TODO: re-enable when adding count loop
 #        if not loop % 20: #TODO: READ FROM CONFIG
@@ -164,9 +175,25 @@ if __name__ == "__main__":
                         , dest = 'core_number'
                         , default = False
     )
+    parser.add_argument('--save-spike-images',
+                        help = 'Generate spike images and saves them'
+                        , dest = 'save_images'
+                        , default = False
+                        , action = 'store_true'
+    )
+    parser.add_argument('--save-images-only',
+                        help = 'Save images (auto-enable save-spike-images if False).\
+                        Don\t run any other analysis'
+                        , dest = 'images_only'
+                        , default = False
+                        , action = 'store_true'
+    )
 
     args = parser.parse_args()
 
+    if args.images_only or args.save_images:
+        import plugins.images.IO as ImageIO
+    
     core_number = int(args.core_number) if args.core_number else multiprocessing.cpu_count()
 
     path = args.path

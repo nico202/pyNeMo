@@ -9,6 +9,8 @@ with import <nixpkgs> {};
          python27Packages.virtualenv
          python27Packages.pillow
          python27Packages.numpy
+         python27Packages.pip #Not required, just for testing
+         python27Packages.matplotlib
          python27Full
 	 yarp
          ];
