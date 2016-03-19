@@ -1,70 +1,14 @@
 #!/usr/bin/env python2
-#TODO: use multiprocess (add params --cores)
 
-if __name__ == "__main__":
-    import argparse
-    from plugins.importer import import_history
-    from libs.IO import cprint
-    from os import listdir
-    from os.path import isfile, join
-    from sys import exit
-    from plugins.analysis import spikes
-    from plugins.importer import spikesDictToArray
-    import imp
-
-    parser = argparse.ArgumentParser(description='Offline analysis for\
-     spiking neural networks')
-    parser.add_argument('--history-dir',
-                        help = 'Path of the history dir'
-                        , dest = 'path'
-                        , default = "history"
-    )
-    parser.add_argument('--start-from',
-                        help = 'Which file (loop) to start with'
-                        , dest = 'start_from'
-                        , default = 0
-    )
-    parser.add_argument('--end-to',
-                        help = 'Which file (loop) to end with'
-                        , dest = 'end_to'
-                        , default = False
-    )
-    parser.add_argument('--get-cycle-number',
-                        help = 'Return number of loops to be executed and exit'
-                        , dest = 'number_only'
-                        , default = False
-                        , action = 'store_true'
-    )
-
-    args = parser.parse_args()
-    path = args.path
-    start_from = int(args.start_from)
-    end_to = int(args.end_to)
-    files = [f for f in listdir(path) if isfile(join(path, f))]
-    #FIXME: allow uncompressed
-    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
-
-    #Filter out unwanted runs
-    if end_to:
-        outputs = outputs[start_from:end_to]
-    else:
-        outputs = outputs[start_from:]
-    total = len(outputs) + start_from
-
-    #Update index
-    loop = start_from - 1 if start_from else 0
-
-    cprint("Total number of analysis to be run: %s" % (len(outputs)), 'okblue')
-    if args.number_only:
-        exit()
-        
-    neurons_to_analyze = [4, 5] #FIXME: read from cli
+def main_loop(outputs):
+    #TODO: add loop count
     for f in outputs:
         bypass = False
         print("Using file: %s" % f)
         neurons_info = {}
-        loop += 1
-        input_file = join(path, f.split("_")[1]) + "_input.py" #_input.bz2 could be used, but is more difficult to extract data, and is heavier
+#        loop += 1
+        #_input.bz2 could be used, but is more difficult to extract, and is heavier
+        input_file = join(path, f.split("_")[1]) + "_input.py"
         try:
             input_conf = imp.load_source('*', input_file)
         except IOError: #File _input.py missing, save name to file, will try later?
@@ -81,15 +25,15 @@ if __name__ == "__main__":
             continue
         data =import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
         neuron_number = 0
-        if not loop % 20: #TODO: READ FROM CONFIG
-            cprint ("Loop: %s/%s" % (loop, total), 'okblue')
+        #TODO: re-enable when adding count loop
+#        if not loop % 20: #TODO: READ FROM CONFIG
+#            cprint ("Loop: %s/%s" % (loop, total), 'okblue')
 
         all_neurons_spikes_list = spikesDictToArray(data["NeMo"][1])
         if len( all_neurons_spikes_list) < max(neurons_to_analyze) -1:
             neurons_info={}
             for n in neurons_to_analyze:
                 neurons_info[n] = {}
-                neurons_info[n]={}
                 neurons_info[n]["on_time"] = 0
                 neurons_info[n]["off_time"] = 0
                 neurons_info[n]["mode"] = 3 #Dead neuron
@@ -97,7 +41,7 @@ if __name__ == "__main__":
                 neurons_info[n]["burst_freq"] = 0
 
             bypass = True
-            
+
         if not bypass:
             for i in all_neurons_spikes_list:
                 if neuron_number not in neurons_to_analyze:
@@ -161,7 +105,93 @@ if __name__ == "__main__":
                    )
         )
         save.close() #And close it after, to speed up
+
+
+#Multiprocessing: https://gist.github.com/baojie/6047780
+def chunks(l, n):
+    return [l[i:i+n] for i in range(0, len(l), n)]
+
+def dispatch_jobs(data, job_number):
+    total = len(data)
+    chunk_size = total / job_number
+    _slice = chunks(data, chunk_size)
+    
+    jobs = []
+    
+    for s in _slice:
+        j = multiprocessing.Process(target=main_loop, args=([s]))
+        jobs.append(j)
+    for j in jobs:
+        j.start()
+
+if __name__ == "__main__":
+    import argparse
+    from plugins.importer import import_history
+    from libs.IO import cprint
+    from os import listdir
+    from os.path import isfile, join
+    from sys import exit
+    from plugins.analysis import spikes
+    from plugins.importer import spikesDictToArray
+    import imp
+    #Adding Multiprocess capability
+    import multiprocessing
+    parser = argparse.ArgumentParser(description='Offline analysis for\
+     spiking neural networks')
+    parser.add_argument('--history-dir',
+                        help = 'Path of the history dir'
+                        , dest = 'path'
+                        , default = "history"
+    )
+    parser.add_argument('--start-from',
+                        help = 'Which file (loop) to start with'
+                        , dest = 'start_from'
+                        , default = 0
+    )
+    parser.add_argument('--end-to',
+                        help = 'Which file (loop) to end with'
+                        , dest = 'end_to'
+                        , default = False
+    )
+    parser.add_argument('--get-cycle-number',
+                        help = 'Return number of loops to be executed and exit'
+                        , dest = 'number_only'
+                        , default = False
+                        , action = 'store_true'
+    )
+    parser.add_argument('--cores',
+                        help = 'Number of cores to use. Max if none set'
+                        , dest = 'core_number'
+                        , default = False
+    )
+
+    args = parser.parse_args()
+
+    core_number = args.core_number if args.core_number else multiprocessing.cpu_count()
+
+    path = args.path
+    start_from = int(args.start_from)
+    end_to = int(args.end_to)
+    files = [f for f in listdir(path) if isfile(join(path, f))]
+    #FIXME: allow uncompressed
+    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
+
+    #Filter out unwanted runs
+    outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]
+
+    total = len(outputs) + start_from
+
+    #Update index
+    loop = start_from - 1 if start_from else 0
+
+    cprint("Total number of analysis to be run: %s" % (len(outputs)), 'okblue')
+    if args.number_only:
+        exit()
         
+    neurons_to_analyze = [4, 5] #FIXME: read from cli
+
+    dispatch_jobs(outputs, core_number)
+
 
         
     
