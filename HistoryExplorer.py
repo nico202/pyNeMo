@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    core_number = args.core_number if args.core_number else multiprocessing.cpu_count()
+    core_number = int(args.core_number) if args.core_number else multiprocessing.cpu_count()
 
     path = args.path
     start_from = int(args.start_from)
@@ -185,6 +185,14 @@ if __name__ == "__main__":
     loop = start_from - 1 if start_from else 0
 
     cprint("Total number of analysis to be run: %s" % (len(outputs)), 'okblue')
+    
+    cprint("And we are going to use %s %s" %
+           (
+               core_number
+               , "core" if core_number == 1 else "cores"
+           )
+           , 'okgreen' if core_number >= 4 else 'okblue' if core_number >= 2 else 'warning' #Style :D
+    )
     if args.number_only:
         exit()
         
