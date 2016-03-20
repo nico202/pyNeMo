@@ -17,6 +17,7 @@ import config
 from sys import argv, exit
 
 from libs.simulations import main_simulation_run
+from libs.IO import import_network
 
 print ("\n\n\n\n\n\n\n----------------")
 
@@ -110,7 +111,7 @@ real_commands = set(commands)
 session_hash = str(hashDict(real_commands))
 
 #Save commands list
-if_folder("./commands")
+is_folder("./commands")
 commands_file = "./commands/" + session_hash + "_commands"
 cprint ("Saving %s commands to file: %s" % (len(real_commands), commands_file), 'info')
 saveKey(commands_file, commands)
@@ -159,15 +160,13 @@ for com in real_commands:
         print ("Lap %s / %s" % (lap , laps))
         ##Replace subprocess: call it directly to save time
         parser = parse_args()
-        print(com) #Debug
         args = parser.parse_args(com.split()) #That way is 100% compatible with the old os call
-        exit("Exiting, debug") #Debug
         
         #Load all the parameters (choose if/when read from CLI/config.py)
         use_config = True if os.path.isfile("config.py") else False
         if use_config: import config
         
-        network_file = args.network_file
+        network_file = args.network_file.strip("'")
 
         config_steps = config.STEPS if use_config else 0
         steps = time_to_steps(args.steps) if args.steps != None else config_steps
