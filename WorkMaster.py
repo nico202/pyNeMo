@@ -64,14 +64,15 @@ class stats:
 class save:
     def POST(self):
         global Work
+        global client_port
         cprint("Data received, saving!", 'okgreen')
         save = open("MultiHeaded-analisys.csv", 'a')
         save.write(web.data())
         save.close()
         cprint("Sending next!", 'okgreen')
         work_append(
-            web.ctx['ip'], Work.pop(1,1))
-        work_start(web.ctx['ip'])
+            web.ctx['ip'], client_port, Work.pop(1,1))
+        work_start(web.ctx['ip'], client_port)
 class Worker(web.application):
     def run(self, port=8080, *middleware):
         func = self.wsgifunc(*middleware)
@@ -121,14 +122,14 @@ if __name__ == "__main__":
     for client_ip in info:
         cprint("Loading data for %s" % client_ip, 'info')
         work_append(
-            client_ip, Work.pop(
+            client_ip, client_port, Work.pop(
                 info[client_ip]["cores"]
                 , info[client_ip]["multiplier"]))
             
     #Really start the queue
     cprint("Starting all queued",'info')
     for client_ip in info:
-        work_init(client_ip)
+        work_init(client_ip, client_port)
         
     #Wait for answers!
     print("Waiting replys on: %s:%s"
