@@ -16,6 +16,9 @@ def work_append(ip, data):
 
 def work_start(ip):
     work_manage(ip, "start")
+
+def work_init(ip):
+    work_manage(ip, "init")
     
 def work_manage(ip, action, data = {"msg": True}):
     global client_port
