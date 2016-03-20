@@ -10,6 +10,10 @@ import json
 import argparse
 import dill
 from libs.IO import cprint
+
+from libs.web import ip_port, get_self_ip
+from libs.web import work_append, work_start, work_init
+
 from HistoryExplorer import list_all, read_output
 
 
@@ -73,30 +77,6 @@ class Worker(web.application):
         func = self.wsgifunc(*middleware)
         return web.httpserver.runsimple(func, ('0.0.0.0', port))
     
-#class RequestHandler():
-#    def POST():
-#        data = web.data() # you can get data use this method
-        
-def get_self_ip():
-    import socket
-    return socket.gethostbyname(socket.gethostname())
-
-def ip_port(ip, port):
-    return "http://"+str(ip)+":"+str(port)
-
-#The lisp way, missing macros now
-def work_append(ip, data):
-    work_manage(ip, "append", data)
-
-def work_start(ip):
-    work_manage(ip, "start")
-    
-def work_manage(ip, action, data = {"msg": True}):
-    global client_port
-    #Will enable a stop?
-    requests.post(ip_port(ip, client_port) + "/" + action, data)
-    #TODO: add success/fail codes
-
 port = 10665
 client_port = 10666
 ip = get_self_ip()
@@ -148,7 +128,7 @@ if __name__ == "__main__":
     #Really start the queue
     cprint("Starting all queued",'info')
     for client_ip in info:
-        work_start(client_ip)
+        work_init(client_ip)
         
     #Wait for answers!
     print("Waiting replys on: %s:%s"

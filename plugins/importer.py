@@ -3,7 +3,6 @@ def import_history(file_path, compressed = False):
     import ast
     from os.path import isfile, join
     try:
-
         if compressed:
             import bz2
             opened = bz2.BZ2File(file_path)

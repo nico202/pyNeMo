@@ -1,4 +1,5 @@
 from sys import exit
+
 #Transform input time to ms (steps):
 #  example: 100 = 100 (ms)
 #  example: 30s = 30000 (ms)
@@ -37,17 +38,16 @@ def load_network_file (network_file, hooks):
         config = imp.load_source('*', config_name)
 
     except SyntaxError:
-        print("Config file: Syntax Error")
+        cprint("Config file: Syntax Error", 'fail')
         raise
     except IOError:
-        print("Error: network file (%s) does not exists" % (network_file))
-        raise
+        cprint("Error: network file (%s) does not exists" % (network_file), 'fail')
         exit()
     except NameError:
-        print("This VUE contains undefined variables (is it for a batch?)")
+        cprint("This VUE contains undefined variables (is it for a batch?)", 'fail')
         raise
     except:
-        print("DEBUG: Unknown error")
+        cprint("DEBUG: Unknown error", 'fail')
         raise
     return config, config_name
 
@@ -55,7 +55,7 @@ def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
     if ".vue" in config_name:
         import libs.VUEtoPy as VUEtoPy
         #TODO: verbosity fix
-        print("Converting input VUE to py")
+        cprint("Converting input VUE to py", 'info')
         VUEtoPy.VUEtoPyConverter(config_name, hooks)
         config_name = "".join((config_name.split(".")[:-1]))
         config_name += ".py"
