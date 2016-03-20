@@ -3,10 +3,12 @@
 def ip_port(ip, port):
     return "http://"+str(ip)+":"+str(port)
 
-def response_request(to_save):
+def response_request(to_save, master_ip, master_port):
     import dill
     import requests
-    requests.post(ip_port("192.168.1.5", "10665") + "/save", data = to_save)
+    from libs.IO import cprint
+    requests.post(ip_port(str(master_ip), str(master_port)) + "/save", data = to_save)
+    cprint("Result sended, waiting for next", 'okgreen')
 
 def read_output(f, path):
     import imp
@@ -76,7 +78,7 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
     )
     return to_write
 
-def main_loop(outputs, remote, in_data = False):
+def main_loop(outputs, master_ip = False, in_data = False):
     from plugins.analysis import spikes
     from plugins.importer import spikesDictToArray
     #???? Depends on kind of analysis, what to do??
@@ -86,7 +88,7 @@ def main_loop(outputs, remote, in_data = False):
     outputs = outputs[0]
     for f in outputs:
         bypass = False
-        if not remote:
+        if not master_ip:
             data, input_conf = read_output(f, args.path)
         else: #Already read file from host
             data, input_conf = in_data[idx][0], in_data[idx][1]
@@ -149,13 +151,13 @@ def main_loop(outputs, remote, in_data = False):
                 neuron_number += 1
                 
         to_write = return_analysis_output(f, neurons_info, input_conf, data["ran_steps"])
-        if not remote:
+        if not master_ip:
             #        is_folder("analysis") TODO: better dir organization
             save = open("ANALYSIS.csv", 'a')#We could open this before
             save.write(to_write)
             save.close() #And close it after, to speed up
         else:
-            response_request(to_write)
+            response_request(to_write, master_ip, "10665")
 
 
 #Multiprocessing: https://gist.github.com/baojie/6047780

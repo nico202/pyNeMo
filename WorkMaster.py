@@ -4,6 +4,7 @@
 # Listen to answers and saves them to file
 
 import web
+web.config.debug = False
 import requests
 import json
 import argparse
@@ -45,12 +46,16 @@ outputs, total = list_all(args.path, args.start_from, args.end_to)
 
 urls = (
     '/save', 'save'
-    , '/index', 'stats'
+    , '/', 'stats'
 )
 
 class stats:
     '''Accessible through a browser: report % of completition'''
-    
+    def GET(self):
+        #TODO: add mean loop time, estimated missing, loop/min x slave etc
+        global Work
+        return "<html>Still missing: "+str(len(Work.queue))+"<br>"\
+            "Number of slaves: "+str(len(clients)) + "</html>"
 
 class save:
     def POST(self):
@@ -62,7 +67,7 @@ class save:
         cprint("Sending next!", 'okgreen')
         work_append(
             web.ctx['ip'], Work.pop(1,1))
-
+        work_start(web.ctx['ip'])
 class Worker(web.application):
     def run(self, port=8080, *middleware):
         func = self.wsgifunc(*middleware)
@@ -112,12 +117,21 @@ class workQueue:
 Work = workQueue(list_all(args.path, args.start_from, args.end_to))
 if __name__ == "__main__":
     from libs.IO import cprint
+    from time import sleep
     app = Worker(urls, globals())
     info = {}
     #Get info needed as core number etc
     for client in clients:
         info[client] = {}
-        response = requests.get(ip_port(client,client_port)+"/cores").text
+        success = False
+        while not success:
+            try:
+                response = requests.get(ip_port(client,client_port)+"/cores").text
+                success = True
+            except requests.exceptions.ConnectionError:
+                cprint("Cannot connect to %s" % (client),'fail')
+                cprint("Retry in 1 sec", 'info')
+                sleep(1)
         info[client]["cores"] = json.loads(response)["cores"]
         info[client]["multiplier"] = json.loads(response)["multiplier"]
     #Add work to queue. Will be started when everyone get it's own

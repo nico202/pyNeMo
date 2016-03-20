@@ -4,6 +4,8 @@
 # When data are received, process them, and sends back to host (using requests), port 10665
 
 import web #Listen for requests
+web.config.debug = False
+
 import requests #Answer to requests when data are processed
 import json #Send data
 import dill
@@ -12,6 +14,8 @@ from uuid import getnode as get_mac #Identify machine, debugging purpose
 #This will be removed, all these part should be managed by HistoryExplorer
 from multiprocessing import cpu_count
 from HistoryExplorer import dispatch_jobs
+
+web.config.debug = False
 urls = (
     '/', 'index'
     , '/cores', 'cores' #Return number of available cores (add --cores cli)
@@ -19,17 +23,17 @@ urls = (
     , '/start', 'start' #Start all works in the queue
 )
 
+master_ip = ""
 class cores:
     def GET(self):
         import config
-        multiplier = 1 if not hasattr(config, 'MULTIPLIER') else config.MULTIPLIER
-        
+        global master_ip
+        master_ip = web.ctx["ip"]
+        multiplier = 1 if not hasattr(config, 'MULTIPLIER') else config.MULTIPLIER        
         return json.dumps(
             {
                 "cores": cpu_count()
-                , "multiplier": multiplier
-            }
-        )
+                , "multiplier": multiplier})
 
 #FIXME: shared beetween 2 script
 def ip_port(ip, port):
@@ -52,13 +56,14 @@ class append:
 class start: #Maybe should be a GET?
     def POST(self):
         global Work
+        global master_ip
         outputs = []
         titles = []
         for work_id in Work.workqueue:
             outputs.append(Work.workqueue[work_id]["data"])
             titles.append(Work.workqueue[work_id]["title"])
         #check if we are really remote or same machine
-        dispatch_jobs(titles, cpu_count(), remote = True, in_data = outputs)
+        dispatch_jobs(titles, cpu_count(), remote = master_ip, in_data = outputs)
 
         return True
 
