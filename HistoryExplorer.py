@@ -1,7 +1,6 @@
 #!/usr/bin/env python2
 
-def ip_port(ip, port):
-    return "http://"+str(ip)+":"+str(port)
+from libs.web import ip_port
 
 def response_request(to_save, master_ip, master_port):
     import dill

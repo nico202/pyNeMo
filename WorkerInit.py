@@ -4,6 +4,8 @@
 # When data are received, process them, and sends back to host (using requests), port 10665
 
 import web #Listen for requests
+from libs.web import ip_port, get_self_ip
+
 web.config.debug = False
 
 import requests #Answer to requests when data are processed
@@ -13,14 +15,15 @@ from uuid import getnode as get_mac #Identify machine, debugging purpose
 
 #This will be removed, all these part should be managed by HistoryExplorer
 from multiprocessing import cpu_count
-from HistoryExplorer import dispatch_jobs
+from HistoryExplorer import dispatch_jobs, main_loop
 
 web.config.debug = False
 urls = (
     '/', 'index'
     , '/cores', 'cores' #Return number of available cores (add --cores cli)
     , '/append', 'append' #Append a work to the queue
-    , '/start', 'start' #Start all works in the queue
+    , '/init', 'init' #Start all works in the queue
+    , '/start', 'start' #Start newly appended
 )
 
 master_ip = ""
@@ -35,36 +38,50 @@ class cores:
                 "cores": cpu_count()
                 , "multiplier": multiplier})
 
-#FIXME: shared beetween 2 script
-def ip_port(ip, port):
-    return "http://"+str(ip)+":"+str(port)
 
 class workQueue:
     def __init__(self):
         self.workqueue = []
     def append(self, data):
-        workqueue.append(data)
+        self.workqueue.append(data)
+    def pop(self):
+        return self.workspace.pop()
 
 class append:
     def POST(self):
         global Work
         import dill
         loaded = dill.loads(web.data())
-        Work.workqueue = loaded
+        Work.append(loaded)
         return True #Allow error codes
 
-class start: #Maybe should be a GET?
+class start:
+    #Start one only
+    #It's multiprocessing since web.py provides it, and
+    #We are spawning 1 new process as soon as one finish
+    def POST(self):
+        next_work = Work.pop()
+        if next_work:
+            outputs.append(next_work["data"])
+            titles.append(next_work["title"])
+        main_loop(titles, web.ctx['ip'], outputs)
+
+class init: #Maybe should be a GET?
+    #Use multiprocessing implemented by me
+    #(thanks to StackO)
     def POST(self):
         global Work
         global master_ip
+        cpu_number = cpu_count()
         outputs = []
         titles = []
-        for work_id in Work.workqueue:
-            outputs.append(Work.workqueue[work_id]["data"])
-            titles.append(Work.workqueue[work_id]["title"])
+        for i in cpu_number:
+            next_work = Work.pop()
+            if next_work:
+                outputs.append(next_work["data"])
+                titles.append(next_work["title"])
         #check if we are really remote or same machine
-        dispatch_jobs(titles, cpu_count(), remote = master_ip, in_data = outputs)
-
+        dispatch_jobs(titles, cpu_number, remote = master_ip, in_data = outputs)
         return True
 
 class index:
@@ -82,11 +99,6 @@ class Worker(web.application):
 class RequestHandler():
     def POST():
         data = web.data() # you can get data use this method
-
-#FIXME: shared between 2 script
-def get_self_ip():
-    import socket
-    return socket.gethostbyname(socket.gethostname())
 
 port = 10666
 mac = str(get_mac())
