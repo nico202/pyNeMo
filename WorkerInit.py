@@ -43,7 +43,7 @@ class workQueue:
     def __init__(self):
         self.workqueue = []
     def append(self, data):
-        workqueue = data
+        workqueue.append(data)
 
 class append:
     def POST(self):
