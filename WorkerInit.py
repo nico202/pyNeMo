@@ -45,7 +45,7 @@ class workQueue:
     def append(self, data):
         self.workqueue.append(data)
     def pop(self):
-        return self.workspace.pop()
+        return self.workqueue.pop()
 
 class append:
     def POST(self):
@@ -75,7 +75,7 @@ class init: #Maybe should be a GET?
         cpu_number = cpu_count()
         outputs = []
         titles = []
-        for i in cpu_number:
+        for i in range(cpu_number):
             next_work = Work.pop()
             if next_work:
                 outputs.append(next_work["data"])
