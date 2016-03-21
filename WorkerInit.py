@@ -45,7 +45,11 @@ class workQueue:
     def append(self, data):
         self.workqueue.append(data)
     def pop(self):
-        return self.workqueue.pop()
+        try:
+            ret = self.workqueue.pop()
+        except IndexError:
+            ret = False
+        return ret
 
 class append:
     def POST(self):
@@ -60,10 +64,13 @@ class start:
     #It's multiprocessing since web.py provides it, and
     #We are spawning 1 new process as soon as one finish
     def POST(self):
+        global titles
         next_work = Work.pop()
+        outputs = []; titles = []
         if next_work:
-            outputs.append(next_work["data"])
-            titles.append(next_work["title"])
+            for i in next_work: #Should be just 1
+                outputs.append(next_work[i]["data"])
+                titles.append(next_work[i]["title"])
         main_loop(titles, web.ctx['ip'], outputs)
 
 class init: #Maybe should be a GET?
@@ -78,8 +85,8 @@ class init: #Maybe should be a GET?
         for i in range(cpu_number):
             next_work = Work.pop()
             if next_work:
-                outputs.append(next_work["data"])
-                titles.append(next_work["title"])
+                outputs.append(next_work[i]["data"])
+                titles.append(next_work[i]["title"])
         #check if we are really remote or same machine
         dispatch_jobs(titles, cpu_number, remote = master_ip, in_data = outputs)
         return True

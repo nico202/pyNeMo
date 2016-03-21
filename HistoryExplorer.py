@@ -84,7 +84,7 @@ def main_loop(outputs, master_ip = False, in_data = False):
     neurons_to_analyze = [4, 5] #FIXME: read from cli
     #TODO: add loop count
     idx = 0
-    outputs = outputs[0]
+#    outputs = outputs[0]
     for f in outputs:
         bypass = False
         if not master_ip:
@@ -174,7 +174,7 @@ def dispatch_jobs(data, job_number, remote = False, in_data = False):
     jobs = []
     
     for s in _slice:
-        j = multiprocessing.Process(target=main_loop, args=([s], remote, in_data))
+        j = multiprocessing.Process(target=main_loop, args=(s, remote, in_data))
         jobs.append(j)
     
     for j in jobs:
