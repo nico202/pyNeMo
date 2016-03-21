@@ -9,14 +9,13 @@ def response_request(to_save, master_ip, master_port):
     requests.post(ip_port(str(master_ip), str(master_port)) + "/save", data = to_save)
     cprint("Result sended, waiting for next", 'okgreen')
 
-def read_output(f, path):
+def read_output(f, path, idx = 0, total = 0):
     import imp
     from plugins.importer import import_history
     from os.path import isfile, join
     
     fail = False
-    total = 0
-    print("[%s/%s]\tUsing file: %s" % (0, 0, f))
+    print("[%s/%s]\tUsing file: %s" % (idx, total, f))
     #_input.bz2 could be used, but is more difficult to extract, and is heavier
     input_file = join(path, f.split("_")[1]) + "_input.py"
     try:
@@ -84,14 +83,14 @@ def main_loop(outputs, master_ip = False, in_data = False):
     neurons_to_analyze = [4, 5] #FIXME: read from cli
     #TODO: add loop count
     idx = 0
-#    outputs = outputs[0]
+    total = len(outputs)
     for f in outputs:
         bypass = False
-        if not master_ip:
-            data, input_conf = read_output(f, args.path)
+        if not master_ip: #Locale, read file
+            data, input_conf = read_output(f, args.path, idx, total)
         else: #Already read file from host
             data, input_conf = in_data[idx][0], in_data[idx][1]
-            idx += 1
+        idx += 1
         if not data:
             continue
 
@@ -161,7 +160,7 @@ def main_loop(outputs, master_ip = False, in_data = False):
 
 #Multiprocessing: https://gist.github.com/baojie/6047780
 def chunks(l, n):
-    if len(l) > n:
+    if len(l) < n:
         return [l]
     else:
         return [l[i:i+n] for i in range(0, len(l), n)]
@@ -170,9 +169,10 @@ def dispatch_jobs(data, job_number, remote = False, in_data = False):
     import multiprocessing
     total = len(data)
     chunk_size = total / job_number
+    
     _slice = chunks(data, chunk_size)
     jobs = []
-    
+
     for s in _slice:
         j = multiprocessing.Process(target=main_loop, args=(s, remote, in_data))
         jobs.append(j)
@@ -182,8 +182,8 @@ def dispatch_jobs(data, job_number, remote = False, in_data = False):
 
 
 def get_cores():
-    import multiprocessing
-    return multiprocessing.cpu_count()
+    from multiprocessing import cpu_count
+    return cpu_count()
 
 def info_print(total, core_number, print_only = False):
     from libs.IO import cprint
