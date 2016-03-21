@@ -254,7 +254,7 @@ MAP = {0: "R", 1: "G", 2: "B"}
 def rgb(triplet):
     return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
 
-def cprint(text, color = "okblue"):
+def cprint(text, color = "okblue", debug = False):
     colors = {
         'okblue': '\033[94m'
         , 'info': '\033[94m'
@@ -264,7 +264,8 @@ def cprint(text, color = "okblue"):
         , 'fail': '\033[91m'
         , 'red': '\033[91m' #=fail
     }
-    print(colors[color]+text+colors['endc'])
+    if not debug:# or debug: #change if enable debug
+        print(colors[color]+text+colors['endc'])
     
     
 def saveFile(file_source, file_dest):

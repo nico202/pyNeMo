@@ -10,7 +10,7 @@ import string
 from libs.runParser import parse_args
 
 from libs.IO import is_folder, hashDict, write_batch_log, saveKey
-from libs.IO import cprint
+from libs.IO import cprint, time_to_steps, write_log
 from plugins.importer import import_history
 import config
 
@@ -160,13 +160,13 @@ for com in real_commands:
         print ("Lap %s / %s" % (lap , laps))
         ##Replace subprocess: call it directly to save time
         parser = parse_args()
-        args = parser.parse_args(com.split()) #That way is 100% compatible with the old os call
+        args = parser.parse_args([w.strip("'") for w in com.split()]) #That way is 100% compatible with the old os call
         
         #Load all the parameters (choose if/when read from CLI/config.py)
         use_config = True if os.path.isfile("config.py") else False
         if use_config: import config
         
-        network_file = args.network_file.strip("'")
+        network_file = args.network_file
 
         config_steps = config.STEPS if use_config else 0
         steps = time_to_steps(args.steps) if args.steps != None else config_steps
@@ -186,7 +186,7 @@ for com in real_commands:
             
         vue_prehook = args.vue_prehook
         vue_posthook = args.vue_posthook
-            
+
         #Robot args
         control_robot = args.control_robot
         robot_mode = args.robot_mode #FIXME
@@ -194,8 +194,8 @@ for com in real_commands:
         disable_sensory = args.disable_sensory
         
         ########################################
-
         #L1
+        import_start_time = time.time()
         networks, config_file_name =\
                 import_network (
                     (network_file, (vue_prehook, vue_posthook))
@@ -203,17 +203,12 @@ for com in real_commands:
                     , (disable_sensory))
 
         #L1
+        import_end_time = time.time()
+        cprint("Import time: %s" % (import_end_time - import_start_time), 'info', True)
         nemo_simulation = networks[0]
         to_save = networks[1][0]
         neuron_number = networks[1][1]
         stimuli_dict = networks[1][2]
-        
-        #L2
-        if (sensory_neurons_in or sensory_neurons_out):
-            from libs.pYARP import RobotYARP #Import only if strictly needed
-            robot = RobotYARP ()
-        else:
-            robot = None
 
         #L3
         if not disable_sensory: #CLI
@@ -221,7 +216,24 @@ for com in real_commands:
         else:
             sensory_neurons_in = []
             sensory_neurons_out = []
-
+        
+        dict_config = {
+            "neurons": networks[1][4]
+            ,"sensory_neurons":(sensory_neurons_in, sensory_neurons_out)
+            , "save": to_save
+            , "step_input": stimuli_dict
+            , "synapses": networks[1][5]
+            , "name": networks[1][6]
+        }
+        
+        #L2
+        if (sensory_neurons_in or sensory_neurons_out):
+            from libs.pYARP import RobotYARP #Import only if strictly needed
+            robot = RobotYARP ()
+        else:
+            robot = None
+        
+        nemo_start_time = time.time()
         output = main_simulation_run(
             {
                 "steps": steps
@@ -232,7 +244,8 @@ for com in real_commands:
             , (robot) #L2
             , (sensory_neurons_in, sensory_neurons_out) #L3
         )
-
+        nemo_end_time = time.time()
+        cprint("NeMo speedup: %s" % (output["ran_steps"]/((nemo_end_time - nemo_start_time)*1000)), 'okgreen', True)
         general_config_out = {"steps": output["ran_steps"]} #Add various robot params
         #Save/process output + input
         uniqueId = hashDict(general_config_out)\
@@ -256,7 +269,7 @@ for com in real_commands:
             cprint("-------------------")
         else:
             end_time = time.time()
-            cprint ("Realtime ratio: %sX" % (output["ran_steps"]/((start_time - end_time)*1000)), 'info')
+            cprint ("Realtime ratio: %sX" % (output["ran_steps"]/((end_time - start_time)*1000)), 'info')
         
     except KeyboardInterrupt:
         if not forced_quit:
