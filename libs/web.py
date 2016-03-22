@@ -40,3 +40,7 @@ def local_work_manage(action, data = True):
     if action == "append":
 	return        
     
+def response_request(to_save, master_ip, master_port):
+    import requests
+    requests.post(ip_port(str(master_ip), str(master_port)) + "/save", data = to_save)
+    cprint("Result sended, waiting for next", 'okgreen')
