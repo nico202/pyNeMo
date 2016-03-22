@@ -1,7 +1,7 @@
 #!/usr/bin/env python2
 
 from libs.web import ip_port, response_request
-from libs.IO import read_output
+from libs.IO import read_output, list_all
 from libs.multiProcess import chunks, dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
@@ -95,8 +95,6 @@ def main_loop(outputs, master_ip = False, in_data = False):
                         mode = 0 #Neuron is stable OFF
                     else:
                         mode = 2 #Neuron is stable ON
-                        #on_time = 0
-                        #off_time = 0
                 else: #Neuron IS oscillating
                     mode = 1 #Neuron is both ON and OFF
                 neurons_info[neuron_number] = {}
@@ -119,7 +117,6 @@ def main_loop(outputs, master_ip = False, in_data = False):
 def info_print(total, core_number, print_only = False):
     from libs.IO import cprint
     cprint("Total number of analysis to be run: %s" % (total), 'okblue')
-    
     cprint("And we are going to use %s%s %s"
            %
            ( #Style :D
@@ -203,4 +200,4 @@ if __name__ == "__main__":
 
     info_print(total, core_number, args.number_only)
     
-    dispatch_jobs(outputs, core_number)
+    dispatch_jobs(outputs, core_number, main_loop)
