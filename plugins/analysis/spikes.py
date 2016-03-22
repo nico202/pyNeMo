@@ -1,43 +1,31 @@
 #!/usr/bin/env python2
 
+#Import modules needed for all
+import numpy as np
+
 def neuronSpikesToSquare(
         spikes
         , steps
         , time_window = 20
         , treshold = .05
 ):
-    import numpy as np
     raw, data = runningMean(spikes, time_window, steps)
     array_np = np.asarray(data)
     tresholded = array_np > treshold
-    #Numpy should be faster
-#    tresholded = [ 1 if i > treshold else 0 for i in data ]
     return raw, tresholded
 
 def getBurstFreq(raw, tresholded):
-    '''Get frequency during and not during a burst'''
-    import numpy as np
-    tresholded = np.asarray(tresholded)
-    raw = np.asarray(raw)
+    '''Get frequency during and not during a burst
+    Arguments must be numpy arrays'''
     bursting_freq = raw[tresholded].mean() #Bursting freq
     not_bursting_freq = raw[np.invert(tresholded)].mean() #Not bursting freq
-#    bursting_time, not_bursting_time = 0, 0
-#    bursting_spikes, not_bursting_spikes = 0, 0
-#    for ms in range(len(tresholded)):
-#        if tresholded[ms]: #Bursting:
-#            bursting_time += 1
-#            bursting_spikes += raw[ms] #either 0 or 1
-#        else: #not bursting
-#            not_bursting_time += 1
-#            not_bursting_spikes += raw[ms]
-#    return float(not_bursting_spikes)/not_bursting_time, float(bursting_spikes)/bursting_time
     return not_bursting_freq, bursting_freq
 
 def runningMean(serie, window, steps):
     import pandas as pd
-    import numpy as np
     spike_series = []
     prev = 0
+    #TODO: speed this up (numpy)
     for t in serie:
         spike_series += [0] * ((t-prev) -1) + [1] #Lenght will be ms of last spike
         prev = t
@@ -80,7 +68,8 @@ def getFreq(seq, steps, period = True):
             on_period_mode = on_period.most_common(1)[0][0]
         except IndexError:
             print "DEBUG ME"
-            exit()
+            raise
+#            exit()
         if period:
             return off_period_mode, on_period_mode, True
         else:

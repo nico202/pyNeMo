@@ -20,7 +20,7 @@ def saveRawImage(img, name, close = True):
             raise
     return True
 
-def ImageFromSpikes(input_spikes, file_path = "", show = True, save = True):
+def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save = True):
     '''Input: get converted to:
     spikes = list of lists (neurons) of ms
     ie. [[1, 3, 5], [2, 4, 5]] # 2 neurons, 3 spikes/neuron, ms 1, 3...

@@ -1,8 +1,8 @@
 #!/usr/bin/env python2
-#TODO: use multiprocess (add params --cores)
 
 if __name__ == "__main__":
     import argparse
+    from libs.IO import is_folder
     from plugins.importer import import_history
     from plugins.images import IO as ImageIO
 
@@ -39,12 +39,13 @@ if __name__ == "__main__":
     file_name = join(path, args.general + "_" + args.config + "_output.bz2")
     #FIXME: allow uncompressed
     data =import_history(file_name, compressed = True)
-    print file_name
+    print ("Using file: %s" % file_name)
+    is_folder("output_images")
     ImageIO.ImageFromSpikes(
         data["NeMo"][1]
-        , file_path = ""
-        , save = False
-        , show = True
+        , file_path = "./output_images/%s_%s.png" % (args.general, args.config)
+        , save = True
+        , show = False
     )
     exit()
     #Filter out unwanted runs

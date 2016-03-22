@@ -284,3 +284,51 @@ def saveFile(file_source, file_dest):
             return True
     else:
         return False
+
+def read_output(f, path, idx = 0, total = 0):
+    import imp
+    #Move import_istory to libs.IO?
+    from plugins.importer import import_history
+    from os.path import isfile, join
+    
+    fail = False
+    print("[%s/%s]\tUsing file: %s" % (idx, total, f))
+    #_input.bz2 could be used, but is more difficult to extract, and is heavier
+    input_file = join(path, f.split("_")[1]) + "_input.py"
+    try:
+        input_conf = imp.load_source('*', input_file)
+    except IOError: #File _input.py missing, save name to file, will try later?
+        broken = open('ANALYSIS_FAILED.csv', 'a')
+        broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
+        broken.close()
+        cprint("FAILED, SKIPPING", 'fail')
+        fail = True
+    except SyntaxError:
+        broken = open('CONVERT_VUE_TO_PY.csv', 'a')
+        broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
+        broken.close()
+        cprint("FAILED, SKIPPING", 'fail')
+        fail = True
+    input_conf = vars(input_conf)
+    remove = ["step_input", "_S", "_N", "_stimuli", "_typicalN"]
+    input_conf_clear = {}
+    for var in input_conf:
+        if var not in remove and not var.startswith("__"):
+            input_conf_clear[var] = input_conf[var]
+    data = import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
+
+    return data, input_conf_clear if not fail else False
+
+def list_all(path, start_from, end_to):
+    from os import listdir
+    from os.path import isfile, join
+    files = [f for f in listdir(path) if isfile(join(path, f))]
+    #FIXME: allow uncompressed
+    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
+
+    #Filter out unwanted runs
+    outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]
+    total = len(outputs) + start_from
+
+    return outputs, total
+    
