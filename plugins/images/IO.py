@@ -42,6 +42,7 @@ def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save 
     sp.set_linestyle('-')
     sp.set_markerscale(0.8)
     sp.plot_spikes(spikes, draw=show)
+    del sp #fixes memory leak?
     return True
 
 def ImageFromMembranes(all_membranes):
