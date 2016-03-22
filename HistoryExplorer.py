@@ -1,46 +1,8 @@
 #!/usr/bin/env python2
 
-from libs.web import ip_port
-
-def response_request(to_save, master_ip, master_port):
-    import dill
-    import requests
-    from libs.IO import cprint
-    requests.post(ip_port(str(master_ip), str(master_port)) + "/save", data = to_save)
-    cprint("Result sended, waiting for next", 'okgreen')
-
-def read_output(f, path, idx = 0, total = 0):
-    import imp
-    from plugins.importer import import_history
-    from os.path import isfile, join
-    
-    fail = False
-    print("[%s/%s]\tUsing file: %s" % (idx, total, f))
-    #_input.bz2 could be used, but is more difficult to extract, and is heavier
-    input_file = join(path, f.split("_")[1]) + "_input.py"
-    try:
-        input_conf = imp.load_source('*', input_file)
-    except IOError: #File _input.py missing, save name to file, will try later?
-        broken = open('ANALYSIS_FAILED.csv', 'a')
-        broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
-        broken.close()
-        cprint("FAILED, SKIPPING", 'fail')
-        fail = True
-    except SyntaxError:
-        broken = open('CONVERT_VUE_TO_PY.csv', 'a')
-        broken.write("%s,%s\n" % (f.split("_")[0], f.split("_")[1]))
-        broken.close()
-        cprint("FAILED, SKIPPING", 'fail')
-        fail = True
-    input_conf = vars(input_conf)
-    remove = ["step_input", "_S", "_N", "_stimuli", "_typicalN"]
-    input_conf_clear = {}
-    for var in input_conf:
-        if var not in remove and not var.startswith("__"):
-            input_conf_clear[var] = input_conf[var]
-    data = import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
-
-    return data, input_conf_clear if not fail else False
+from libs.web import ip_port, response_request
+from libs.IO import read_output
+from libs.multiProcess import chunks, dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
     to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
@@ -85,7 +47,6 @@ def main_loop(outputs, master_ip = False, in_data = False):
     idx = 0
     total = len(outputs)
     for f in outputs:
-        bypass = False
         if not master_ip: #Locale, read file
             data, input_conf = read_output(f, args.path, idx, total)
         else: #Already read file from host
@@ -118,11 +79,9 @@ def main_loop(outputs, master_ip = False, in_data = False):
                 neurons_info[n]["mode"] = 3 #Dead neuron
                 neurons_info[n]["not_burst_freq"] = 0
                 neurons_info[n]["burst_freq"] = 0
-
-            bypass = True
-
-        if not bypass:
+        else:
             for i in all_neurons_spikes_list:
+                #What's the pythonic way to do this?
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
@@ -140,7 +99,7 @@ def main_loop(outputs, master_ip = False, in_data = False):
                         #off_time = 0
                 else: #Neuron IS oscillating
                     mode = 1 #Neuron is both ON and OFF
-                neurons_info[neuron_number]={}
+                neurons_info[neuron_number] = {}
                 neurons_info[neuron_number]["on_time"] = on_time
                 neurons_info[neuron_number]["off_time"] = off_time
                 neurons_info[neuron_number]["mode"] = mode
@@ -156,34 +115,6 @@ def main_loop(outputs, master_ip = False, in_data = False):
             save.close() #And close it after, to speed up
         else:
             response_request(to_write, master_ip, "10665")
-
-
-#Multiprocessing: https://gist.github.com/baojie/6047780
-def chunks(l, n):
-    if len(l) < n:
-        return [l]
-    else:
-        return [l[i:i+n] for i in range(0, len(l), n)]
-
-def dispatch_jobs(data, job_number, remote = False, in_data = False):
-    import multiprocessing
-    total = len(data)
-    chunk_size = total / job_number
-    
-    _slice = chunks(data, chunk_size)
-    jobs = []
-
-    for s in _slice:
-        j = multiprocessing.Process(target=main_loop, args=(s, remote, in_data))
-        jobs.append(j)
-    
-    for j in jobs:
-        j.start()
-
-
-def get_cores():
-    from multiprocessing import cpu_count
-    return cpu_count()
 
 def info_print(total, core_number, print_only = False):
     from libs.IO import cprint
@@ -208,19 +139,6 @@ def info_print(total, core_number, print_only = False):
     if print_only: #Print simulations number and exit!
         exit()
         
-def list_all(path, start_from, end_to):
-    from os import listdir
-    from os.path import isfile, join
-    files = [f for f in listdir(path) if isfile(join(path, f))]
-    #FIXME: allow uncompressed
-    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
-
-    #Filter out unwanted runs
-    outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]
-    total = len(outputs) + start_from
-
-    return outputs, total
-    
 if __name__ == "__main__":
     import argparse
     from sys import exit
