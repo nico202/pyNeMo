@@ -10,6 +10,7 @@ def import_history(file_path, compressed = False):
             opened = open(file_path, 'r')
 
         ret = ast.literal_eval(opened.readline())
+        del opened
     except SyntaxError:
         print ("FATAL ERROR: input file broken!")
         return False

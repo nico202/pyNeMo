@@ -16,6 +16,7 @@ def main_loop(content, remote, dummy):
             , save = True
             , show = False
         )
+        del data #Memory leak again?
         i += 1
 
 if __name__ == "__main__":
