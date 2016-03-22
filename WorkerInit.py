@@ -15,7 +15,8 @@ from uuid import getnode as get_mac #Identify machine, debugging purpose
 
 #This will be removed, all these part should be managed by HistoryExplorer
 from multiprocessing import cpu_count
-from HistoryExplorer import dispatch_jobs, main_loop
+from HistoryExplorer import main_loop
+from libs.multiProcess import dispatch_jobs
 
 web.config.debug = False
 urls = (
@@ -69,7 +70,7 @@ class start:
         outputs = []; titles = []
         if next_work:
             for i in next_work: #Should be just 1
-                outputs.append(next_work[i]["data"])
+                outputs.append(next[i]["data"])
                 titles.append(next_work[i]["title"])
         main_loop(titles, web.ctx['ip'], outputs)
 
