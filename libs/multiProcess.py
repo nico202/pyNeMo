@@ -10,7 +10,6 @@ def dispatch_jobs(data, job_number, function, remote = False, in_data = False):
     chunk_size = total / job_number or total
     
     _slice = chunks(data, chunk_size)
-    print _slice
     jobs = []
 
     for s in _slice:
