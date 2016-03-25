@@ -154,12 +154,10 @@ def nemo_select_backend (
         else:
             nemo_config.set_cpu_backend()
 
-def saveKey(filename, values, out_dir = ".", compress = True, force_write = False):
+def saveKey(filename, values, out_dir = ".", compress = True, compress_format = "gzip", force_write = False):
     '''
     Saves a dict to a file.
-    If compress enabled, saves to bz2 (size on nets reduced by\
- more then 20X)
-    TODO if python > 3: use lzma
+    If compress enabled, saves to gz (compress less then bz2 but faster)
     '''
     import os.path
     filename = str(filename)
@@ -169,12 +167,22 @@ def saveKey(filename, values, out_dir = ".", compress = True, force_write = Fals
     if not os.path.isfile(output_name) or force_write:
         try:
             if compress:
-                import bz2
-                values = bz2.compress("%s" % values)
-                output_name = output_name + ".bz2"
-            output = open(output_name, 'w')
-            output.write("%s" % values)
-            output.close()
+                if compress_format in [ "gzip", "gz" ]:
+                    import gzip
+                    with gzip.open(output_name + ".gz", 'wb') as f:
+                        f.write(values)
+                elif compress_format in [ "bzip2", "bzip", "bz2" ]:
+                    import bz2
+                    file_out = bz2.BZ2File(output_name + ".bz2", 'wb')
+                    try:
+                        file_out.write(values)
+                    finally:
+                        file_out.cloes()
+                    values = bz2.compress("%s" % values)
+            else:
+                output = open(output_name, 'w')
+                output.write("%s" % values)
+                output.close()
         except:
             print("Probem writing file?! DEBUG me")
             raise

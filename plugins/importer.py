@@ -4,8 +4,15 @@ def import_history(file_path, compressed = False):
     from os.path import isfile, join
     try:
         if compressed:
-            import bz2
-            opened = bz2.BZ2File(file_path)
+            if ".bz2" in file_path:
+                import bz2
+                opened = bz2.BZ2File(file_path)
+            elif ".gz" in file_path:
+                import gzip
+                opened = gzip.GzipFile(file_path)
+            else:
+                print("Error: file type not known! Try plain import")
+                opened = open(file_path, 'r')
         else:
             opened = open(file_path, 'r')
 
