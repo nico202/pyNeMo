@@ -4,6 +4,7 @@ def parse_args():
     #The parser. Read command line arguments
     class MyParser(argparse.ArgumentParser):
         def error(self, message):
+            from sys import stderr, exit
             if message == "Too few arguments":
                 message = "You must provide a network file!"
             stderr.write('Error: %s\n' % message)

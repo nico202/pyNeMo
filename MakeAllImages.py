@@ -9,13 +9,14 @@ def main_loop(content, remote, dummy):
         filename = "./%s/%s_%s.png" % (values[1], values[2], values[3])
         cprint ("[%s/%s] %s match and is missing, generating image" % (i, total, filename),'info')
         #TODO:allow compressed
-        data = import_history("%s/%s_%s_output.bz2" % (values[0], values[2], values[3]), compressed = True)
-        ImageIO.ImageFromSpikes(
+        data = import_history("%s/%s_%s_output.gz" % (values[0], values[2], values[3]), compressed = True)
+        state = ImageIO.ImageFromSpikes(
             data["NeMo"][1]
             , file_path = filename
             , save = True
             , show = False
         )
+        del state
         del data #Memory leak again?
         i += 1
 
@@ -46,6 +47,12 @@ if __name__ == "__main__":
                         , dest = 'images_path'
                         , default = "output_images"
     )
+    parser.add_argument('--run-all',
+                        help = 'Ran all the sims'
+                        , dest = 'run_all'
+                        , default = 'false'
+                        , action = 'save_true'
+    )
 
     args = parser.parse_args()
     path = args.path
@@ -58,6 +65,7 @@ if __name__ == "__main__":
     cprint("Total files provided: %s" % len(content),'info')
     is_folder(args.images_path)
 
+
     real_content = []
     for line in content:
         file_data = line.split(",")
@@ -67,7 +75,7 @@ if __name__ == "__main__":
             filename = "./%s/%s_%s.png" % (args.images_path, general, config)
             if not isfile(filename): #Don't run it twice
                 real_content.append((args.path, args.images_path, general, config))
-    
+
     dispatch_jobs(real_content, get_cores(), main_loop, False) #Ugly, ya'know
     
     cprint("All done!", 'okgreen')

@@ -7,18 +7,18 @@ def neuronSpikesToSquare(
         spikes
         , steps
         , time_window = 20
-        , treshold = .05
+        , threshold = .05
 ):
     raw, data = runningMean(spikes, time_window, steps)
     array_np = np.asarray(data)
-    tresholded = array_np > treshold
-    return raw, tresholded
+    thresholded = array_np > threshold
+    return raw, thresholded
 
-def getBurstFreq(raw, tresholded):
+def getBurstFreq(raw, thresholded):
     '''Get frequency during and not during a burst
     Arguments must be numpy arrays'''
-    bursting_freq = raw[tresholded].mean() #Bursting freq
-    not_bursting_freq = raw[np.invert(tresholded)].mean() #Not bursting freq
+    bursting_freq = raw[thresholded].mean() #Bursting freq
+    not_bursting_freq = raw[np.invert(thresholded)].mean() #Not bursting freq
     return not_bursting_freq, bursting_freq
 
 def runningMean(serie, window, steps):

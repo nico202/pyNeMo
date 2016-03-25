@@ -20,7 +20,7 @@ def saveRawImage(img, name, close = True):
             raise
     return True
 
-def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save = True):
+def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save = True, xmin = False, xmax = False):
     '''Input: get converted to:
     spikes = list of lists (neurons) of ms
     ie. [[1, 3, 5], [2, 4, 5]] # 2 neurons, 3 spikes/neuron, ms 1, 3...
@@ -34,6 +34,13 @@ def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save 
     from plugins.importer import spikesDictToArray
 
     spikes = spikesDictToArray(input_spikes)
+    if xmax or xmin: #TODO: Use numpy (faster) v1.0
+        new_spikes = []
+        for i in spikes:
+            i = [l for l in i if l < xmax and l > xmin]
+            new_spikes.append(i)
+        spikes = new_spikes
+        
 
     if save:
         cprint("\t*\tSaving image to %s" % file_path, 'info')
@@ -43,6 +50,8 @@ def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save 
     sp.set_markerscale(0.8)
     sp.plot_spikes(spikes, draw=show)
     del sp #fixes memory leak? Seems not
+    del spikes
+    del input_spikes
     return True
 
 def ImageFromMembranes(all_membranes):

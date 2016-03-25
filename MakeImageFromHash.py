@@ -58,10 +58,11 @@ if __name__ == "__main__":
     #Update index
     loop = start_from - 1 if start_from else 0
 
+    print 1 * 2
     print("Total number of analysis to be run: %s" % (len(outputs)))
     if args.number_only:
         exit()
-        
+
     neurons_to_analyze = [4, 5] #FIXME: read from cli
     for f in outputs:
         bypass = False
@@ -152,7 +153,3 @@ if __name__ == "__main__":
                    )
         )
         save.close() #And close it after, to speed up
-        
-
-        
-    

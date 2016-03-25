@@ -137,7 +137,7 @@ except IOError:
     pass
 
 last_save_time = time.time()
-start_time = last_save_time
+all_start_time = last_save_time
 next_sleep = False
 forced_quit = False
 lap = 0
@@ -263,7 +263,7 @@ for com in real_commands:
             now = time.time()
             time_diff = now - last_save_time
             last_save_time = now
-            cprint("\n\n\n-----------------------------------\n\n\n\nSAVING\n\n\n")
+            cprint("\n-----------------------------------\nSAVING\n")
             cprint("This round mean step time: %s" % (time_diff / config.BATCH_SAVE_EVERY))
             write_batch_log(session_hash + "_batch", lap, output_dir)
             cprint("-------------------")
@@ -282,7 +282,7 @@ for com in real_commands:
             cprint("Forced QUIT", 'error')
             exit()
 
-run_time = time.time() - start_time
+run_time = time.time() - all_start_time
 cprint("Batch runned successfully in %s!" % (run_time), 'okgreen')
 end = time.time()
 

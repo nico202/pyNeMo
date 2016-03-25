@@ -23,9 +23,11 @@ def spikesDictToArray(input_spikes):
             if neuron in spikes_dict:                                              
                 spikes_dict[neuron].append(ms)                                     
             else:                                                                  
-                spikes_dict[neuron] = [ms]                                         
-                                                                                   
+                spikes_dict[neuron] = [ms]
+
     spikes = []                                                                    
     for key in spikes_dict:                                                        
         spikes.append(spikes_dict[key])
+    del spikes_dict
+    del input_spikes
     return spikes
