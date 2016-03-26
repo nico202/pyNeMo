@@ -130,14 +130,15 @@ def VUEtoPyConverter(input_vue, (prehook, posthook)):
 from libs.FasterPresets import _S, _stimuli, _typicalN\n"
 
     #PreHook
-    net_content += "\n" + prehook + "\n"
+    net_content += "\n#PreHooks:\n" + prehook + "\n"
 
     #Load variables (contained in the rhombus) before anything else.
     #This way they can be replaced by the prehook
     net_content += "#Variables Loaded from the rhombus\n%s\n" % variables_load 
 
     #PreHook
-    net_content += "\n" + posthook + "\n"
+    net_content += "\n#PostHooks:\n" + posthook + "\n"
+
     #Name
     for filename in input_vue.split("."):
         if filename:
