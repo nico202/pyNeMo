@@ -36,7 +36,9 @@ if __name__ == "__main__":
     #TODO: allow uncompressed
     if not all([args.general, args.config, args.path]):
         exit("Missing parameter")
-    file_name = join(path, args.general + "_" + args.config + "_output.bz2")
+#    file_name = join(path, args.general + "_" + args.config + "_output.bz2")
+    file_name = join(path, args.general + "_" + args.config + "_output.gz")
+
     #FIXME: allow uncompressed
     data =import_history(file_name, compressed = True)
     print ("Using file: %s" % file_name)
