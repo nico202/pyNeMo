@@ -33,10 +33,16 @@ def dependency_check(modules):
 
 def load_network_file (network_file, hooks):
     import imp
+    #Ultra-important. Prevent the creation of pyc files, that get imported by imp
+    #... preventing the reload of the source, leading to wrong input -> wrong output
+    #... in batch runs
+    ###############################
+    import sys
+    sys.dont_write_bytecode = True
+    ###############################
     try:
         config_name = try_load_vue (network_file, hooks)
         config = imp.load_source('*', config_name)
-
     except SyntaxError:
         cprint("Config file: Syntax Error", 'fail')
         raise
@@ -57,6 +63,7 @@ def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
         #TODO: verbosity fix
         cprint("Converting input VUE to py", 'info')
         VUEtoPy.VUEtoPyConverter(config_name, hooks)
+        raw_input("PAUSE")
         config_name = "".join((config_name.split(".")[:-1]))
         config_name += ".py"
     return "./" + config_name
@@ -73,11 +80,11 @@ def import_network (
     returns [ nemo_simulation, to_save ]
     '''
     network_config, network_name = load_network_file (network_file, hooks)
-
+    
     import nemo
     nemo_net = nemo.Network()
     nemo_config = nemo.Configuration()
-    
+
     nemo_select_backend (nemo_config, (use_cuda, cuda_backend_number))
 
     #Add network neurons
@@ -341,3 +348,13 @@ def list_all(path, start_from, end_to):
 
     return outputs, total
     
+def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [y/n]"):
+    from sys import exit
+    action = "z"
+    while action.capitalize() not in ["Y","N"]:
+        action = raw_input(msg + "\n" + sure +": ")
+        if action.capitalize() == "Y":
+            break
+        else:
+            cprint(exit_msg, 'warning')
+            exit()

@@ -9,8 +9,8 @@ import string
 
 from libs.runParser import parse_args
 
-from libs.IO import is_folder, hashDict, write_batch_log, saveKey
-from libs.IO import cprint, time_to_steps, write_log
+from libs.IO import is_folder, hashDict, write_batch_log, saveKey, saveFile
+from libs.IO import cprint, time_to_steps, write_log, ask
 from plugins.importer import import_history
 import config
 
@@ -40,17 +40,7 @@ else:
     output_dir = new_args[new_args.index("--history-dir")+1]
 if "'" in output_dir:
     output_dir = string.replace(output_dir,"'", "")
-def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [y/n]"):
-    from sys import exit
-    action = "z"
-    while action.capitalize() not in ["Y","N"]:
-        action = raw_input(msg + "\n" + sure +": ")
-        if action.capitalize() == "Y":
-            break
-        else:
-            cprint(exit_msg, 'warning')
-            exit()
-    
+
 if (
         config.BATCH_CONFIRM_NO_SAVE_IMAGE
         and not "--save-spikes" in new_args
@@ -108,7 +98,7 @@ real_commands = set(commands)
 
 #TODO:
 #FIXME: remove "--show-image" etc to prevent different hashes of same config
-session_hash = str(hashDict(real_commands))
+session_hash = hashDict(real_commands)
 
 #Save commands list
 is_folder("./commands")
@@ -116,7 +106,7 @@ commands_file = "./commands/" + session_hash + "_commands"
 cprint ("Saving %s commands to file: %s" % (len(real_commands), commands_file), 'info')
 saveKey(commands_file, commands)
 cprint("Running in 5s", "warning")
-time.sleep(5)
+#time.sleep(5)
 
 #Start
 is_folder (output_dir)
@@ -186,7 +176,7 @@ for com in real_commands:
             
         vue_prehook = args.vue_prehook
         vue_posthook = args.vue_posthook
-
+                
         #Robot args
         control_robot = args.control_robot
         robot_mode = args.robot_mode #FIXME
@@ -209,29 +199,35 @@ for com in real_commands:
         to_save = networks[1][0]
         neuron_number = networks[1][1]
         stimuli_dict = networks[1][2]
-
+        
         #L3
         if not disable_sensory: #CLI
             sensory_neurons_in, sensory_neurons_out  = networks[1][3]
         else:
             sensory_neurons_in = []
             sensory_neurons_out = []
-        
+
         dict_config = {
             "neurons": networks[1][4]
-            ,"sensory_neurons":(sensory_neurons_in, sensory_neurons_out)
+            , "sensory_neurons":(sensory_neurons_in, sensory_neurons_out)
             , "save": to_save
             , "step_input": stimuli_dict
             , "synapses": networks[1][5]
             , "name": networks[1][6]
         }
-        
+
+        config_dict_hash = hashDict(dict_config)
+
         #L2
         if (sensory_neurons_in or sensory_neurons_out):
             from libs.pYARP import RobotYARP #Import only if strictly needed
             robot = RobotYARP ()
         else:
             robot = None
+
+        #Save input files
+        #saveKey(config_dict_hash + "_input", dict_config, output_dir)
+        saveFile(config_file_name, output_dir + "/" + config_dict_hash + "_input.py")
         
         nemo_start_time = time.time()
         output = main_simulation_run(
@@ -248,10 +244,10 @@ for com in real_commands:
         cprint("NeMo speedup: %s" % (output["ran_steps"]/((nemo_end_time - nemo_start_time)*1000)), 'okgreen', True)
         general_config_out = {"steps": output["ran_steps"]} #Add various robot params
         #Save/process output + input
-        uniqueId = hashDict(general_config_out)\
-                   + "_" + hashDict(dict_config)
+        uniqueId = hashDict(general_config_out) + "_" + config_dict_hash
         
         #Step is included in the output
+        print ("Saving output to %s_output" % uniqueId)
         saveKey(uniqueId + "_output", output, output_dir)
         
         #Save the log
@@ -270,7 +266,7 @@ for com in real_commands:
         else:
             end_time = time.time()
             cprint ("Realtime ratio: %sX" % (output["ran_steps"]/((end_time - start_time)*1000)), 'info')
-        
+
     except KeyboardInterrupt:
         if not forced_quit:
             write_batch_log(session_hash + "_batch", lap, output_dir)
@@ -278,8 +274,8 @@ for com in real_commands:
             cprint ("Forced saving! Press CTRL-C again (on cue) to quit", 'warning')
         else:
             #save 2 lap less to be sure sims have not been interrupted
-            write_batch_log(str(session_hash) + "_batch", lap - 2, output_dir)
-            cprint("Forced QUIT", 'error')
+            write_batch_log(session_hash + "_batch", lap - 2, output_dir)
+            cprint("Forced QUIT", 'fail')
             exit()
 
 run_time = time.time() - all_start_time
