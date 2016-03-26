@@ -164,6 +164,7 @@ def saveKey(filename, values, out_dir = ".", compress = True, compress_format = 
     out_dir = str(out_dir)
     is_folder (out_dir)
     output_name = out_dir + '/' + filename
+    values = str(values)
     if not os.path.isfile(output_name) or force_write:
         try:
             if compress:
@@ -177,7 +178,7 @@ def saveKey(filename, values, out_dir = ".", compress = True, compress_format = 
                     try:
                         file_out.write(values)
                     finally:
-                        file_out.cloes()
+                        file_out.close()
                     values = bz2.compress("%s" % values)
             else:
                 output = open(output_name, 'w')
