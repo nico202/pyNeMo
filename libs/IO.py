@@ -63,7 +63,6 @@ def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
         #TODO: verbosity fix
         cprint("Converting input VUE to py", 'info')
         VUEtoPy.VUEtoPyConverter(config_name, hooks)
-        raw_input("PAUSE")
         config_name = "".join((config_name.split(".")[:-1]))
         config_name += ".py"
     return "./" + config_name

@@ -106,7 +106,7 @@ commands_file = "./commands/" + session_hash + "_commands"
 cprint ("Saving %s commands to file: %s" % (len(real_commands), commands_file), 'info')
 saveKey(commands_file, commands)
 cprint("Running in 5s", "warning")
-#time.sleep(5)
+time.sleep(5)
 
 #Start
 is_folder (output_dir)
