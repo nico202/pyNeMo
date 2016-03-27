@@ -32,7 +32,9 @@ def runningMean(serie, window, steps):
     spike_series += (steps - len(spike_series)) * [0]
     spike_series = np.asarray(spike_series) #remove when np used directly
     #StackOverflow: 13728392
-    return spike_series, pd.rolling_mean(np.array(spike_series), window)
+    #Replaced (went unsupported):
+    #    pd.rolling_mean(np.array(spike_series), window) 
+    return spike_series, pd.Series(spike_series).rolling(window=window).mean()
 
 def getFreq(seq, steps, period = True):
     from collections import Counter
