@@ -3,7 +3,7 @@
 #Import modules needed for all
 import numpy as np
 
-def neuronSpikesToSquare(
+def neuronSpikesToSquare (
         spikes
         , steps
         , time_window = 20
@@ -30,6 +30,7 @@ def runningMean(serie, window, steps):
         spike_series += [0] * ((t-prev) -1) + [1] #Lenght will be ms of last spike
         prev = t
     spike_series += (steps - len(spike_series)) * [0]
+    spike_series = np.asarray(spike_series) #remove when np used directly
     #StackOverflow: 13728392
     return spike_series, pd.rolling_mean(np.array(spike_series), window)
 

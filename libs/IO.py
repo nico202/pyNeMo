@@ -338,8 +338,9 @@ def list_all(path, start_from, end_to):
     from os import listdir
     from os.path import isfile, join
     files = [f for f in listdir(path) if isfile(join(path, f))]
+
     #FIXME: allow uncompressed
-    outputs = list(set([ f for f in files if "_output.bz2" in f ]))
+    outputs = list(set([ f for f in files if ( "_output" in f )]))
 
     #Filter out unwanted runs
     outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]

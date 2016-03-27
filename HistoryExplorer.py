@@ -2,7 +2,7 @@
 
 from libs.web import ip_port, response_request
 from libs.IO import read_output, list_all
-from libs.multiProcess import chunks, dispatch_jobs, get_cores
+from libs.multiProcess import dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
     to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
@@ -85,9 +85,9 @@ def main_loop(outputs, master_ip = False, in_data = False):
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
-                raw, tresholded = spikes.neuronSpikesToSquare(i, data["ran_steps"])
-                off_time, on_time, osc = spikes.getFreq(tresholded, data["ran_steps"])
-                not_burst_freq, burst_freq = spikes.getBurstFreq(raw, tresholded)
+                raw, thresholded = spikes.neuronSpikesToSquare(i, data["ran_steps"])
+                off_time, on_time, osc = spikes.getFreq(thresholded, data["ran_steps"])
+                not_burst_freq, burst_freq = spikes.getBurstFreq(raw, thresholded)
 
                 if not osc: #Not oscillating
                     state = max(off_time, on_time)
@@ -199,5 +199,5 @@ if __name__ == "__main__":
     loop = start_from - 1 if start_from else 0
 
     info_print(total, core_number, args.number_only)
-    
+
     dispatch_jobs(outputs, core_number, main_loop)
