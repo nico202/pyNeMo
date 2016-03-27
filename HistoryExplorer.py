@@ -1,41 +1,75 @@
 #!/usr/bin/env python2
 
 from libs.web import ip_port, response_request
-from libs.IO import read_output, list_all
+from libs.IO import read_output, list_all, cprint
 from libs.multiProcess import dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
-    to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
-        f.split("_")[0] #Save somewhere to save time, used multimple times #1
-        , f.split("_")[1]
-        , neurons_info[4]["mode"]
-        , neurons_info[4]["on_time"]
-        , neurons_info[4]["off_time"]
-        , neurons_info[4]["burst_freq"]
-        , neurons_info[4]["not_burst_freq"]
-        , neurons_info[5]["mode"]
-        , neurons_info[5]["on_time"]
-        , neurons_info[5]["off_time"]
-        , neurons_info[5]["burst_freq"]
-        , neurons_info[5]["not_burst_freq"]
-        , input_conf["cerebellum_ctrl"][0]
-        , input_conf["cerebellum_ctrl"][1]
-        , input_conf["cerebellum_ctrl"][2]
-        , input_conf["_stim_a"]
-        , input_conf["_stim_b"]
-        , input_conf["_start_a"]
-        , input_conf["_start_b"]
-        , input_conf["_stop_a"]
-        , input_conf["_stop_b"]
-        , input_conf["CIN"][0][0]
-        , input_conf["CIN"][0][1]
-        , input_conf["CIN"][0][2]
-        , input_conf["CIN"][0][3]
-        , input_conf["CIN"][0][4]
-        , input_conf["CIN"][0][5]
-        , input_conf["CIN"][0][6]
-        , steps #29
-    )
+    try:
+        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+            f.split("_")[0] #Save somewhere to save time, used multimple times #1
+            , f.split("_")[1]
+            , neurons_info[4]["mode"]
+            , neurons_info[4]["on_time"]
+            , neurons_info[4]["off_time"]
+            , neurons_info[4]["burst_freq"]
+            , neurons_info[4]["not_burst_freq"]
+            , neurons_info[5]["mode"]
+            , neurons_info[5]["on_time"]
+            , neurons_info[5]["off_time"]
+            , neurons_info[5]["burst_freq"]
+            , neurons_info[5]["not_burst_freq"]
+            , input_conf["cerebellum_ctrl"][0]
+            , input_conf["cerebellum_ctrl"][1]
+            , input_conf["cerebellum_ctrl"][2]
+            , input_conf["_stim_a"]
+            , input_conf["_stim_b"]
+            , input_conf["_start_a"]
+            , input_conf["_start_b"]
+            , input_conf["_stop_a"]
+            , input_conf["_stop_b"]
+            , input_conf["CIN"][0][0]
+            , input_conf["CIN"][0][1]
+            , input_conf["CIN"][0][2]
+            , input_conf["CIN"][0][3]
+            , input_conf["CIN"][0][4]
+            , input_conf["CIN"][0][5]
+            , input_conf["CIN"][0][6]
+            , steps #29
+        )
+    except KeyError:
+        to_write =  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+            f.split("_")[0] #Save somewhere to save time, used multimple times #1
+            , f.split("_")[1]
+            , 3
+            , 0
+            , 0
+            , 0
+            , 0
+            , 3
+            , 0
+            , 0
+            , 0
+            , 0
+            , input_conf["cerebellum_ctrl"][0]
+            , input_conf["cerebellum_ctrl"][1]
+            , input_conf["cerebellum_ctrl"][2]
+            , input_conf["_stim_a"]
+            , input_conf["_stim_b"]
+            , input_conf["_start_a"]
+            , input_conf["_start_b"]
+            , input_conf["_stop_a"]
+            , input_conf["_stop_b"]
+            , input_conf["CIN"][0][0]
+            , input_conf["CIN"][0][1]
+            , input_conf["CIN"][0][2]
+            , input_conf["CIN"][0][3]
+            , input_conf["CIN"][0][4]
+            , input_conf["CIN"][0][5]
+            , input_conf["CIN"][0][6]
+            , steps #29
+        )
+        cprint("Key error!","fail")
     return to_write
 
 def main_loop(outputs, master_ip = False, in_data = False):
