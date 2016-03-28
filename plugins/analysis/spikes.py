@@ -8,10 +8,10 @@ def neuronSpikesToSquare (
         , steps
         , time_window = 20
         , threshold = .05
+        , split_at = False
 ):
     raw, data = runningMean(spikes, time_window, steps)
-    array_np = np.asarray(data)
-    thresholded = array_np > threshold
+    thresholded = np.asarray(data) > threshold
     return raw, thresholded
 
 def getBurstFreq(raw, thresholded):
