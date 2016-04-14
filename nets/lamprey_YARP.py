@@ -2,6 +2,7 @@
 from libs.templates import * #For ease of use, this line is mandatory
 from libs.FasterPresets import _S, _stimuli, _typicalN
 
+#PreHooks:
 #No prehooks
 #Variables Loaded from the rhombus
 #NEURONS
@@ -31,6 +32,7 @@ cerebellum_ctrl = (0.02,800,60000)
 min_angle = -45
 max_angle = 45
 
+#PostHooks:
 #No posthooks
 
 name = "nets/lamprey_YARP"

@@ -119,10 +119,16 @@ def main_loop(outputs, master_ip = False, in_data = False):
                 if neuron_number not in neurons_to_analyze:
                     neuron_number +=1 
                     continue
-                raw, thresholded = spikes.neuronSpikesToSquare(i, data["ran_steps"])
+
+                split_range = (800, 3000)
+                
+                raw, thresholded = spikes.neuronSpikesToSquare(
+                    i
+                    , data["ran_steps"]
+                    , split_range = split_range)
                 off_time, on_time, osc = spikes.getFreq(thresholded, data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, thresholded)
-
+                                
                 if not osc: #Not oscillating
                     state = max(off_time, on_time)
                     if state == off_time:

@@ -170,7 +170,7 @@ from libs.FasterPresets import _S, _stimuli, _typicalN\n"
             net_content += "\t[ " + ", ".join(values[0:2]) + " ," + values[2] + ", " + values[3] + ", [" + outs + "], ],\n"
 
     net_content += "],\n"
-    net_content += "[ #outs (joint, [inputs])\n"
+    net_content += "[ #outs (joint, decay, min, max [inputs])\n"
 
     for key, val in sensory_neurons.iteritems(): #FIXME: output neurons
         if key in sens_rev_map_out:

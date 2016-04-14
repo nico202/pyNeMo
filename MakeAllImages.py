@@ -7,7 +7,7 @@ def main_loop(content, remote, dummy):
     total = len(content)
     for values in content:
         filename = "./%s/%s_%s.png" % (values[1], values[2], values[3])
-        cprint ("[%s/%s] %s match and is missing, generating image" % (i, total, filename),'info')
+        cprint ("[%s/%s] %s match and is missing, generating image\r" % (i, total, filename),'info')
         #TODO:allow compressed
         data = import_history("%s/%s_%s_output.gz" % (values[0], values[2], values[3]), compressed = True)
         state = ImageIO.ImageFromSpikes(
@@ -42,6 +42,11 @@ if __name__ == "__main__":
                         , dest = 'path'
                         , default = False
     )
+    parser.add_argument('--analysis-file',
+                        help = 'Path of the analysis csv file (to filter)'
+                        , dest = 'analysis_file'
+                        , default = "ANALYSIS.csv"
+    )
     parser.add_argument('--output-dir',
                         help = 'Path of the output images dir'
                         , dest = 'images_path'
@@ -51,31 +56,40 @@ if __name__ == "__main__":
                         help = 'Ran all the sims'
                         , dest = 'run_all'
                         , default = 'false'
-                        , action = 'save_true'
+                        , action = 'store_true'
+    )
+    parser.add_argument('--cores',
+                        help = 'Number of cores to use. All by default'
+                        , dest = 'cores'
+                        , default = get_cores()
     )
 
+    
     args = parser.parse_args()
     path = args.path
 
     #Read ANALYSIS file
-    fname = "ANALYSIS.csv"
+    fname = args.analysis_file
     with open(fname) as f:
         content = f.readlines()
 
-    cprint("Total files provided: %s" % len(content),'info')
+    cprint("Total files provided: %s; Number of cores: %s" % (len(content), args.cores),'info')
     is_folder(args.images_path)
 
 
     real_content = []
+#    existing = listdir(args.images_path) #Slower than isfile
     for line in content:
         file_data = line.split(",")
         general = file_data[0]
         config = file_data[1]
-        if file_data[2] == "1" == file_data[7]:
-            filename = "./%s/%s_%s.png" % (args.images_path, general, config)
-            if not isfile(filename): #Don't run it twice
+        if args.run_all or (file_data[2] == "1" == file_data[7]):
+            filename = "%s_%s.png" % (general, config)
+            if not isfile("./%s" % args.images_path + filename): 
+#            if filename not in existing: #Slower than isfile O.o
                 real_content.append((args.path, args.images_path, general, config))
+#            else: existing.remove(filename)
 
-    dispatch_jobs(real_content, get_cores(), main_loop, False) #Ugly, ya'know
+    dispatch_jobs(real_content, int(args.cores), main_loop, False) #Ugly, ya'know
     
     cprint("All done!", 'okgreen')

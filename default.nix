@@ -14,6 +14,7 @@ with import <nixpkgs> {};
          python27Packages.dill
          python27Packages.web #Required for multiple-machine system
          python27Packages.requests #Required for multiple-machine system
+         python27Packages.bpython
          python27Full
 	 yarp
          #Enable image show
