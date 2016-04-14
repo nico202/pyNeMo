@@ -78,6 +78,11 @@ if __name__ == "__main__":
     }
 
     #Import the network, tranform it to a valid nemo.Network object
+    if ".py" in network_file and (vue_prehook != "#No prehooks"
+                                  or vue_posthook != "#No posthooks"):
+        exit("Refusing to run with hooks on py file (not supported yet")
+    
+    
     networks, config_file_name =\
         import_network(
             (network_file, (vue_prehook, vue_posthook))
@@ -98,7 +103,7 @@ if __name__ == "__main__":
     neurons = networks[1][4]
     synapses = networks[1][5]
     network_name = networks[1][6]
-
+    
     #Save Config
     dict_config = {
         "neurons":neurons

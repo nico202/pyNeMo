@@ -7,6 +7,7 @@ with import <nixpkgs> {};
          git
          python27Packages.pandas
          python27Packages.virtualenv
+         python27Packages.pylint
          python27Packages.pillow
          python27Packages.numpy
          python27Packages.pip #Not required, just for testing

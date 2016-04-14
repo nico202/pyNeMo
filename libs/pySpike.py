@@ -117,7 +117,9 @@ class sensNetOut():
             for n in range(0, self.neuron_number):
                 angle_sum += self.current_variables[n] * self.current_variable_angles[n]
                 weighted_sum += self.current_variables[n]
-            print self.current_variables
+            # print("iSpike current variables = %s" % self.current_variables)
+            # print("iSpike weighed sum = %s" % weighted_sum)
+            # print("iSpike current variables = %s" % angle_sum)
             new_angle = 0
             if weighted_sum:
                 new_angle = angle_sum / weighted_sum
@@ -130,5 +132,4 @@ class sensNetOut():
             
             self.current_angle = new_angle
             self.missing_steps = self.integration_steps
-        print self.current_angle
         return self.current_angle

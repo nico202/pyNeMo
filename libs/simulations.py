@@ -174,12 +174,11 @@ def main_simulation_run (
             if yarp_robot:
                 #YARP: input/outputs?
                 yarp_angle = yarp_robot.read() #READ yarp
-                #print yarp_angle, nemo_firings
                 add_stims, jnt_angles = pySpike_simulation.step (
                     yarp_angle
                     , nemo_firings
                 )
-                #print jnt_angles
+                print("jnt_angles = %s" % jnt_angles)
                 yarp_robot.write(jnt_angles)
                 #Gazebo: input/outputs?
                 gazebo_simulation.step ()
