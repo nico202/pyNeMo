@@ -3,7 +3,9 @@
 #Class for yarp. Require "yarp" python module
 #Also, yarpserver should be running
 
-class RobotYARP ():
+modes = ("Position", "Torque")
+
+class RobotYARP (): #TODO: Save history (if save enabled)
     def __init__ (
             self
             , device_name = "nemo_yarp_ctrl" #this controller's name
@@ -21,43 +23,55 @@ class RobotYARP ():
         self.YARP.Network.init()
         self.props = self.YARP.Property()
         self.props.put("device", "remote_controlboard")
-        self.mode = 0
+
+        #Save mode as index number (read "modes" values for info)
+        try:
+            self.mode = modes.index(mode)
+        except ValueError:
+            exit("Unknown mode: %s! Available modes are:\n  %s"
+                 % (mode, modes))
+
         #TODO: prevent conflicting names
         self.props.put("local","/client/nemo_ctrl")
         self.props.put("remote", robot_name)
         # create remote driver
         self.armDriver = self.YARP.PolyDriver(self.props)
 
-        self.iPos = self.armDriver.viewIPositionControl()
-        iVel = self.armDriver.viewIVelocityControl()
-        self.iEnc = self.armDriver.viewIEncoders()
-
-        try:
-            #retrieve number of joints
-            self.jnts = self.iPos.getAxes()
-            self.encs = self.YARP.Vector(self.jnts)
-        except AttributeError:
-            print("ERROR: Read error")
-            print("Cannot initialize robot. If yarp is not running, you can use --disable-sensory option")
-            exit()
-
-        while not self.iEnc.getEncoders(self.encs.data()):
+        if self.mode == 0: #Position control
+            self.iPos = self.armDriver.viewIPositionControl()
+            #FIXME: Used?
+            #        iVel = self.armDriver.viewIVelocityControl()
+            self.iEnc = self.armDriver.viewIEncoders()
+            
+            try:
+                #retrieve number of joints
+                self.jnts = self.iPos.getAxes()
+                self.encs = self.YARP.Vector(self.jnts)
+            except AttributeError:
+                print("ERROR: Read error")
+                print("Cannot initialize robot. If yarp is not running, you can use --disable-sensory option")
+                exit()
+            
+            while not self.iEnc.getEncoders(self.encs.data()):
                 time.sleep(0.1)
+            
+            self.angles = [0] * self.jnts
 
-        self.angles = [0] * self.jnts
-
-        #initialize a new tmp vector identical to encs
-        tmp = self.YARP.Vector(self.jnts, self.encs.data())
-        speed = self.YARP.Vector(self.jnts, self.encs.data())
-        acc = self.YARP.Vector(self.jnts, self.encs.data())    
+            #initialize a new tmp vector identical to encs
+            tmp = self.YARP.Vector(self.jnts, self.encs.data())
+            speed = self.YARP.Vector(self.jnts, self.encs.data())
+            acc = self.YARP.Vector(self.jnts, self.encs.data())    
         
-        # Set Ref Acceleration and Speed
-        for i in range(self.jnts):
-            speed.set(i, speed_val)
-            self.iPos.setRefSpeed(i,ref_speed)
-            acc.set(i, acc_val)
-            self.angles[i] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(i)
-        
+            # Set Ref Acceleration and Speed
+            for i in range(self.jnts):
+                speed.set(i, speed_val)
+                self.iPos.setRefSpeed(i,ref_speed)
+                acc.set(i, acc_val)
+                self.angles[i] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(i)
+        elif self.mode == 1: #Torque
+            exit("Torque mode still to be implemented!")
+        else:
+            exit("Unknown bug happened")
     #READ
     def read (self, jnt = "All"):
         '''
@@ -76,9 +90,9 @@ class RobotYARP ():
     #TODO: ADD torque etc
     def write(self, jnts_angles):
         has_to_move = False
+        tmp = self.YARP.Vector(self.jnts
+                               , self.encs.data())
         for jnt, angle in jnts_angles:
-            tmp = self.YARP.Vector(self.jnts
-                                   , self.encs.data())
             if angle != None:
                 has_to_move = True
                 try:
