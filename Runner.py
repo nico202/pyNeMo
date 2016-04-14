@@ -127,12 +127,15 @@ if __name__ == "__main__":
         robot = RobotYARP()
     else:
         robot = None
+    #TODO: Reset robot original position? (and maybe gz-world status?)
+    if args.reset_position or args.reset_only:
+        robot.reset_all()
+        if args.reset_only:
+            exit("Resetting done, exiting (remove --reset-and-exit to continue)")
+
     #Time the simulation
     start_time = time.time()
 
-    #TODO: Reset robot original position? (and maybe gz-world status?)
-    robot.reset_all()
-    
     #Actually run the simulation
     output = main_simulation_run(
         general_config

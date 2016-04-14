@@ -178,7 +178,6 @@ def main_simulation_run (
                     yarp_angle
                     , nemo_firings
                 )
-                print("jnt_angles = %s" % jnt_angles)
                 yarp_robot.write(jnt_angles)
                 #Gazebo: input/outputs?
                 gazebo_simulation.step ()

@@ -53,11 +53,17 @@ def parse_args():
                         , dest = 'robot_mode'
                         , default = 'Torque'
     )
-    parser.add_argument('--no-reset' #TODO: implement
-                        , help = 'Reset robot position to it\'s home'
+    parser.add_argument('--no-home-position'
+                        , help = 'Don\'t reset robot position to it\'s home'
                         , dest = 'reset_position'
-                        , action = 'store_true'
+                        , action = 'store_false'
                         , default = True
+    )
+    parser.add_argument('--reset-and-exit'
+                        , help = 'Move to home, then exit. Don\'t simulate anything'
+                        , dest = 'reset_only'
+                        , action = 'store_true'
+                        , default = False
     )
     parser.add_argument('--vue-prehook'
                         , help = 'Add python commands before a vue script variable definition'

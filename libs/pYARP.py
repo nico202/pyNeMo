@@ -107,16 +107,16 @@ class RobotYARP ():
         '''
         This function port every joint to the default (home) position. Default is 0.
         '''
+        print("Resetting robot to home position (0). Disable with --no-home-position")
         tmp = self.YARP.Vector(self.jnts)
         for jnt in range(self.jnts):
-            print "Set %s %s" % (jnt, home_position)
             tmp.set(jnt, home_position)
         #Move ones for all joints
         self.iPos.positionMove(tmp.data())
         #FIXME: seems not working
         while not self.iPos.checkMotionDone(): #Wait home position reached
-            print "sleeping"
             self.YARP.Time.delay(0.01)
+        print("Reset done!")
         return True
 
 #Torque:
