@@ -79,7 +79,7 @@ if __name__ == "__main__":
 
     #Import the network, tranform it to a valid nemo.Network object
     networks, config_file_name =\
-        import_network (
+        import_network(
             (network_file, (vue_prehook, vue_posthook))
             , (use_cuda, cuda_backend)
             , (disable_sensory))
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     stimuli_dict = networks[1][2]
 
     if not disable_sensory:
-        sensory_neurons_in, sensory_neurons_out  = networks[1][3]
+        sensory_neurons_in, sensory_neurons_out = networks[1][3]
     else:
         sensory_neurons_in = []
         sensory_neurons_out = []
@@ -119,17 +119,17 @@ if __name__ == "__main__":
 
     #Define robot
     if (sensory_neurons_in or sensory_neurons_out):
-        robot = RobotYARP ()
+        robot = RobotYARP()
     else:
         robot = None
     #Time the simulation
-    start_time = time.time ()
+    start_time = time.time()
 
     #TODO: Reset robot original position? (and maybe gz-world status?)
-    #robot.reset_all()
+    robot.reset_all()
     
     #Actually run the simulation
-    output = main_simulation_run (
+    output = main_simulation_run(
         general_config
         , (nemo_simulation
            , (to_save, neuron_number)
@@ -181,9 +181,9 @@ Steps: %s"
         if args.show_spikes or args.save_spikes:
             ImageIO.ImageFromSpikes(output["NeMo"][1]
                         #used only if save true
-                        , file_path = output_dir + "/" + uniqueId + "_spikes.png"
-                        , show = all([args.show_spikes, args.show_images])
-                        , save = args.save_spikes
+                        , file_path=output_dir + "/" + uniqueId + "_spikes.png"
+                        , show=all([args.show_spikes, args.show_images])
+                        , save=args.save_spikes
             )
         if args.show_membrane:
             ImageIO.ImageFromMembranes(output["NeMo"][0])
@@ -201,6 +201,6 @@ if args.analyze_spikes_frequency: #TODO: write all conditions etc
             print ("Neuron: %s, freqs: %s, %s"
                    %
                    (neuron_number, 1./freq[0]*1000, 1./freq[1]*1000))
-        neuron_number +=1
+        neuron_number += 1
         
 print("All done, thanks!")

@@ -32,8 +32,8 @@ def VUEtoPyConverter(input_vue, (prehook, posthook)):
     stims = {}
     to_save = []
     sensory_neurons = {}
-    sens_map_in = {}; sens_rev_map_in = {};
-    sens_map_out = {}; sens_rev_map_out = {};
+    sens_map_in = {}; sens_rev_map_in = {}
+    sens_map_out = {}; sens_rev_map_out = {}
     tree = ET.fromstring(xml)
     self_connection = []
     for child in tree.findall("child"):
