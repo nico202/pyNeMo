@@ -4,6 +4,7 @@
 ######################################
 
 class sensNetIn():
+    #TODO: explain XD
     '''
     This object gets as input
 

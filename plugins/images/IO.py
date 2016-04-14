@@ -1,6 +1,14 @@
 #!/usr/bin/env python2
 from PIL import Image
 from libs.IO import cprint
+
+try:
+    from neuronpy.graphics import spikeplot
+except ImportError:
+    cprint ("You need nepuronpy to create spikes images\n\
+    (as root) pip2 install neuronpy; pip2 install matplotlib", 'fail')
+sp = spikeplot.SpikePlot(savefig=True)
+
 def showImageFile(image_path):
     try:
         img = Image.open(image_path)
@@ -25,12 +33,7 @@ def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save 
     spikes = list of lists (neurons) of ms
     ie. [[1, 3, 5], [2, 4, 5]] # 2 neurons, 3 spikes/neuron, ms 1, 3...
     '''
-    try:
-        from neuronpy.graphics import spikeplot
-    except ImportError:
-        cprint ("You need nepuronpy to create spikes images\n\
-        (as root) pip2 install neuronpy; pip2 install matplotlib", 'fail')
-        return False
+    global sp
     from plugins.importer import spikesDictToArray
 
     spikes = spikesDictToArray(input_spikes)
@@ -41,15 +44,13 @@ def ImageFromSpikes(input_spikes, file_path = "./latest.png", show = True, save 
             new_spikes.append(i)
         spikes = new_spikes
         
-
     if save:
         cprint("\t*\tSaving image to %s" % file_path, 'info')
-    sp = spikeplot.SpikePlot(savefig=save)
     sp.set_fig_name(file_path)
     sp.set_linestyle('-')
     sp.set_markerscale(0.8)
-    sp.plot_spikes(spikes, draw=show)
-    del sp #fixes memory leak? Seems not
+    sp.plot_spikes(spikes, draw=show, savefig=save)
+#    del sp #fixes memory leak? Seems not
     del spikes
     del input_spikes
     return True

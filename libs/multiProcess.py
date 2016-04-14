@@ -18,6 +18,7 @@ def dispatch_jobs(data, job_number, function, remote = False, in_data = False):
 
     for j in jobs:
         j.start()
+    j.join() #Wait process end
 
 def get_cores():
     from multiprocessing import cpu_count

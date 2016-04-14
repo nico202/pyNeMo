@@ -19,6 +19,7 @@ with import <nixpkgs> {};
 	 yarp
          #Enable image show
          imagemagick
+         ( pkgs.callPackage ./yarp-python { })
          ];
       src = null;
     }

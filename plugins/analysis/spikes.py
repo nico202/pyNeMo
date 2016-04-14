@@ -8,10 +8,22 @@ def neuronSpikesToSquare (
         , steps
         , time_window = 20
         , threshold = .05
-        , split_at = False
+        , split_range = (False, False) #Limit analysis on subset
 ):
+    start = split_range[0]
+    end = split_range[1] if split_range[1] else len(spikes)
+    
+    if split_range[0] or split_range[1]:
+        steps = split_range[1]-split_range[0]
+
+    spikes = np.asarray(spikes)
+
+    spikes = spikes[(spikes > start) & (spikes < end)]
+
     raw, data = runningMean(spikes, time_window, steps)
+    
     thresholded = np.asarray(data) > threshold
+    
     return raw, thresholded
 
 def getBurstFreq(raw, thresholded):
@@ -51,9 +63,6 @@ def getFreq(seq, steps, period = True):
         i += 1
     else:
         state[last_state].append(i - last_change)
-#        state[last_state].append(steps - i)
-#         print state
-#         print steps, len(seq), steps - i
 
     off_period = Counter(state[0])
     on_period = Counter(state[1])

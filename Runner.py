@@ -102,15 +102,20 @@ if __name__ == "__main__":
     #Save Config
     dict_config = {
         "neurons":neurons
-        ,"sensory_neurons":(sensory_neurons_in, sensory_neurons_out)
+        , "sensory_neurons":(sensory_neurons_in, sensory_neurons_out)
         , "save": to_save
         , "step_input": stimuli_dict
         , "synapses": synapses
         , "name": network_name
     }
     config_dict_hash = hashDict(dict_config)
-    saveKey(config_dict_hash + "_input", dict_config, output_dir)
-    saveFile(config_file_name, output_dir + "/" + config_dict_hash + "_input.py")
+    saveKey(config_dict_hash + "_input"
+            , dict_config
+            , output_dir)
+    
+    saveFile(
+        config_file_name
+        , output_dir + "/" + config_dict_hash + "_input.py")
 
     #Define robot
     if (sensory_neurons_in or sensory_neurons_out):
@@ -118,17 +123,20 @@ if __name__ == "__main__":
     else:
         robot = None
     #Time the simulation
-    start_time = time.time()
+    start_time = time.time ()
 
     #TODO: Reset robot original position? (and maybe gz-world status?)
     #robot.reset_all()
     
     #Actually run the simulation
-    output = main_simulation_run(
+    output = main_simulation_run (
         general_config
-        , (nemo_simulation, (to_save, neuron_number), stimuli_dict)
+        , (nemo_simulation
+           , (to_save, neuron_number)
+           , stimuli_dict)
         , (robot)
-        , (sensory_neurons_in, sensory_neurons_out)
+        , (sensory_neurons_in
+           , sensory_neurons_out)
     )
 
     #Get the total run time

@@ -282,7 +282,6 @@ def cprint(text, color = "okblue", debug = False):
     if not debug:# or debug: #change if enable debug
         print(colors[color]+text+colors['endc'])
     
-    
 def saveFile(file_source, file_dest):
     '''
     Copy file #TODO: Enable compression (bz2/_lzma_)

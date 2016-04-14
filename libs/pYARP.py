@@ -22,19 +22,19 @@ class RobotYARP ():
         self.props = self.YARP.Property()
         self.props.put("device", "remote_controlboard")
         self.mode = 0
-        self.props.put("local","/client/nemo_ctrl") #prevent conflict
+        #TODO: prevent conflicting names
+        self.props.put("local","/client/nemo_ctrl")
         self.props.put("remote", robot_name)
         # create remote driver
         self.armDriver = self.YARP.PolyDriver(self.props)
-
 
         self.iPos = self.armDriver.viewIPositionControl()
         iVel = self.armDriver.viewIVelocityControl()
         self.iEnc = self.armDriver.viewIEncoders()
         try:
             #retrieve number of joints
-            self.jnts=self.iPos.getAxes()
-            self.encs=self.YARP.Vector(self.jnts)
+            self.jnts = self.iPos.getAxes()
+            self.encs = self.YARP.Vector(self.jnts)
         except AttributeError:
             print("ERROR: Read error")
             print("Cannot initialize robot. If yarp is not running, you can use --disable-sensory option")
@@ -42,8 +42,8 @@ class RobotYARP ():
 
         #check that we can communicate with the robot
         try:
-            self.jnts=self.iPos.getAxes()
-            self.encs=self.YARP.Vector(self.jnts)
+            self.jnts = self.iPos.getAxes()
+            self.encs = self.YARP.Vector(self.jnts)
         except AttributeError:
             exit("ERROR: Read error\n\Cannot initialize robot.\n\
 Is yarp running?")
