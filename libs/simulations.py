@@ -141,13 +141,14 @@ def main_simulation_run (
     add_stims = []
     
     keep_running = True
+
     global_output = {
         "NeMo": []
         , "pySpike": []
         , "stimuli" : []
         , "ran_steps": 0
     }
-
+    
     #Main loop
     while ( #Allow indefinite loops (total=-1). Exit with CTRL-C
             ran_steps != total_steps and keep_running):
@@ -166,18 +167,18 @@ def main_simulation_run (
 
             nemo_firings = nemo_simulation.step (
                 nemo_simulation
-                , stimuli
-            )
+                , stimuli)
             #Cerebellum: input/outputs?
-            cerebellum_simulation.step ()
+            #Disable right now (not implemented)
+            #TODO: implement
+            # cerebellum_simulation.step()
 
             if yarp_robot:
                 #YARP: input/outputs?
                 yarp_angle = yarp_robot.read() #READ yarp
-                add_stims, jnt_angles = pySpike_simulation.step (
+                add_stims, jnt_angles = pySpike_simulation.step(
                     yarp_angle
-                    , nemo_firings
-                )
+                    , nemo_firings)
                 yarp_robot.write(jnt_angles)
                 #Gazebo: input/outputs?
                 gazebo_simulation.step ()

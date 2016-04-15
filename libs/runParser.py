@@ -51,7 +51,7 @@ def parse_args():
     parser.add_argument('--robot-mode' #TODO: Read docs + ADD TO HASH
                         , help = 'Control mode: Torque, Position ...'
                         , dest = 'robot_mode'
-                        , default = 'Torque'
+                        , default = 'Position' #TODO: Decide default (before v1)
     )
     parser.add_argument('--no-home-position'
                         , help = 'Don\'t reset robot position to it\'s home'
@@ -112,4 +112,11 @@ def parse_args():
                         , default = False
                         , action = 'store_true'
     )
+    parser.add_argument('--dont-save-anything'
+                        , help = 'Experimental: don\'t save any kind of output. Useful for realtime tests'
+                        , dest = 'dont_save'
+                        , default = False
+                        , action = 'store_true'
+    )
+    
     return parser

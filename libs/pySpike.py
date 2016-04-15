@@ -14,15 +14,14 @@ class sensNetIn():
     from sys import exit
 
     def __init__(self,
-        dof = 0, #FIXME: NOT USED
-        std = 0.5,
-        neuron_number = 10,
-        min_angle = -90,
-        max_angle = 90,
-        current_factor = 1,
-        constant_current = 0,
-        peak_current = 40
-    ):
+                 dof=0, #FIXME: NOT USED
+                 std=0.5,
+                 neuron_number=10,
+                 min_angle=-90,
+                 max_angle=90,
+                 current_factor=1, #FIXME: unused?!
+                 constant_current=0,
+                 peak_current=40):
         import scipy.stats
         self._max_angle = max_angle
         self._min_angle = min_angle
@@ -58,22 +57,23 @@ class sensNetIn():
             self._angle = input_angle
 
         current_input = []
-        for i in range (self.size):
+        for i in range(self.size):
             current_input.append(
                 (i
                  , self._constant_current + self._current_factor * self._normal_distribution.pdf(self._neuron_angles[i] - self._angle)
-             ))
+                ))
         return current_input
 
 class sensNetOut():
     def __init__(self,
-        neuron_idx, 
-        min_angle = -90, #The minimum angle to read
-        max_angle = 90, #The maximum angle to read
-        decay_rate = 0.25, #The rate of decay of the angle variables
-        current_increment = 10, #The amount by which the input current to the neurons is incremented by each spike
-        dof = 0, #Degree of freedom of joint. FIXME: NOT USED
-        integration_steps = 10  #Step after which integration occurs (1step = 1ms)
+                 neuron_idx, 
+                 min_angle=-90, #The minimum angle to read
+                 max_angle=90, #The maximum angle to read
+                 decay_rate=0.25, #The rate of decay of the angle variables
+                 #FIXME: current_increment UNUSED!?
+                 current_increment=10, #The amount by which the input current to the neurons is incremented by each spike
+                 dof=0, #Degree of freedom of joint. FIXME: NOT USED
+                 integration_steps=10  #Step after which integration occurs (1step = 1ms)
     ):
         self.neuron_idx = neuron_idx
         neuron_number = len(neuron_idx)
@@ -129,7 +129,7 @@ class sensNetOut():
             elif new_angle < self.min_angle:
                 print("ERROR: new angle (%d) < minimum" % (new_angle))
                 new_angle = self.min_angle
-            
+
             self.current_angle = new_angle
             self.missing_steps = self.integration_steps
         return self.current_angle

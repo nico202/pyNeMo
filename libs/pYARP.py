@@ -3,17 +3,21 @@
 #Class for yarp. Require "yarp" python module
 #Also, yarpserver should be running
 
-modes = ("Position", "Torque")
+modes_map = ("Position", "Torque")
 
-class RobotYARP (): #TODO: Save history (if save enabled)
-    def __init__ (
+class RobotYARP(): #TODO: Save history (if save enabled)
+    '''
+    Interface to the YARP python bindings
+    Creates a robot and allows reads and writes easily
+    '''
+    def __init__(
             self
-            , device_name = "nemo_yarp_ctrl" #this controller's name
-            , robot_name = '/doublePendulumGazebo/body' #robot to control
-            , mode = "Position" #Positon, Torque
-            , speed_val = 10
-            , ref_speed = 100
-            , acc_val = 50
+            , device_name="nemo_yarp_ctrl" #this controller's name
+            , robot_name='/doublePendulumGazebo/body' #robot to control
+            , mode="Position" #Positon, Torque
+            , speed_val=10
+            , ref_speed=100
+            , acc_val=50
     ):
         import yarp
         import time
@@ -24,15 +28,15 @@ class RobotYARP (): #TODO: Save history (if save enabled)
         self.props = self.YARP.Property()
         self.props.put("device", "remote_controlboard")
 
-        #Save mode as index number (read "modes" values for info)
+        #Save mode as index number (read "modes_map" values for info)
         try:
-            self.mode = modes.index(mode)
+            self.mode = modes_map.index(mode)
         except ValueError:
             exit("Unknown mode: %s! Available modes are:\n  %s"
-                 % (mode, modes))
+                 % (mode, modes_map))
 
         #TODO: prevent conflicting names
-        self.props.put("local","/client/nemo_ctrl")
+        self.props.put("local", "/client/nemo_ctrl")
         self.props.put("remote", robot_name)
         # create remote driver
         self.armDriver = self.YARP.PolyDriver(self.props)
@@ -42,38 +46,41 @@ class RobotYARP (): #TODO: Save history (if save enabled)
             #FIXME: Used?
             #        iVel = self.armDriver.viewIVelocityControl()
             self.iEnc = self.armDriver.viewIEncoders()
-            
+
             try:
                 #retrieve number of joints
                 self.jnts = self.iPos.getAxes()
                 self.encs = self.YARP.Vector(self.jnts)
             except AttributeError:
                 print("ERROR: Read error")
-                print("Cannot initialize robot. If yarp is not running, you can use --disable-sensory option")
+                print("Cannot initialize robot.\
+If yarp is not running, you can use --disable-sensory option")
                 exit()
-            
+
             while not self.iEnc.getEncoders(self.encs.data()):
                 time.sleep(0.1)
-            
+
             self.angles = [0] * self.jnts
 
             #initialize a new tmp vector identical to encs
-            tmp = self.YARP.Vector(self.jnts, self.encs.data())
+            # tmp = self.YARP.Vector(self.jnts, self.encs.data())
             speed = self.YARP.Vector(self.jnts, self.encs.data())
-            acc = self.YARP.Vector(self.jnts, self.encs.data())    
-        
+            acc = self.YARP.Vector(self.jnts, self.encs.data())
+
             # Set Ref Acceleration and Speed
             for i in range(self.jnts):
                 speed.set(i, speed_val)
-                self.iPos.setRefSpeed(i,ref_speed)
+                self.iPos.setRefSpeed(i, ref_speed)
                 acc.set(i, acc_val)
-                self.angles[i] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(i)
+                self.angles[i] = self.YARP.Vector(
+                    self.jnts
+                    , self.YARP.Vector(self.jnts).data()).get(i)
         elif self.mode == 1: #Torque
             exit("Torque mode still to be implemented!")
         else:
             exit("Unknown bug happened")
     #READ
-    def read (self, jnt = "All"):
+    def read(self, jnt="All"):
         '''
             Returns the angle of a joint, unless jnt = "All".
             In the latter case, returns a list with all joints value
@@ -81,10 +88,14 @@ class RobotYARP (): #TODO: Save history (if save enabled)
         if jnt == "All":
             for jnt in range(0, self.jnts):
                 self.iEnc.getEncoders(self.encs.data())
-                self.angles[jnt] = self.YARP.Vector(self.jnts, self.encs.data()).get(jnt)
+                self.angles[jnt] = self.YARP.Vector(
+                    self.jnts
+                    , self.encs.data()).get(jnt)
             return self.angles
         else:
-            self.angles[jnt] = self.YARP.Vector(self.jnts, self.YARP.Vector(self.jnts).data()).get(jnt)
+            self.angles[jnt] = self.YARP.Vector(
+                self.jnts
+                , self.YARP.Vector(self.jnts).data()).get(jnt)
             return self.angles[jnt]
 
     #TODO: ADD torque etc
@@ -103,7 +114,7 @@ class RobotYARP (): #TODO: Save history (if save enabled)
         #The motion is done ones for all joints
         if has_to_move:
             self.iPos.positionMove(tmp.data())
-            
+
         #This is to try to sync them.
         #Pretty useless, substitute with C++
         # self.YARP.Time.delay(0.001)
@@ -113,11 +124,10 @@ class RobotYARP (): #TODO: Save history (if save enabled)
         return True
 
     def get_output(self):
-        
         #FIXME:
-        return 
+        return
 
-    def reset_all (self, home_position = 0):
+    def reset_all(self, home_position=0):
         '''
         This function port every joint to the default (home) position. Default is 0.
         '''
@@ -133,5 +143,12 @@ class RobotYARP (): #TODO: Save history (if save enabled)
         print("Reset done!")
         return True
 
+    def reset_world(self): #TODO: move to own function (like in IO.py)
+        '''
+        Reset gazebo world. Replaces reset_all
+        '''
+        import subprocess
+        subprocess.call(["gz", "world", "-o"])
+        return True
 #Torque:
 #getTorque

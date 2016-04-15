@@ -124,12 +124,14 @@ if __name__ == "__main__":
 
     #Define robot
     if (sensory_neurons_in or sensory_neurons_out):
-        robot = RobotYARP()
+        robot = RobotYARP(mode=args.robot_mode)
     else:
         robot = None
     #TODO: Reset robot original position? (and maybe gz-world status?)
     if args.reset_position or args.reset_only:
-        robot.reset_all()
+        #robot.reset_all()
+        robot.reset_world() #FIXME: wrong class?
+        robot.reset_all() #Use both right now. Strange gz reset
         if args.reset_only:
             exit("Resetting done, exiting (remove --reset-and-exit to continue)")
 

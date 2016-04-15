@@ -17,6 +17,7 @@ with import <nixpkgs> {};
          python27Packages.requests #Required for multiple-machine system
          python27Packages.bpython
          python27Packages.tkinter
+         python27Packages.pyflakes
          python27Full
 	 yarp
          #Enable image show

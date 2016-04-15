@@ -31,7 +31,7 @@ def dependency_check(modules):
             found = False
         if not found: exit("Could not find required module: %s" % (module))
 
-def load_network_file (network_file, hooks):
+def load_network_file(network_file, hooks):
     import imp
     #Ultra-important. Prevent the creation of pyc files, that get imported by imp
     #... preventing the reload of the source, leading to wrong input -> wrong output
@@ -67,7 +67,7 @@ def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
         config_name += ".py"
     return "./" + config_name
 
-def import_network (
+def import_network(
         (network_file, hooks)
         , (use_cuda, cuda_backend_number)
         , (disable_sensory)
@@ -110,16 +110,16 @@ def import_network (
     ]
     ), network_name
 
-def nemo_add_neurons (net, neuron_list, start_id = 0):
+def nemo_add_neurons(net, neuron_list, start_id=0):
     iz = net.add_neuron_type('Izhikevich')
     #TODO: edit conifg file to allow this?
     #km = net.add_neuron_type('Kuramoto')
-    for nidx in range( len( neuron_list ) ):
+    for nidx in range(len(neuron_list)):
         n_id = nidx + start_id
         a, b, c, d, s, u, v = neuron_list[nidx]
         net.add_neuron(iz, n_id, a, b, c, d, s, u, v)
 
-def nemo_add_synapses (net, synaspes_list):
+def nemo_add_synapses(net, synaspes_list):
     for sidx in range(len(synaspes_list)):
         source, dests, synaptic_prop = synaspes_list[sidx]
         delay, weights, plastic = synaptic_prop
@@ -135,8 +135,8 @@ def nemo_add_synapses (net, synaspes_list):
         except TypeError: #Already an array
             pass
 
-        if ( len(weights) != len(dests) ):
-            if ( len(weights) == 1 ):
+        if (len(weights) != len(dests)):
+            if (len(weights) == 1):
                 #List of weight matching number of outpu nurons
                 weights = weights * len(dests)
             else:
@@ -145,7 +145,7 @@ def nemo_add_synapses (net, synaspes_list):
         net.add_synapse(source, dests, delay, weights, plastic)
 
 
-def nemo_select_backend (
+def nemo_select_backend(
         nemo_config
         , (use_cuda, backend_number)
 ):
@@ -160,7 +160,12 @@ def nemo_select_backend (
         else:
             nemo_config.set_cpu_backend()
 
-def saveKey(filename, values, out_dir = ".", compress = True, compress_format = "gzip", force_write = False):
+def saveKey(filename
+            , values
+            , out_dir="."
+            , compress=True
+            , compress_format="gzip"
+            , force_write=False):
     '''
     Saves a dict to a file.
     If compress enabled, saves to gz (compress less then bz2 but faster)
@@ -208,7 +213,7 @@ def hashDict(dictionary):
     import hashlib
     return str(hashlib.sha1(str(dictionary)).hexdigest())
 
-def is_folder(output_dir = ".store"):
+def is_folder(output_dir=".store"):
     #FIXME: allow recursive creation
     import os.path
     output_dir = str(output_dir)
@@ -225,13 +230,13 @@ def is_folder(output_dir = ".store"):
     else:
         return True
 
-def write_log(uniqueId, output_dir = "history", name = "history.log"):
+def write_log(uniqueId, output_dir="history", name="history.log"):
     import time
     history = open(output_dir + "/" + name, 'a') #Update the history
     history.write("%f, %s\n" % (time.time(), uniqueId))
     history.close()
 
-def write_batch_log(sessionId, cycle, output_dir = "batch"):
+def write_batch_log(sessionId, cycle, output_dir="batch"):
     print cycle, output_dir, sessionId
     save = {
         "cycle":cycle
@@ -239,7 +244,10 @@ def write_batch_log(sessionId, cycle, output_dir = "batch"):
     saveKey(str(sessionId), save, output_dir, compress = False, force_write = True)
     
 
-def membraneImage(values, title = False, close = True, scales = []): #TODO: Add stimulation trace
+def membraneImage(values
+                  , title=False
+                  , close=True
+                  , scales=[]): #TODO: Add stimulation trace
     '''
         Output an image of the membrane potential from a list of Membrane values.
         zoom = (stretch_x, stretch_y) means the stretch that is applied to x and y axes
@@ -269,7 +277,7 @@ MAP = {0: "R", 1: "G", 2: "B"}
 def rgb(triplet):
     return _HEXDEC[triplet[0:2]], _HEXDEC[triplet[2:4]], _HEXDEC[triplet[4:6]]
 
-def cprint(text, color = "okblue", debug = False):
+def cprint(text, color="okblue", debug=False):
     colors = {
         'okblue': '\033[94m'
         , 'info': '\033[94m'
@@ -299,7 +307,7 @@ def saveFile(file_source, file_dest):
     else:
         return False
 
-def read_output(f, path, idx = 0, total = 0):
+def read_output(f, path, idx=0, total=0):
     import imp
     #Move import_istory to libs.IO?
     from plugins.importer import import_history
@@ -329,7 +337,7 @@ def read_output(f, path, idx = 0, total = 0):
     for var in input_conf:
         if var not in remove and not var.startswith("__"):
             input_conf_clear[var] = input_conf[var]
-    data = import_history(join(path, f), compressed = True) #FIXME: allow uncompressed
+    data = import_history(join(path, f), compressed=True) #FIXME: allow uncompressed
 
     return data, input_conf_clear if not fail else False
 
@@ -339,7 +347,7 @@ def list_all(path, start_from, end_to):
     files = [f for f in listdir(path) if isfile(join(path, f))]
 
     #FIXME: allow uncompressed
-    outputs = list(set([ f for f in files if ( "_output" in f )]))
+    outputs = list(set([f for f in files if ("_output" in f)]))
 
     #Filter out unwanted runs
     outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]
@@ -347,7 +355,9 @@ def list_all(path, start_from, end_to):
 
     return outputs, total
     
-def ask(msg, exit_msg =  "Change your cli params then!", sure = "Are you sure? [y/n]"):
+def ask(msg
+        , exit_msg="Change your cli params then!"
+        , sure="Are you sure? [y/n]"):
     from sys import exit
     action = "z"
     while action.capitalize() not in ["Y","N"]:
