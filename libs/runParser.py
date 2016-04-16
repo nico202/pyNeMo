@@ -112,6 +112,12 @@ def parse_args():
                         , default = False
                         , action = 'store_true'
     )
+    parser.add_argument('--angle-images'
+                        , help = 'Show angle images'
+                        , dest = 'angle_images'
+                        , default = False
+                        , action = 'store_true'
+    )
     parser.add_argument('--dont-save-anything'
                         , help = 'Experimental: don\'t save any kind of output. Useful for realtime tests'
                         , dest = 'dont_save'

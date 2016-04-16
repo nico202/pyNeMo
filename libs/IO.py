@@ -88,7 +88,6 @@ def import_network(
 
     #Add network neurons
     nemo_add_neurons (nemo_net, network_config.neurons[0])
-    nidx = len(network_config.neurons[0]) #Used to coninue numeration on sensory
 
     #Add networks synapses
     nemo_add_synapses (nemo_net, network_config.synapses)
@@ -100,7 +99,7 @@ def import_network(
         nemo_simulation #0
         , ( #1
             network_config.save
-            , len(network_config.neurons[0])
+            , len(network_config.neurons[0])#Used to coninue numeration on sensor
             , network_config.step_input
             , network_config.sensory_neurons
             , network_config.neurons

@@ -129,9 +129,8 @@ if __name__ == "__main__":
         robot = None
     #TODO: Reset robot original position? (and maybe gz-world status?)
     if args.reset_position or args.reset_only:
-        #robot.reset_all()
-        robot.reset_world() #FIXME: wrong class?
         robot.reset_all() #Use both right now. Strange gz reset
+        robot.reset_world() #FIXME: wrong class?
         if args.reset_only:
             exit("Resetting done, exiting (remove --reset-and-exit to continue)")
 
@@ -179,12 +178,13 @@ Steps: %s"
     print("-------------------\n")
     #Show images
     if (
-            (args.show_images or args.save_spikes)
+            (args.show_images or args.save_spikes or args.angle_images)
             and
             any([
                 args.show_membrane
                 , args.show_spikes
                 , args.save_spikes
+                , args.angle_images
             ])):
         print("Processing images...")
         from plugins.images import IO as ImageIO
@@ -197,6 +197,11 @@ Steps: %s"
             )
         if args.show_membrane:
             ImageIO.ImageFromMembranes(output["NeMo"][0])
+        if args.angle_images:
+            ImageIO.ImageFromAngles(
+                (output["YARP"]["read"],
+                output["YARP"]["wrote"])#FIXME: should be pyspike
+                , file_path=output_dir + "/" + uniqueId + "_angles.png")
 
 #Analysis:
 if args.analyze_spikes_frequency: #TODO: write all conditions etc
