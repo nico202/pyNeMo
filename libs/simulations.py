@@ -147,6 +147,10 @@ def main_simulation_run (
         , "pySpike": []
         , "stimuli" : []
         , "ran_steps": 0
+        , "YARP": {
+            "read":[]
+            , "wrote":[]#MOVE TO PYSPIKE (it's HIS output)
+        }
     }
     
     #Main loop
@@ -191,8 +195,12 @@ def main_simulation_run (
     if yarp_robot:
         global_output["pySpike"] = pySpike_simulation.get_output()
     global_output["NeMo"] = nemo_simulation.get_output()
-    #FIXME: enable
-    #global_output["YARP"] = yarp_robot.get_output()
+    yarp_read, yarp_wrote = yarp_robot.get_output()
+    global_output["YARP"]["read"] = yarp_read
+    global_output["YARP"]["wrote"] = yarp_wrote
+    
+    
+    
     global_output["ran_steps"] = ran_steps
     global_output["stimuli"] = stimuli_dict
     
