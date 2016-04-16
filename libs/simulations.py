@@ -105,7 +105,7 @@ class pySpikeSimulation ():
         for ins, jnt, net_obj in self.networks_ins:
             for nidx, current in net_obj.step(yarp_angles[jnt]):
                 stims.append((ins[nidx], current))
-
+                
         #Convert spikes to jnt angle
         angles = []
         for jnt, out, net_obj in self.networks_out:
@@ -115,6 +115,7 @@ class pySpikeSimulation ():
         
         self.stims.append(stims)
         self.angles.append(angles)
+        
         return stims, angles
 
     def get_output(self):
@@ -125,6 +126,10 @@ def main_simulation_run (
         , (nemo_sim, to_save, stimuli_dict)
         , (yarp_robot)
         , (sensory_neurons)
+        , simple_feedback=False
+        , alpha=1
+        , beta=0.99
+        , non_linear_correction="squared"#False to use linear
 ):
     #Import & configure varios plugins
     nemo_simulation = nemoSimulation(nemo_sim, to_save)
@@ -154,6 +159,9 @@ def main_simulation_run (
     }
     
     #Main loop
+    jnt_angles = False #Needed for the first feedback loop
+    ang_diff = False #Extremely ulgy FIXME
+    jnt_angles_tmp = False
     while ( #Allow indefinite loops (total=-1). Exit with CTRL-C
             ran_steps != total_steps and keep_running):
         try:
@@ -169,7 +177,7 @@ def main_simulation_run (
             else:
                 stimuli = add_stims
 
-            nemo_firings = nemo_simulation.step (
+            nemo_firings = nemo_simulation.step(
                 nemo_simulation
                 , stimuli)
             #Cerebellum: input/outputs?
@@ -180,12 +188,50 @@ def main_simulation_run (
             if yarp_robot:
                 #YARP: input/outputs?
                 yarp_angle = yarp_robot.read() #READ yarp
+                #Calculate the diff for feedback
+                # #BYPASS ispike angles (test with continuous signal)
+                # if not jnt_angles:
+                #     data = [(0, 0), (1, 0)]
+                # else:
+                #     data = [(0, 30), (1, 30)]
+                # jnt_angles=data[:]
+                if simple_feedback and jnt_angles:
+                    #FIXME: change ispike output to a simple list - simplify everithing
+                    #FIXME: quick hack, write better
+                    if jnt_angles:
+                        spike_angles = [v[1] for v in jnt_angles]
+                        if not None in spike_angles:
+                            if non_linear_correction == False:
+                                ang_diff = [((spike_angles[i] - yarp_angle[i])*alpha + beta * (spike_angles[i])) for i in range(len(jnt_angles))]
+                            elif non_linear_correction == "power-two":
+                                error = [spike_angles[i] - yarp_angle[i] for i in range(len(jnt_angles))]
+                                sign = [1 if error[i] > 0 else -1 for i in range(len(jnt_angles))]
+                                ang_diff = [((error[i]**2)*sign[i]*alpha + beta * (spike_angles[i])) for i in range(len(jnt_angles))]
+                            elif non_linear_correction == "squared":
+                                error = [spike_angles[i] - yarp_angle[i] for i in range(len(jnt_angles))]
+                                sign = [1 if error[i] > 0 else -1 for i in range(len(jnt_angles))]
+                                ang_diff = [((abs(error[i])**0.5)*sign[i]*alpha + beta * (spike_angles[i])) for i in range(len(jnt_angles))]
+                                
+                                
+                    else:
+                        ang_diff = [] * len(jnt_angles)
+                
+                #Update pySpike
                 add_stims, jnt_angles = pySpike_simulation.step(
                     yarp_angle
                     , nemo_firings)
+                # #BYPASS
+                # jnt_angles = data[:]
+                if simple_feedback and ang_diff: #Use numpy
+                    print "Diff is: %s" % ang_diff
+                    jnt_angles_tmp = jnt_angles[:]
+                    jnt_angles = [(i, ang_diff[i] + jnt_angles[i][1]) for i in range(len(jnt_angles))] #FIXME: keep the right i
+
                 yarp_robot.write(jnt_angles)
+                if jnt_angles_tmp:
+                    jnt_angles = jnt_angles_tmp[:]
                 #Gazebo: input/outputs?
-                gazebo_simulation.step ()
+                gazebo_simulation.step()
 
             ran_steps += 1
 
@@ -194,8 +240,9 @@ def main_simulation_run (
 
     if yarp_robot:
         global_output["pySpike"] = pySpike_simulation.get_output()
+        yarp_read, yarp_wrote = yarp_robot.get_output()
+
     global_output["NeMo"] = nemo_simulation.get_output()
-    yarp_read, yarp_wrote = yarp_robot.get_output()
     global_output["YARP"]["read"] = yarp_read
     global_output["YARP"]["wrote"] = yarp_wrote
     
