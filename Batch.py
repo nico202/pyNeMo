@@ -23,8 +23,6 @@ print ("\n\n\n\n\n\n\n----------------")
 
 name = False
 
-python = "python" #Python command
-
 new_args = []
 for a in argv:
     if not "--" in a:
@@ -80,7 +78,7 @@ def substituteRanges(input_strings, commands):
             start, stop, step = [float(n) for n in ranges.split(',')]
             steps = np.linspace (start, stop, (abs(stop-start)/step)+1)
             for s in steps:
-                command = string.replace(input_string, "["+ranges+"]", str(s))
+                command = input_string.replace("["+ranges+"]", str(s), 1)
                 commands.append(command)
         else:
             commands.append(input_string)
