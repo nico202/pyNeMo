@@ -213,7 +213,6 @@ for com in real_commands:
             , "synapses": networks[1][5]
             , "name": networks[1][6]
         }
-
         config_dict_hash = hashDict(dict_config)
 
         #L2
