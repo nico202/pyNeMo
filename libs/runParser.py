@@ -124,5 +124,15 @@ def parse_args():
                         , default = False
                         , action = 'store_true'
     )
-    
+    parser.add_argument('--simple-feedback'
+                        , help = 'sum YARP error to pySpike output'
+                        , dest = 'simple_feedback'
+                        , default = False
+                        , action = 'store_true'
+    )
+    parser.add_argument('--bypass-debug'
+                        , help = 'Bypass iSpike angle output and force this angle value'
+                        , dest = 'bypass_debug'
+                        , default = False
+    )
     return parser

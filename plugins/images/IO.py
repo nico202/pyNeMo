@@ -105,6 +105,7 @@ def ImageFromAngles(
 ): #Similar to ImageFromMembrane?
     import matplotlib.pyplot as plt
     import numpy as np
+    
     angles_read = angles_input
     angles_wrote = pyspike_output
     if not len(angles_read):
@@ -155,11 +156,13 @@ def ImageFromAngles(
     ax1.plot(a, np.array(angles[0]))
     ax1.set_xlabel('time (ms)')
     ax1.set_ylabel('Angle Joint %s' % (1))
+    ax1.set_ylim([-90, 90])
 
     ax2 = ax1.twinx()
     ax2.plot(angles[1], color = 'r')
     ax2.set_xlabel('time (ms)')
     ax2.set_ylabel('Angle Joint %s' % (2))    
+    ax2.set_ylim([-90, 90])
 
     if pyspike_output:
         out_zero = []
@@ -174,11 +177,13 @@ def ImageFromAngles(
         ax3.plot(out_zero, color = 'g')
         ax3.set_xlabel('time (ms)')
         ax3.set_ylabel('pySpike %s' % (2))    
+        ax3.set_ylim([-90, 90])
 
         ax4 = ax3.twinx()
         ax4.plot(out_one, color = 'c')
         ax4.set_xlabel('time (ms)')
         ax4.set_ylabel('pySpike %s' % (2))    
+        ax4.set_ylim([-90, 90])
 
     if title:
         plt.title(title)

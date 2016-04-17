@@ -145,6 +145,7 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         tmp = self.YARP.Vector(self.jnts
                                , self.encs.data())
         for jnt, angle in jnts_angles:
+#        for jnt, angle in enumerate(jnts_angles):
             if angle != None:
                 has_to_move = True
                 try:

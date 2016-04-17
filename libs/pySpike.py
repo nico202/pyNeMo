@@ -132,4 +132,5 @@ class sensNetOut():
 
             self.current_angle = new_angle
             self.missing_steps = self.integration_steps
+
         return self.current_angle

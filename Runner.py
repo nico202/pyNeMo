@@ -128,11 +128,12 @@ if __name__ == "__main__":
     else:
         robot = None
     #TODO: Reset robot original position? (and maybe gz-world status?)
-    if args.reset_position or args.reset_only:
-        robot.reset_all() #Use both right now. Strange gz reset
-        robot.reset_world() #FIXME: wrong class?
-        if args.reset_only:
-            exit("Resetting done, exiting (remove --reset-and-exit to continue)")
+    if robot:
+        if args.reset_position or args.reset_only:
+            robot.reset_all() #Use both right now. Strange gz reset
+            robot.reset_world() #FIXME: wrong class?
+            if args.reset_only:
+                exit("Resetting done, exiting (remove --reset-and-exit to continue)")
 
     #Time the simulation
     start_time = time.time()
@@ -146,6 +147,8 @@ if __name__ == "__main__":
         , (robot)
         , (sensory_neurons_in
            , sensory_neurons_out)
+        , simple_feedback=args.simple_feedback
+        , bypass_debug=float(args.bypass_debug)
     )
 
     #Get the total run time

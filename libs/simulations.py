@@ -127,9 +127,10 @@ def main_simulation_run (
         , (yarp_robot)
         , (sensory_neurons)
         , simple_feedback=False
-        , alpha=1
-        , beta=0.99
-        , non_linear_correction="squared"#False to use linear
+        , alpha=0.9
+        , beta=0.1
+        , non_linear_correction=False#"squared"#False to use linear
+        , bypass_debug=False #Angle to force (debug function, bypasses ispike)
 ):
     #Import & configure varios plugins
     nemo_simulation = nemoSimulation(nemo_sim, to_save)
@@ -189,12 +190,13 @@ def main_simulation_run (
                 #YARP: input/outputs?
                 yarp_angle = yarp_robot.read() #READ yarp
                 #Calculate the diff for feedback
-                # #BYPASS ispike angles (test with continuous signal)
-                # if not jnt_angles:
-                #     data = [(0, 0), (1, 0)]
-                # else:
-                #     data = [(0, 30), (1, 30)]
-                # jnt_angles=data[:]
+                #BYPASS ispike angles (test with continuous signal)
+                if bypass_debug: #bypass debug is an angle (or False)
+                    if not jnt_angles: #First loop
+                        data = [(0, 0), (1, 0)]
+                    else:
+                        data = [(0, bypass_debug), (1, bypass_debug)]
+                        jnt_angles=data[:]
                 if simple_feedback and jnt_angles:
                     #FIXME: change ispike output to a simple list - simplify everithing
                     #FIXME: quick hack, write better
@@ -221,11 +223,12 @@ def main_simulation_run (
                     yarp_angle
                     , nemo_firings)
                 # #BYPASS
-                # jnt_angles = data[:]
-                if simple_feedback and ang_diff: #Use numpy
-                    print "Diff is: %s" % ang_diff
-                    jnt_angles_tmp = jnt_angles[:]
-                    jnt_angles = [(i, ang_diff[i] + jnt_angles[i][1]) for i in range(len(jnt_angles))] #FIXME: keep the right i
+                if bypass_debug:
+                    jnt_angles = data[:]
+                    if simple_feedback and ang_diff: #Use numpy
+                        print "Diff is: %s" % ang_diff
+                        jnt_angles_tmp = jnt_angles[:]
+                        jnt_angles = [(i, ang_diff[i] + jnt_angles[i][1]) for i in range(len(jnt_angles))] #FIXME: keep the right i
 
                 yarp_robot.write(jnt_angles)
                 if jnt_angles_tmp:
@@ -241,13 +244,10 @@ def main_simulation_run (
     if yarp_robot:
         global_output["pySpike"] = pySpike_simulation.get_output()
         yarp_read, yarp_wrote = yarp_robot.get_output()
+        global_output["YARP"]["read"] = yarp_read
+        global_output["YARP"]["wrote"] = yarp_wrote
 
     global_output["NeMo"] = nemo_simulation.get_output()
-    global_output["YARP"]["read"] = yarp_read
-    global_output["YARP"]["wrote"] = yarp_wrote
-    
-    
-    
     global_output["ran_steps"] = ran_steps
     global_output["stimuli"] = stimuli_dict
     
