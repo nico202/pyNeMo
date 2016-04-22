@@ -1,4 +1,7 @@
-from sys import exit
+"""
+This module defines various useful functions used for Input and Output
+like loading the config file, checking dependencies, various conversions etc.
+"""
 
 #Transform input time to ms (steps):
 #  example: 100 = 100 (ms)
@@ -18,7 +21,7 @@ def time_to_steps(input_time):
         return None
 
     return int(steps)
-    
+
 #Dependency check: check if all required module are present
 #(without actually importing them)
 def dependency_check(modules):
@@ -29,7 +32,8 @@ def dependency_check(modules):
             found = True
         except ImportError:
             found = False
-        if not found: exit("Could not find required module: %s" % (module))
+        if not found:
+            exit("Could not find required module: %s" % (module))
 
 def load_network_file(network_file, hooks):
     import imp
@@ -41,7 +45,7 @@ def load_network_file(network_file, hooks):
     sys.dont_write_bytecode = True
     ###############################
     try:
-        config_name = try_load_vue (network_file, hooks)
+        config_name = try_load_vue(network_file, hooks)
         config = imp.load_source('*', config_name)
     except SyntaxError:
         cprint("Config file: Syntax Error", 'fail')
@@ -57,7 +61,7 @@ def load_network_file(network_file, hooks):
         raise
     return config, config_name
 
-def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
+def try_load_vue(config_name, hooks=("", "")): #FIXME: relative path etc
     if ".vue" in config_name:
         import libs.VUEtoPy as VUEtoPy
         #TODO: verbosity fix
@@ -68,74 +72,74 @@ def try_load_vue(config_name, hooks = ("", "")): #FIXME: relative path etc
     return "./" + config_name
 
 def import_network(
-        (network_file, hooks)
-        , (use_cuda, cuda_backend_number)
-        , (disable_sensory)
+        (network_file, hooks),
+        (use_cuda, cuda_backend_number),
+        (disable_sensory) #FIXME: use this
 ):
     '''
     Pass the network file to load_network_file, then:
     * Add neurons and synapses to Nemo
-    
+
     returns [ nemo_simulation, to_save ]
     '''
-    network_config, network_name = load_network_file (network_file, hooks)
-    
+    network_config, network_name = load_network_file(network_file, hooks)
+
     import nemo
     nemo_net = nemo.Network()
     nemo_config = nemo.Configuration()
 
-    nemo_select_backend (nemo_config, (use_cuda, cuda_backend_number))
+    nemo_select_backend(nemo_config, (use_cuda, cuda_backend_number))
 
     #Add network neurons
-    nemo_add_neurons (nemo_net, network_config.neurons[0])
+    nemo_add_neurons(nemo_net, network_config.neurons[0])
 
     #Add networks synapses
-    nemo_add_synapses (nemo_net, network_config.synapses)
+    nemo_add_synapses(nemo_net, network_config.synapses)
 
     #Create the simulation
     nemo_simulation = nemo.Simulation(nemo_net, nemo_config)
 
     return ([
-        nemo_simulation #0
-        , ( #1
-            network_config.save
-            , len(network_config.neurons[0])#Used to coninue numeration on sensor
-            , network_config.step_input
-            , network_config.sensory_neurons
-            , network_config.neurons
-            , network_config.synapses
-            , network_config.name
+        nemo_simulation, #0
+        ( #1
+            network_config.save,
+            #Used to coninue numeration on sensor
+            len(network_config.neurons[0]),
+            network_config.step_input,
+            network_config.sensory_neurons,
+            network_config.neurons,
+            network_config.synapses,
+            network_config.name
         )
-    ]
-    ), network_name
+    ]), network_name
 
 def nemo_add_neurons(net, neuron_list, start_id=0):
     iz = net.add_neuron_type('Izhikevich')
     #TODO: edit conifg file to allow this?
     #km = net.add_neuron_type('Kuramoto')
-    for nidx in range(len(neuron_list)):
+    for nidx, neuron in enumerate(neuron_list):
         n_id = nidx + start_id
-        a, b, c, d, s, u, v = neuron_list[nidx]
+        a, b, c, d, s, u, v = neuron
         net.add_neuron(iz, n_id, a, b, c, d, s, u, v)
 
 def nemo_add_synapses(net, synaspes_list):
-    for sidx in range(len(synaspes_list)):
-        source, dests, synaptic_prop = synaspes_list[sidx]
+    for sidx, synapse in enumerate(synaspes_list):
+        source, dests, synaptic_prop = synapse
         delay, weights, plastic = synaptic_prop
         try: #dests is a single value or a list?
             dests = int(dests)
-            dests = [ dests ]
+            dests = [dests]
         except TypeError: #Is already a list :)
             pass
-            
+
         try: #if weight length is 1, apply it to all synapses
             weights = int(weights)
-            weights = [ weights ]
+            weights = [weights]
         except TypeError: #Already an array
             pass
 
-        if (len(weights) != len(dests)):
-            if (len(weights) == 1):
+        if len(weights) != len(dests):
+            if len(weights) == 1:
                 #List of weight matching number of outpu nurons
                 weights = weights * len(dests)
             else:
@@ -145,26 +149,25 @@ def nemo_add_synapses(net, synaspes_list):
 
 
 def nemo_select_backend(
-        nemo_config
-        , (use_cuda, backend_number)
+        nemo_config,
+        (use_cuda, backend_number)
 ):
     if use_cuda:
         try:
             nemo_config.set_cuda_backend(backend_number)
         except RuntimeError:
             #FIXME: verbosity
-            print("No CUDA-GPU found: using CPU instead")
+            print "No CUDA-GPU found: using CPU instead"
             nemo_config.set_cpu_backend()
-            
         else:
             nemo_config.set_cpu_backend()
 
-def saveKey(filename
-            , values
-            , out_dir="."
-            , compress=True
-            , compress_format="gzip"
-            , force_write=False):
+def saveKey(filename,
+            values,
+            out_dir=".",
+            compress=True,
+            compress_format="gzip",
+            force_write=False):
     '''
     Saves a dict to a file.
     If compress enabled, saves to gz (compress less then bz2 but faster)
@@ -172,17 +175,17 @@ def saveKey(filename
     import os.path
     filename = str(filename)
     out_dir = str(out_dir)
-    is_folder (out_dir)
+    is_folder(out_dir)
     output_name = out_dir + '/' + filename
     values = str(values)
     if not os.path.isfile(output_name) or force_write:
         try:
             if compress:
-                if compress_format in [ "gzip", "gz" ]:
+                if compress_format in ["gzip", "gz"]:
                     import gzip
                     with gzip.open(output_name + ".gz", 'wb') as f:
                         f.write(values)
-                elif compress_format in [ "bzip2", "bzip", "bz2" ]:
+                elif compress_format in ["bzip2", "bzip", "bz2"]:
                     import bz2
                     file_out = bz2.BZ2File(output_name + ".bz2", 'wb')
                     try:
@@ -195,7 +198,7 @@ def saveKey(filename
                 output.write("%s" % values)
                 output.close()
         except:
-            print("Probem writing file?! DEBUG me")
+            print "Probem writing file?! DEBUG me"
             raise
         return True
     else:
@@ -204,7 +207,7 @@ def saveKey(filename
 def hashIt(module): #We use this to check if configuration changed
     import hashlib
     key_string = str({key: value for key, value in module.__dict__.iteritems()
-            if not (key.startswith('__') or key.startswith('_'))})
+                      if not (key.startswith('__') or key.startswith('_'))})
 
     return key_string, str(hashlib.sha1(key_string).hexdigest())
 
@@ -221,8 +224,8 @@ def is_folder(output_dir=".store"):
             try:
                 os.mkdir(output_dir)
             except:
+                print "Unknown error creating folder"
                 raise
-                exit("Unknown error creating folder")
             return True
         else:
             exit("Destination must be a folder! Check your config")
@@ -240,25 +243,28 @@ def write_batch_log(sessionId, cycle, output_dir="batch"):
     save = {
         "cycle":cycle
     } #Do we need something else?
-    saveKey(str(sessionId), save, output_dir, compress = False, force_write = True)
-    
+    saveKey(str(sessionId), save, output_dir, compress=False, force_write=True)
 
-def membraneImage(values
-                  , title=False
-                  , close=True
-                  , scales=[]): #TODO: Add stimulation trace
-    '''
+def membraneImage(values,
+                  title=False,
+                  close=True,
+                  scales=None):
+    """
         Output an image of the membrane potential from a list of Membrane values.
         zoom = (stretch_x, stretch_y) means the stretch that is applied to x and y axes
-    '''
+    """
+    #https://docs.python.org/2/tutorial/controlflow.html#default-argument-values
+    if not scales:
+        scales = []
+    #TODO: Add stimulation trace
     import matplotlib.pyplot as plt
     import numpy as np
-    Vm_list=  values
+    Vm_list = values
     if close:
         plt.clf()
         plt.cla()
     x = len(Vm_list)
-    x = np.array(range (0, x))
+    x = np.array(range(0, x))
     fig, ax1 = plt.subplots()
     ax1.plot(x, np.array(Vm_list))
     ax1.set_xlabel('time (ms)')
@@ -278,17 +284,17 @@ def rgb(triplet):
 
 def cprint(text, color="okblue", debug=False):
     colors = {
-        'okblue': '\033[94m'
-        , 'info': '\033[94m'
-        , 'okgreen': '\033[92m'
-        , 'endc': '\033[0m'
-        , 'warning': '\033[93m'
-        , 'fail': '\033[91m'
-        , 'red': '\033[91m' #=fail
+        'okblue': '\033[94m',
+        'info': '\033[94m',
+        'okgreen': '\033[92m',
+        'endc': '\033[0m',
+        'warning': '\033[93m',
+        'fail': '\033[91m',
+        'red': '\033[91m' #=fail
     }
     if not debug:# or debug: #change if enable debug
-        print(colors[color]+text+colors['endc'])
-    
+        print colors[color]+text+colors['endc']
+
 def saveFile(file_source, file_dest):
     '''
     Copy file #TODO: Enable compression (bz2/_lzma_)
@@ -300,9 +306,8 @@ def saveFile(file_source, file_dest):
         try:
             copy2(file_source, file_dest)
         except:
+            print "Probem copying file?! DEBUG me"
             raise
-            exit("Probem copying file?! DEBUG me")
-            return True
     else:
         return False
 
@@ -311,9 +316,9 @@ def read_output(f, path, idx=0, total=0):
     #Move import_istory to libs.IO?
     from plugins.importer import import_history
     from os.path import isfile, join
-    
+
     fail = False
-    print("[%s/%s]\tUsing file: %s" % (idx, total, f))
+    print "[%s/%s]\tUsing file: %s" % (idx, total, f)
     #_input.bz2 could be used, but is more difficult to extract, and is heavier
     input_file = join(path, f.split("_")[1]) + "_input.py"
     try:
@@ -346,20 +351,19 @@ def list_all(path, start_from, end_to):
     files = [f for f in listdir(path) if isfile(join(path, f))]
 
     #FIXME: allow uncompressed
-    outputs = list(set([f for f in files if ("_output" in f)]))
+    outputs = list(set([f for f in files if "_output" in f]))
 
     #Filter out unwanted runs
     outputs = outputs[start_from:end_to] if end_to else outputs[start_from:]
     total = len(outputs) + start_from
 
     return outputs, total
-    
+
 def ask(msg
         , exit_msg="Change your cli params then!"
         , sure="Are you sure? [y/n]"):
-    from sys import exit
     action = "z"
-    while action.capitalize() not in ["Y","N"]:
+    while action.capitalize() not in ["Y", "N"]:
         action = raw_input(msg + "\n" + sure +": ")
         if action.capitalize() == "Y":
             break
