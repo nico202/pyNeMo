@@ -370,3 +370,11 @@ def ask(msg
         else:
             cprint(exit_msg, 'warning')
             exit()
+
+def reset_world(): #TODO: move to own function (like in IO.py)
+    '''
+    Reset gazebo world. Replaces reset_all
+    '''
+    import subprocess
+    subprocess.call(["gz", "world", "-r"])
+    return True

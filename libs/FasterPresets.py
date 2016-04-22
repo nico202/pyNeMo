@@ -17,10 +17,10 @@ def _typicalN( #DO NOT TOUCH
         u = b * v
     return [(a, b, c, d, s, u, v)]
 
-def _randomN(): #TODO: WriteMe
-    from random import random
-    exit("_randomN has still to be written!")
-    return [(a, b, c, d, s, u, v)]    
+# def _randomN(): #TODO: WriteMe
+#     from random import random
+#     exit("_randomN has still to be written!")
+#     return [(a, b, c, d, s, u, v)]    
 
 def _typicalS(d=1, w=10, l=False): #TODO: not tested
     """

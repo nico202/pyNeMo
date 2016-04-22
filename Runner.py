@@ -17,6 +17,7 @@ from libs.IO import dependency_check
 from libs.IO import import_network
 from libs.IO import saveKey, hashDict, write_log
 from libs.IO import saveFile
+from libs.IO import reset_world
 
 from libs.simulations import main_simulation_run
 from libs.pYARP import RobotYARP
@@ -130,7 +131,7 @@ if __name__ == "__main__":
     if robot:
         if args.reset_position or args.reset_only:
             robot.reset_all() #Use both right now. Strange gz reset
-            robot.reset_world() #FIXME: wrong class?
+            reset_world()
             if args.reset_only:
                 exit("Resetting done, exiting (remove --reset-and-exit to continue)")
 
