@@ -1,3 +1,7 @@
+"""
+This is pyNeMo config file. It's used to define general
+settings. Can be overridden by cli params
+"""
 #Default number of steps to run. Replace with --steps
 STEPS = 1000
 

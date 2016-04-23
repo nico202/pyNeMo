@@ -1,29 +1,40 @@
 #!/bin/python2
-from random import random
-
+"""
+Useful helper function for creating synapses, neurons, and stimuli
+"""
 #On function defined here, the "_" is mandatory
 
 def _typicalN( #DO NOT TOUCH
-    a = 0.02,   # time scale of recovery variable (u)
-    b = 0.2,    # sensitivity of recovery variable (u) on subtreshold
-    c = -65,    # after-spike reset value
-    d = 2,      # after-spike recovery variable (u)
-    s = 0,      # input bias picked from gaussian [0, s)
-    u = False,  # default calculated down here
-    v = -65     # Initial membrane potential
+        a=0.02,   # time scale of recovery variable (u)
+        b=0.2,    # sensitivity of recovery variable (u) on subtreshold
+        c=-65,    # after-spike reset value
+        d=2,      # after-spike recovery variable (u)
+        s=0,      # input bias picked from gaussian [0, s)
+        u=False,  # default calculated down here
+        v=-65     # Initial membrane potential
     ):
     if not u:
         u = b * v
     return [(a, b, c, d, s, u, v)]
 
-def _typicalS (d = 1, w = 10, l = False): #TODO: not tested
+# def _randomN(): #TODO: WriteMe
+#     from random import random
+#     exit("_randomN has still to be written!")
+#     return [(a, b, c, d, s, u, v)]    
+
+def _typicalS(d=1, w=10, l=False): #TODO: not tested
+    """
+Creates a synapse with default values where omitted.
+_typicalS(d=delay, w=weight, l=learn)
+Return a list containing a tuple: [(delay, weight, learn)]
+    """
     #return fixing unsupported values
     return [(d if d >= 1 else 1, w, True if l else False)]
 
-def _S (Stype = "WeakInhFastNoLearn"):
-    '''
+def _S(Stype="WeakInhFastNoLearn"):
+    """
         Convert a string into a synapse
-    '''
+    """
     #Delay:
     if 'Fast' in Stype:
         delay = 1
@@ -69,12 +80,12 @@ def _S (Stype = "WeakInhFastNoLearn"):
     return (delay, weight, learn)
 
 def _stimuli(input_list):
-    '''
+    """
         Convert the input list of the kind:
             [[neuron#, value, stimul from, stimul to]]
         to a dict:
             {step: [(neuron#, value), (..), ..]}
-    '''
+    """
 #    try:
 #
 #        input_list = _proportional_stimuli(input_list)
@@ -84,7 +95,7 @@ def _stimuli(input_list):
     for stimul in input_list:
         for step in range(int(stimul[1][1]), int(stimul[1][2])):
             neurons, input_value = stimul[0], stimul[1][0]
-            if type(neurons) != list:
+            if not isinstance(neurons, list):
                 neurons = [neurons]
             for neuron in neurons:
                 if not step in output_dict:
@@ -94,12 +105,12 @@ def _stimuli(input_list):
     return output_dict
 
 def _proportional_stimuli(input_list):
-    '''
+    """
         [
             [neuron#, (step, offset, multi), stimul from, stimul to]
         ]
         is converted to the default list that feeds _stimulti
-    '''
+    """
     output = []
     n = 0
     for stimul in input_list:
