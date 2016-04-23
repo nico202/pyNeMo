@@ -150,7 +150,7 @@ def ImageFromAngles(
             # plots[-1].plot(x, np.array(l))
             plots[-1].plot(l, color=COLORS[joint
                                            if joint < len(COLORS)
-                                           else (0, 0, 0)]
+                                           else (0, 0, 0)])
             plots[-1].set_xlabel('time\n(ms)')
             plots[-1].set_ylabel('Angle Joint %s' % joint)
             plots[-1].set_ylim([min_x, max_x])
