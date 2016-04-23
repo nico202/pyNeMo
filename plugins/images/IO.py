@@ -1,6 +1,7 @@
 #!/usr/bin/env python2
 from PIL import Image
 from libs.IO import cprint
+from libs.IO import COLORS
 
 try:
     from neuronpy.graphics import spikeplot
@@ -147,7 +148,9 @@ def ImageFromAngles(
         else:
             plots.append(plots[-1].twinx())
             # plots[-1].plot(x, np.array(l))
-            plots[-1].plot(l, color=np.random.rand(3,))
+            plots[-1].plot(l, color=COLORS[joint
+                                           if joint < len(COLORS)
+                                           else (0, 0, 0)]
             plots[-1].set_xlabel('time\n(ms)')
             plots[-1].set_ylabel('Angle Joint %s' % joint)
             plots[-1].set_ylim([min_x, max_x])
