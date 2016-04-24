@@ -93,7 +93,8 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         elif self.mode == 1: #Torque
             #TODO: add impendence control
             try:
-                assert(self.iTor.setTorqueMode())
+                assert self.iTor.setTorqueMode()
+                print "Torque mode set!"
             except AssertionError:
                 exit("Robot does not support toruqe mode!")
             #Set jnts accelerations
@@ -105,14 +106,9 @@ class RobotYARP(): #TODO: Save history (if save enabled)
             self.iPos.setRefAccelerations(tmp.data())
             #Set jnts speeds
             tmp = self.YARP.Vector(self.jnts, self.encs.data())
-            tmp = self.set_references(ref_speeds
+            self.set_references(ref_speeds
                                       , tmp)
             self.iPos.setRefSpeeds(tmp.data())
-            tmp = self.YARP.Vector(self.jnts, self.encs.data())
-            tmp = self.set_references(ref_torques
-                                      , tmp)
-            self.iTor.setRefTorques(tmp.data())
-            
         else:
             exit("Unknown bug happened")
     #READ
@@ -141,28 +137,37 @@ class RobotYARP(): #TODO: Save history (if save enabled)
 
     #TODO: ADD torque etc
     def write(self, jnts_angles):
-        has_to_move = False
-        tmp = self.YARP.Vector(self.jnts
-                               , self.encs.data())
-        for jnt, angle in jnts_angles:
-#        for jnt, angle in enumerate(jnts_angles):
-            if angle != None:
-                has_to_move = True
-                try:
-                    # tmp.set(jnt, 0) #to debug
-                    tmp.set(jnt, angle)
-                except:
-                    raise
-        #The motion is done ones for all joints
-        if has_to_move:
-            self.iPos.positionMove(tmp.data())
-        self.wroteAnglesHistory.append(jnts_angles[:])
-        #This is to try to sync them.
-        #Pretty useless, substitute with C++
-        # self.YARP.Time.delay(0.001)
-        # self.iPos.stop()
-        # I can check motion is done?
-
+        if not self.mode: # Position control
+            has_to_move = False
+            tmp = self.YARP.Vector(self.jnts, self.encs.data())
+            for jnt, angle in jnts_angles:
+                if angle != None:
+                    has_to_move = True
+                    try:
+                        # tmp.set(jnt, 0) #to debug
+                        tmp.set(jnt, angle)
+                    except:
+                        raise
+            #The motion is done ones for all joints
+            if has_to_move:
+                self.iPos.positionMove(tmp.data())
+            self.wroteAnglesHistory.append(jnts_angles[:])
+        elif self.mode == 1: # Torque control
+            tmp = self.YARP.Vector(self.jnts, self.encs.data())
+            has_to_move = False
+            for jnt, torque in jnts_angles:
+                if torque != None:
+                    has_to_move = True
+                    try:
+                        tmp.set(jnt, torque)
+                    except:
+                        raise
+            if has_to_move and self.readAnglesHistory[-1] != [jnt, torque]:
+                for j, t in jnts_angles:
+                    self.iTor.setRefTorque(j, t)
+                # self.iTor.setRefTorques(tmp)
+        else:
+            exit("Unknown mode!")
         return True
 
     def get_output(self):
@@ -177,13 +182,19 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         for jnt in range(self.jnts):
             tmp.set(jnt, home_position)
         #Move ones for all joints
+        self.iPos.setPositionMode()
         self.iPos.positionMove(tmp.data())
         #FIXME: seems not working
         while not self.iPos.checkMotionDone(): #Wait home position reached
             self.YARP.Time.delay(0.01)
         self.YARP.Time.delay(5)
         self.iPos.stop()
-        print("Reset done!")
+        print "Reset done!"
+        if self.mode == 1:
+            print "Going back to torque control!"
+            self.iTor.setTorqueMode()
+            for j in range(self.jnts):
+                self.iTor.setRefTorque(j, 1)
         return True
 
     def reset_world(self): #TODO: move to own function (like in IO.py)
