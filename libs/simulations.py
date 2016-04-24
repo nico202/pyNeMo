@@ -204,7 +204,7 @@ taking care of passing the data from one sim to the other
     jnt_angles_tmp = False
 
     #Allow indefinite loops (total=-1). Exit with CTRL-C
-    while (ran_steps != total_steps and keep_running):
+    while ran_steps != total_steps and keep_running:
         try:
             ####Main part of the main loop######
             #NeMo

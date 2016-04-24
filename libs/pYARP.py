@@ -60,10 +60,12 @@ class RobotYARP(): #TODO: Save history (if save enabled)
             self.command_velocity = yarp.Vector(self.jnts)
 
         except AttributeError:
-            print("ERROR: Read error")
-            print("Cannot initialize robot.\
-        If yarp is not running, you can use --disable-sensory option\
-            If yarp is running but it cannot bind the port, use \"netstat -lnp\" to know which process is accessing it, and kill (ie. killall gz)")
+            print "ERROR: Read error"
+            print "Cannot initialize robot.\
+            If yarp is not running, you can use --disable-sensory option.\
+            If yarp is running but it cannot bind the port\
+            , use \"netstat -lnp\" to know which process is accessing it,\
+            and kill (ie. killall gz)"
             exit()
 
         self.angles = [0] * self.jnts
@@ -93,7 +95,7 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         elif self.mode == 1: #Torque
             #TODO: add impendence control
             try:
-                assert(self.iTor.setTorqueMode())
+                assert self.iTor.setTorqueMode()
             except AssertionError:
                 exit("Robot does not support toruqe mode!")
             #Set jnts accelerations
@@ -184,14 +186,6 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         self.YARP.Time.delay(5)
         self.iPos.stop()
         print("Reset done!")
-        return True
-
-    def reset_world(self): #TODO: move to own function (like in IO.py)
-        '''
-        Reset gazebo world. Replaces reset_all
-        '''
-        import subprocess
-        subprocess.call(["gz", "world", "-r"])
         return True
 
     def set_references(self, ref, tmp):
