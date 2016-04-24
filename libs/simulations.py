@@ -285,7 +285,7 @@ taking care of passing the data from one sim to the other
                 if bypass_debug:
                     jnt_angles = data[:]
                     if simple_feedback and ang_diff: #TODO: Use numpy
-                        print "Diff is: %s" % ang_diff
+                        # print "Diff is: %s" % ang_diff
                         jnt_angles_tmp = jnt_angles[:]
                         jnt_angles = [
                             (i, ang_diff[i] + jnt_angles[i][1])
