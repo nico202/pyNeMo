@@ -130,6 +130,8 @@ if __name__ == "__main__":
     #TODO: Reset robot original position? (and maybe gz-world status?)
     if robot:
         if args.reset_position or args.reset_only:
+            print "RESETTING"
+            print args.reset_position, args.reset_only
             robot.reset_all() #Use both right now. Strange gz reset
             reset_world()
             if args.reset_only:

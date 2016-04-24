@@ -109,7 +109,7 @@ class RobotYARP(): #TODO: Save history (if save enabled)
             #Set jnts speeds
             tmp = self.YARP.Vector(self.jnts, self.encs.data())
             self.set_references(ref_speeds
-                                      , tmp)
+                                , tmp)
             self.iPos.setRefSpeeds(tmp.data())
         else:
             exit("Unknown bug happened")
@@ -181,6 +181,7 @@ class RobotYARP(): #TODO: Save history (if save enabled)
         '''
         print("Resetting robot to home position (0). Disable with --no-home-position")
         tmp = self.YARP.Vector(self.jnts)
+
         for jnt in range(self.jnts):
             tmp.set(jnt, home_position)
         #Move ones for all joints
@@ -199,20 +200,19 @@ class RobotYARP(): #TODO: Save history (if save enabled)
                 self.iTor.setRefTorque(j, 1)
         return True
 
-    def set_references(self, ref, tmp):
-        if type(ref) == int:
+    def set_references(self, value, vector):
+        if type(value) == int:
             for i in range(self.jnts):
-                tmp[i] = ref
-        #tuple/list: map one value to one joint
-        elif type(ref) in [tuple, list]: #tuple is better
-            if self.jnts != len(ref):
-                exit("Ref lenght and jnts number differs!")
-            for (jnt_number, jnt_ref) in enumerate():
-                tmp[jnt_number] = jnt_ref
+                vector[i] = value
+        elif type(value) in [tuple, list]: #tuple is better
+            if self.jnts != len(value):
+                exit("Value lenght and jnts number differs!")
+            for jnt_number, jnt_value in enumerate(value):
+                vector[jnt_number] = jnt_value
         else:
             exit("Cannot set reference (unknown type %s)"
-                 % (type(ref)))
-        return tmp
+                 % (type(value)))
+        return vector
 
 #Torque:
 #getTorque
