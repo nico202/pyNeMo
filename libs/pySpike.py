@@ -1,7 +1,9 @@
 #!/bin/python2
-######################################
-#   iSpike-like joint conversion
-######################################
+"""
+#####################################
+#   iSpike-like joint conversion    #
+#####################################
+"""
 
 class sensNetIn():
     #TODO: explain XD
@@ -31,13 +33,14 @@ class sensNetIn():
 
         if self.size < 2:
             exit('ERROR: pySpike neuron size is less then 2!')
-        #Angle covered by each neuron
+        # Angle covered by each neuron
         angle_dist = (max_angle - min_angle) / (self.size - 1)
-        #Standard deviation expressed in angle
-        sd_angle = std * angle_dist;
-        #Create normal distribution and calculate current factor
+        # Standard deviation expressed in angle
+        sd_angle = std * angle_dist
+        # Create normal distribution and calculate current factor
         self._normal_distribution = scipy.stats.norm(0, sd_angle)
         self._current_factor = peak_current / self._normal_distribution.pdf(0)
+        # Populate the angles
         self._neuron_angles = []
         for n in range(self.size):
             self._neuron_angles.append(min_angle + n * angle_dist)
@@ -47,46 +50,50 @@ class sensNetIn():
         '''
             Set the value of the current input. Allows getCurrent()
         '''
+        # Check if angle is in range
         if input_angle > self._max_angle:
-            print("ERROR: input angle not in range! (%d is too high)" % (input_angle))
+            print("ERROR: input angle not in range! (%d is too high)"
+                  % (input_angle))
             self._angle = self._max_angle
         elif input_angle < self._min_angle:
-            print("ERROR: input angle not in range! (%d is too low)" % (input_angle))
+            print("ERROR: input angle not in range! (%d is too low)"
+                  % (input_angle))
             self._angle = self._min_angle
         else:
             self._angle = input_angle
 
+        # Set input current to neurons
         current_input = []
         for i in range(self.size):
             current_input.append(
                 (i
-                 , self._constant_current + self._current_factor * self._normal_distribution.pdf(self._neuron_angles[i] - self._angle)
+                 , self._constant_current + self._current_factor
+                 * self._normal_distribution.pdf(
+                     self._neuron_angles[i] - self._angle)
                 ))
         return current_input
 
 class sensNetOut():
     def __init__(self,
-                 neuron_idx, 
+                 neuron_idx,
                  min_angle=-90, #The minimum angle to read
                  max_angle=90, #The maximum angle to read
                  decay_rate=0.25, #The rate of decay of the angle variables
                  #FIXME: current_increment UNUSED!?
-                 current_increment=10, #The amount by which the input current to the neurons is incremented by each spike
+                 #Increment of the input current to the neurons by each spike
+                 current_increment=10,
                  dof=0, #Degree of freedom of joint. FIXME: NOT USED
-                 integration_steps=10  #Step after which integration occurs (1step = 1ms)
-    ):
+                 integration_steps=1  #Step after which integration occurs (1step = 1ms)
+                ):
         self.neuron_idx = neuron_idx
         neuron_number = len(neuron_idx)
-#        for i in range(neuron_idx):
-#            self.neuron_id_map[neuron_idx[i]] = i
-
-#        neuron_number = i
-
-#        exit()
         if neuron_number < 2:
             exit("FATAL ERROR: pySpike - You need at least 2 output neurons")
+        # Calculate angle covered by each current variable
         angle_dist = (max_angle - min_angle) / (neuron_number - 1)
+        # Set up current variables
         current_variables = [0.0] * neuron_number
+        # Populate the current variable angles
         current_variable_angles = [0.0] * neuron_number
         for n in range(neuron_number):
             current_variable_angles[n] = min_angle + n * angle_dist
@@ -113,21 +120,21 @@ class sensNetOut():
             for d in range(0, len(self.current_variables)):
                 self.current_variables[d] *= self.decay_rate
 
-            angle_sum = 0; weighted_sum = 0
+            angle_sum = 0
+            weighted_sum = 0
             for n in range(0, self.neuron_number):
-                angle_sum += self.current_variables[n] * self.current_variable_angles[n]
+                angle_sum += self.current_variables[n]
+                * self.current_variable_angles[n]
                 weighted_sum += self.current_variables[n]
-            # print("iSpike current variables = %s" % self.current_variables)
-            # print("iSpike weighed sum = %s" % weighted_sum)
-            # print("iSpike current variables = %s" % angle_sum)
+
             new_angle = 0
             if weighted_sum:
                 new_angle = angle_sum / weighted_sum
             if new_angle > self.max_angle:
-                print("ERROR: new angle (%d) > maximum" % (new_angle))
+                print "ERROR: new angle (%d) > maximum" % (new_angle)
                 new_angle = self.max_angle
             elif new_angle < self.min_angle:
-                print("ERROR: new angle (%d) < minimum" % (new_angle))
+                print "ERROR: new angle (%d) < minimum" % (new_angle)
                 new_angle = self.min_angle
 
             self.current_angle = new_angle
