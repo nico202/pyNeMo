@@ -3,7 +3,7 @@
 if __name__ == "__main__": #if run in standalone
     from sys import exit
     import argparse
-    from libs.InAndOut import importer, print_if_verbose, saveKey
+    from libs.InAndOut import importer, saveKey
     parser = argparse.ArgumentParser(description='Offline analysis for\
      spiking neural networks')
     #Files to open
@@ -52,7 +52,7 @@ if __name__ == "__main__": #if run in standalone
     batch = args.batch
 
     if not args.path:
-        print("WARNING:\tYou must define the store dir! Using general_config default")
+        print "WARNING:\tYou must define the store dir! Using general_config default"
         try:
             import general_config
             args.path = general_config._history_dir
@@ -73,23 +73,22 @@ if __name__ == "__main__": #if run in standalone
 
     if args.config_hash:
         if not batch:
-            print_if_verbose(not batch, "INFO: Opened file %s" % membrane_file)
-            print_if_verbose(not batch, "INFO: This is a membrane file.")
-            print_if_verbose(not batch, "INFO: There are %s neurons in this net, and %s samples (ms)"
-                    % (len(Vm_dict), len(Vm_dict[0])))
+            print not batch, "INFO: Opened file %s" % membrane_file
+            print not batch, "INFO: This is a membrane file."
+            print batch, "INFO: There are %s neurons in this net, and %s samples (ms)" % (len(Vm_dict), len(Vm_dict[0]))
         if args.phase or args.duty or args.frequency or args.all:
             #Run import only if needed
             import plugins.analysis.membrane as membrane_analysis
             results = membrane_analysis.analyzeMembrane(Vm_dict)
             if args.all:
-                print_if_verbose(not batch, results)
+                print(not batch, results)
             else:
                 if args.phase:
-                    print_if_verbose(not batch, results["phase"])
+                    print(not batch, results["phase"])
                 if args.fundamental:
-                    print_if_verbose(not batch, results["fundamental"])
+                    print(not batch, results["fundamental"])
                 if args.duty_cycle:
-                    print_if_verbose(not batch, results["duty_cycle"])
+                    print(not batch, results["duty_cycle"])
             saveKey(args.general + args.config_hash + "_analysis", results, out_dir = args.path)
 
     if args.update_json:

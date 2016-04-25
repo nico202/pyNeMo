@@ -53,12 +53,16 @@ def ImageFromSpikes(input_spikes,
     if save:
         cprint("\t*\tSaving image to %s" % file_path, 'info')
     sp.set_fig_name(file_path)
+    sp.set_figsize((24, 18))
     sp.set_linestyle('-')
     sp.set_markerscale(0.8)
     sp.plot_spikes(spikes, draw=show, savefig=save)
 #    del sp #fixes memory leak? Seems not
     del spikes
     del input_spikes
+    # Debug code
+    from subprocess import call
+    call(["feh", file_path])
     return True
 
 def ImageFromMembranes(all_membranes):

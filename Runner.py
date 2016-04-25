@@ -217,11 +217,12 @@ if args.analyze_spikes_frequency: #TODO: write all conditions etc
     for i in spikesDictToArray(output["NeMo"][1]):
 #        print "ANALYSIS not working yet"
         #Fixme: changed function names, doesn't match anymore
-        freq = spikes.getFreq(spikes.neuronSpikesToSquare(i))
+        freq = spikes.getFreq(spikes.neuronSpikesToSquare(i, split_range=(5000, 30000)))
+        duty_cycle = float(freq[1]) / (freq[0] + freq[1])
         if freq:
-            print ("Neuron: %s, freqs: %s, %s"
+            print ("Neuron: %s, duty cycle: %f, osc-freq: %f"
                    %
-                   (neuron_number, 1./freq[0]*1000, 1./freq[1]*1000))
+                   (neuron_number, duty_cycle, 1000./(freq[0] + freq[1])))
         neuron_number += 1
 
 print "All done, thanks!"

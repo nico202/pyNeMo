@@ -7,15 +7,17 @@ import numpy as np
 
 def neuronSpikesToSquare(
         spikes,
-        steps,
-        time_window=20,
+        steps=False,
+        time_window=40,
         threshold=.05,
         split_range=(False, False) #Limit analysis on subset
 ):
+    #TODO: check (debugging)
+    if not steps:
+        steps = len(spikes)
     #TODO: use split_range to allow multiple analysis contemporarily
     start = split_range[0]
     end = split_range[1] if split_range[1] else len(spikes)
-
     if split_range[0] or split_range[1]:
         steps = split_range[1]-split_range[0]
 
@@ -58,11 +60,11 @@ Input: serie - the data to analyze
 
 def getFreq(seq, period=True):
     from collections import Counter
+    seq=seq[1]
     state = [[], []]#0 = off, 1 = on
     last_state = seq[0]
     last_change = 0
     i = 1
-
     for frame in seq[1:]:
         if frame != last_state:
             state[last_state].append(i - last_change)
