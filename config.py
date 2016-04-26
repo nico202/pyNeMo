@@ -18,9 +18,9 @@ CUDA_BACKEND = 0
 
 #Batch config:
 #Asks you if you are sure you want to show image on every run?
-BATCH_CONFIRM_SHOW_IMAGE = True
+BATCH_CONFIRM_SHOW_IMAGE = False
 #Asks you if you are sure you don't want to save images
-BATCH_CONFIRM_NO_SAVE_IMAGE = True
+BATCH_CONFIRM_NO_SAVE_IMAGE = False
 #How frequently we should save batch step
 BATCH_SAVE_EVERY = 10
 

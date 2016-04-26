@@ -6,7 +6,7 @@ from libs.multiProcess import dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
     try:
-        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
             f.split("_")[0] #Save somewhere to save time, used multimple times #1
             , f.split("_")[1]
             , neurons_info[4]["mode"]
@@ -19,9 +19,12 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , neurons_info[5]["off_time"]
             , neurons_info[5]["burst_freq"]
             , neurons_info[5]["not_burst_freq"]
-            , input_conf["cerebellum_ctrl"][0]
-            , input_conf["cerebellum_ctrl"][1]
-            , input_conf["cerebellum_ctrl"][2]
+            , input_conf["cerebellum_ctrl_a"][0]
+            , input_conf["cerebellum_ctrl_a"][1]
+            , input_conf["cerebellum_ctrl_a"][2]
+            , input_conf["cerebellum_ctrl_b"][0]
+            , input_conf["cerebellum_ctrl_b"][1]
+            , input_conf["cerebellum_ctrl_b"][2]
             , input_conf["_stim_a"]
             , input_conf["_stim_b"]
             , input_conf["_start_a"]
@@ -35,10 +38,18 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , input_conf["CIN"][0][4]
             , input_conf["CIN"][0][5]
             , input_conf["CIN"][0][6]
-            , steps #29
+            , input_conf["EIN"][0][0]
+            , input_conf["EIN"][0][1]
+            , input_conf["EIN"][0][2]
+            , input_conf["EIN"][0][3]
+            , input_conf["EIN"][0][4]
+            , input_conf["EIN"][0][5]
+            , input_conf["EIN"][0][6]
+            , steps #38
         )
+
     except KeyError:
-        to_write =  "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
             f.split("_")[0] #Save somewhere to save time, used multimple times #1
             , f.split("_")[1]
             , 3
@@ -51,9 +62,12 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , 0
             , 0
             , 0
-            , input_conf["cerebellum_ctrl"][0]
-            , input_conf["cerebellum_ctrl"][1]
-            , input_conf["cerebellum_ctrl"][2]
+            , input_conf["cerebellum_ctrl_a"][0]
+            , input_conf["cerebellum_ctrl_a"][1]
+            , input_conf["cerebellum_ctrl_a"][2]
+            , input_conf["cerebellum_ctrl_b"][0]
+            , input_conf["cerebellum_ctrl_b"][1]
+            , input_conf["cerebellum_ctrl_b"][2]
             , input_conf["_stim_a"]
             , input_conf["_stim_b"]
             , input_conf["_start_a"]
@@ -67,6 +81,13 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , input_conf["CIN"][0][4]
             , input_conf["CIN"][0][5]
             , input_conf["CIN"][0][6]
+            , input_conf["EIN"][0][0]
+            , input_conf["EIN"][0][1]
+            , input_conf["EIN"][0][2]
+            , input_conf["EIN"][0][3]
+            , input_conf["EIN"][0][4]
+            , input_conf["EIN"][0][5]
+            , input_conf["EIN"][0][6]
             , steps #29
         )
         cprint("Key error!","fail")
@@ -120,13 +141,15 @@ def main_loop(outputs, master_ip = False, in_data = False):
                     neuron_number +=1 
                     continue
 
-                split_range = (800, 3000)
-                
+                split_range = (False, False)
+
                 raw, thresholded = spikes.neuronSpikesToSquare(
-                    i
-                    , data["ran_steps"]
-                    , split_range = split_range)
-                off_time, on_time, osc = spikes.getFreq(thresholded, data["ran_steps"])
+                    i,
+                    data["ran_steps"],
+                    split_range=split_range)
+                
+                off_time, on_time, osc = spikes.getFreq(
+                    (raw, thresholded), data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, thresholded)
                                 
                 if not osc: #Not oscillating
@@ -145,7 +168,10 @@ def main_loop(outputs, master_ip = False, in_data = False):
                 neurons_info[neuron_number]["burst_freq"] = burst_freq
                 neuron_number += 1
                 
-        to_write = return_analysis_output(f, neurons_info, input_conf, data["ran_steps"])
+        to_write = return_analysis_output(f,
+                                          neurons_info,
+                                          input_conf,
+                                          data["ran_steps"])
         if not master_ip:
             #        is_folder("analysis") TODO: better dir organization
             save = open("ANALYSIS.csv", 'a')#We could open this before
@@ -156,6 +182,9 @@ def main_loop(outputs, master_ip = False, in_data = False):
 
 def info_print(total, core_number, print_only = False):
     from libs.IO import cprint
+    if not total:
+        cprint("No simulations to analyze, exiting")
+        exit()
     cprint("Total number of analysis to be run: %s" % (total), 'okblue')
     cprint("And we are going to use %s%s %s"
            %
@@ -165,7 +194,7 @@ def info_print(total, core_number, print_only = False):
                else "just " if core_number <= 2 \
                else ""
                , core_number
-               , "core" if core_number == 1 else "cores"
+               , "thread" if core_number == 1 else "threads"
            ) #Style again XD
            , 'okgreen' if core_number >= 4 \
            else 'okblue' if core_number >= 3 \
@@ -183,43 +212,43 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Offline analysis for\
      spiking neural networks')
     parser.add_argument('--history-dir',
-                        help = 'Path of the history dir'
-                        , dest = 'path'
-                        , default = "history"
+                        help='Path of the history dir'
+                        , dest='path'
+                        , default="history"
     )
     parser.add_argument('--start-from',
-                        help = 'Which file (loop) to start with'
-                        , dest = 'start_from'
-                        , default = 0
+                        help='Which file (loop) to start with'
+                        , dest='start_from'
+                        , default=0
     )
     parser.add_argument('--end-to',
-                        help = 'Which file (loop) to end with'
-                        , dest = 'end_to'
-                        , default = False
+                        help='Which file (loop) to end with'
+                        , dest='end_to'
+                        , default=False
     )
     parser.add_argument('--get-cycle-number',
-                        help = 'Return number of loops to be executed and exit'
-                        , dest = 'number_only'
-                        , default = False
-                        , action = 'store_true'
+                        help='Return number of loops to be executed and exit',
+                        dest='number_only',
+                        default=False,
+                        action='store_true'
     )
     parser.add_argument('--cores',
-                        help = 'Number of cores to use. Max if none set'
-                        , dest = 'core_number'
-                        , default = False
+                        help='Number of cores to use. Max if none set',
+                        dest='core_number',
+                        default=False
     )
     parser.add_argument('--save-spike-images',
-                        help = 'Generate spike images and saves them'
-                        , dest = 'save_images'
-                        , default = False
-                        , action = 'store_true'
+                        help='Generate spike images and saves them',
+                        dest='save_images',
+                        default=False,
+                        action='store_true'
     )
     parser.add_argument('--save-images-only',
-                        help = 'Save images (auto-enable save-spike-images if False).\
-                        Don\t run any other analysis'
-                        , dest = 'images_only'
-                        , default = False
-                        , action = 'store_true'
+                        help='Save images (auto-enable save-spike-images if False).\
+                        Don\t run any other analysis',
+                        dest='images_only',
+                        default=False,
+                        action='store_true'
     )
 
     args = parser.parse_args()

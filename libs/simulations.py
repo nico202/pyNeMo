@@ -13,13 +13,16 @@ Creates an object matching the input NeMo configuration
     def __init__(
             self,
             simulation,
-            (to_save, neuron_number)
+            (to_save, neuron_number),
+            save_membrane=False
     ):
         self.simulation = simulation
         self.to_save = to_save
         self.neuron_number = neuron_number
         self.fired_history = []
+        # Do it better
         self.membrane_history = {i: [] for i in self.to_save}
+        self.save_membrane = save_membrane
 
     def step(
             self,
@@ -35,11 +38,15 @@ Output: fired, membrane
         else:
             fired = list(self.simulation.step())
 
+        # Saving membrane
         #TODO: add option to disable membrane save (saves lot of time)
         #Appends are quite slow though
-        for neuron in self.to_save: #Save membrane potential
-            self.membrane_history[neuron].append(
-                self.simulation.get_membrane_potential(neuron))
+        if self.save_membrane:
+            for neuron in self.to_save: #Save membrane potential
+                self.membrane_history[neuron].append(
+                    self.simulation.get_membrane_potential(neuron))
+
+        # Saving spikes
         self.fired_history.append(fired)
 
         return fired
@@ -165,6 +172,7 @@ def main_simulation_run(
         , beta=0.1
         , non_linear_correction=False#"squared"#False to use linear
         , bypass_debug=False #Angle to force (debug function, bypasses ispike)
+        , save_membrane=False
 ):
     """
 This is the core of all pyNeMo
@@ -172,7 +180,7 @@ It's used to create all the Sims defined here, and calls them when needed
 taking care of passing the data from one sim to the other
     """
     #Import & configure varios plugins
-    nemo_simulation = NemoSimulation(nemo_sim, to_save)
+    nemo_simulation = NemoSimulation(nemo_sim, to_save, save_membrane)
     if yarp_robot:
         #FIXME: Don't use gazebo, yarp, pySpike if no sensory (no Robot)
         gazebo_simulation = GazeboSimulation()

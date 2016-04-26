@@ -100,6 +100,12 @@ def parse_args():
                         , default = True
                         , action = 'store_false'
     )
+    parser.add_argument('--save-membrane'
+                        , help = 'Save membrane data (SLOW!)'
+                        , dest = 'save_membrane'
+                        , default = False
+                        , action = 'store_true'
+    )
     parser.add_argument('--save-spikes'
                         , help = 'Save spikes images'
                         , dest = 'save_spikes'

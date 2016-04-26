@@ -19,7 +19,7 @@ from sys import argv, exit
 from libs.simulations import main_simulation_run
 from libs.IO import import_network
 
-print ("\n\n\n\n\n\n\n----------------")
+print ("\n\n\n----------------")
 
 name = False
 
@@ -103,8 +103,9 @@ is_folder("./commands")
 commands_file = "./commands/" + session_hash + "_commands"
 cprint ("Saving %s commands to file: %s" % (len(real_commands), commands_file), 'info')
 saveKey(commands_file, commands)
-cprint("Running in 5s", "warning")
-time.sleep(5)
+# Debug: re-enable in release
+# cprint("Running in 5s", "warning")
+# time.sleep(5)
 
 #Start
 is_folder (output_dir)
@@ -236,6 +237,7 @@ for com in real_commands:
             , (nemo_simulation, (to_save, neuron_number), stimuli_dict) #L1
             , (robot) #L2
             , (sensory_neurons_in, sensory_neurons_out) #L3
+            , save_membrane=args.save_membrane
         )
         nemo_end_time = time.time()
         cprint("NeMo speedup: %s" % (output["ran_steps"]/((nemo_end_time - nemo_start_time)*1000)), 'okgreen', True)

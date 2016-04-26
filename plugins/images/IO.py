@@ -61,8 +61,8 @@ def ImageFromSpikes(input_spikes,
     del spikes
     del input_spikes
     # Debug code
-    from subprocess import call
-    call(["feh", file_path])
+    # from subprocess import call
+    # call(["feh", file_path])
     return True
 
 def ImageFromMembranes(all_membranes):

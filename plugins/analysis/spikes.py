@@ -8,19 +8,18 @@ import numpy as np
 def neuronSpikesToSquare(
         spikes,
         steps=False,
-        time_window=40,
+        time_window=15,
         threshold=.05,
         split_range=(False, False) #Limit analysis on subset
 ):
     #TODO: check (debugging)
     if not steps:
-        steps = len(spikes)
+        steps = spikes[-1]
     #TODO: use split_range to allow multiple analysis contemporarily
     start = split_range[0]
-    end = split_range[1] if split_range[1] else len(spikes)
+    end = split_range[1] if split_range[1] else spikes[-1]
     if split_range[0] or split_range[1]:
         steps = split_range[1]-split_range[0]
-
     spikes = np.asarray(spikes)
     spikes = spikes[(spikes > start) & (spikes < end)]
     raw, data = runningMean(spikes, time_window, steps)
@@ -43,7 +42,7 @@ Input: serie - the data to analyze
     """
     import pandas as pd
     if not steps:
-        steps = len(serie)
+        steps = serie[-1]
     spike_series = []
     prev = 0
     #TODO: speed this up (numpy)
@@ -58,9 +57,9 @@ Input: serie - the data to analyze
     #    pd.rolling_mean(np.array(spike_series), window)
     return spike_series, pd.Series(spike_series).rolling(window=window).mean()
 
-def getFreq(seq, period=True):
+def getFreq((raw, tresholded), period=True):
     from collections import Counter
-    seq=seq[1]
+    seq = tresholded #
     state = [[], []]#0 = off, 1 = on
     last_state = seq[0]
     last_change = 0
@@ -72,7 +71,6 @@ def getFreq(seq, period=True):
             last_state = frame
         i += 1
     state[last_state].append(i - last_change)
-
     off_period = Counter(state[0])
     on_period = Counter(state[1])
     try:
@@ -90,18 +88,30 @@ def getFreq(seq, period=True):
         except IndexError:
             print "DEBUG ME"
             raise
-#            exit()
         if period:
             return off_period_mode, on_period_mode, True
         else:
             return 1000./off_period_mode, 1000./on_period_mode, True
     else: #Not oscillating. Mode (on/off) = max (state[0], state[1])
-        try:
-            off_state = max(state[0])
-        except ValueError:
-            off_state = 0
-        try:
-            on_state = max(state[1])
-        except ValueError:
-            on_state = 0
-        return off_state, on_state, False
+        # Get the mean excluding max and mean value
+        # If len = 1 -> - X / - 2  -> X :D
+        broken = False
+        if type(state[1] != bool):
+            broken = True
+        if not broken and len(state[1] != 2):
+            on_state = (sum(state[1]) - max(state[1]) - min(state[1])) / (len(state[1]) - 2)
+        else:
+            broken = True
+        if not broken and len(state[0] != 2):
+            off_state = (sum(state[0]) - max(state[0]) - min(state[0])) / (len(state[0]) - 2)
+            return off_state, on_state, True
+        else:
+            try:
+                off_state = max(state[0])
+            except ValueError:
+                off_state = 0
+            try:
+                on_state = max(state[1])
+            except ValueError:
+                on_state = 0
+            return off_state, on_state, False

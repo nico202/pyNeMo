@@ -38,7 +38,7 @@ if __name__ == "__main__":
     #Parse args
     args = parser.parse_args()
 
-    #Load all the parameters (choose if/when read from CLI/config.py)
+sa    #Load all the parameters (choose if/when read from CLI/config.py)
     use_config = True if os.path.isfile("config.py") else False
     if use_config:
         import config
@@ -151,6 +151,7 @@ if __name__ == "__main__":
            , sensory_neurons_out)
         , simple_feedback=args.simple_feedback
         , bypass_debug=float(args.bypass_debug)
+        , args.save_membrane
     )
 
     #Get the total run time
@@ -213,7 +214,6 @@ if args.analyze_spikes_frequency: #TODO: write all conditions etc
     from plugins.analysis import spikes
     from plugins.importer import spikesDictToArray
     neuron_number = 0
-    print len(spikesDictToArray(output["NeMo"][1]))
     for i in spikesDictToArray(output["NeMo"][1]):
 #        print "ANALYSIS not working yet"
         #Fixme: changed function names, doesn't match anymore

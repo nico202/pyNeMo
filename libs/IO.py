@@ -205,10 +205,10 @@ def saveKey(filename,
         return False
 
 def hashIt(module): #We use this to check if configuration changed
-    import hashlib
+    import hashlib #Benchmarked: hashlib.sha1, hashlib.sha256, hashlib.md5
+    #hashlib.sha1 is the fastest
     key_string = str({key: value for key, value in module.__dict__.iteritems()
                       if not (key.startswith('__') or key.startswith('_'))})
-
     return key_string, str(hashlib.sha1(key_string).hexdigest())
 
 def hashDict(dictionary):
