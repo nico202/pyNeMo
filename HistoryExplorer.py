@@ -6,7 +6,7 @@ from libs.multiProcess import dispatch_jobs, get_cores
 
 def return_analysis_output(f, neurons_info, input_conf, steps):
     try:
-        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
             f.split("_")[0] #Save somewhere to save time, used multimple times #1
             , f.split("_")[1]
             , neurons_info[4]["mode"]
@@ -45,11 +45,23 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , input_conf["EIN"][0][4]
             , input_conf["EIN"][0][5]
             , input_conf["EIN"][0][6]
+            , input_conf["synapses"][0][2][0] #delay
+            , input_conf["synapses"][0][2][1] #int
+            , input_conf["synapses"][1][2][0] #delay
+            , input_conf["synapses"][1][2][1] #int
+            , input_conf["synapses"][2][2][0] #delay
+            , input_conf["synapses"][2][2][1] #int
+            , input_conf["synapses"][3][2][0] #delay
+            , input_conf["synapses"][3][2][1] #int
+            , input_conf["synapses"][4][2][0] #delay
+            , input_conf["synapses"][4][2][1] #int
+            , input_conf["synapses"][5][2][0] #delay
+            , input_conf["synapses"][5][2][1] #int            
             , steps #38
         )
 
     except KeyError:
-        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
+        to_write = "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" % (
             f.split("_")[0] #Save somewhere to save time, used multimple times #1
             , f.split("_")[1]
             , 3
@@ -88,12 +100,24 @@ def return_analysis_output(f, neurons_info, input_conf, steps):
             , input_conf["EIN"][0][4]
             , input_conf["EIN"][0][5]
             , input_conf["EIN"][0][6]
+            , input_conf["synapses"][0][2][0] #delay
+            , input_conf["synapses"][0][2][1] #int
+            , input_conf["synapses"][1][2][0] #delay
+            , input_conf["synapses"][1][2][1] #int
+            , input_conf["synapses"][2][2][0] #delay
+            , input_conf["synapses"][2][2][1] #int
+            , input_conf["synapses"][3][2][0] #delay
+            , input_conf["synapses"][3][2][1] #int
+            , input_conf["synapses"][4][2][0] #delay
+            , input_conf["synapses"][4][2][1] #int
+            , input_conf["synapses"][5][2][0] #delay
+            , input_conf["synapses"][5][2][1] #int
             , steps #29
         )
         cprint("Key error!","fail")
     return to_write
 
-def main_loop(outputs, master_ip = False, in_data = False):
+def main_loop(outputs, master_ip = False, in_data = False, split_range = (False, False)):
     from plugins.analysis import spikes
     from plugins.importer import spikesDictToArray
     #???? Depends on kind of analysis, what to do??
@@ -141,14 +165,12 @@ def main_loop(outputs, master_ip = False, in_data = False):
                     neuron_number +=1 
                     continue
 
-                split_range = (False, False)
-
                 raw, thresholded = spikes.neuronSpikesToSquare(
                     i,
                     data["ran_steps"],
                     split_range=split_range)
                 
-                off_time, on_time, osc = spikes.getFreq(
+                off_time, on_time, osc, periods = spikes.getFreq(
                     (raw, thresholded), data["ran_steps"])
                 not_burst_freq, burst_freq = spikes.getBurstFreq(raw, thresholded)
                                 
@@ -167,11 +189,20 @@ def main_loop(outputs, master_ip = False, in_data = False):
                 neurons_info[neuron_number]["not_burst_freq"] = not_burst_freq
                 neurons_info[neuron_number]["burst_freq"] = burst_freq
                 neuron_number += 1
-                
+
         to_write = return_analysis_output(f,
                                           neurons_info,
                                           input_conf,
                                           data["ran_steps"])
+
+        general_config, config_hash = f.split("_")[0:2]
+        with open("ANALYSIS_period.csv", 'a') as filewriter:
+            for on, p in enumerate(periods):
+                for l in p.items():
+                    filewriter.write("%s,%s,%s,%s,%s\n" % (
+                        general_config, config_hash,
+                        l[0], l[1], on))
+
         if not master_ip:
             #        is_folder("analysis") TODO: better dir organization
             save = open("ANALYSIS.csv", 'a')#We could open this before
@@ -207,7 +238,6 @@ def info_print(total, core_number, print_only = False):
         
 if __name__ == "__main__":
     import argparse
-    from sys import exit
 
     parser = argparse.ArgumentParser(description='Offline analysis for\
      spiking neural networks')
@@ -250,6 +280,18 @@ if __name__ == "__main__":
                         default=False,
                         action='store_true'
     )
+    parser.add_argument('--start-ms',
+                        help='Start analysis at this ms. Start from 0 if none given\
+                        Don\t run any other analysis',
+                        dest='start_ms',
+                        default=False
+    )
+    parser.add_argument('--stop-ms',
+                        help='Stop analysis at this ms. Stop to 0 if none given\
+                        Don\t run any other analysis',
+                        dest='end_ms',
+                        default=False
+    )
 
     args = parser.parse_args()
 
@@ -263,10 +305,11 @@ if __name__ == "__main__":
     end_to = int(args.end_to)
     
     outputs, total = list_all(path, start_from, end_to)
-    
+
+    split_range = (args.start_ms, args.end_ms)
     #Update index
     loop = start_from - 1 if start_from else 0
 
     info_print(total, core_number, args.number_only)
 
-    dispatch_jobs(outputs, core_number, main_loop)
+    dispatch_jobs(outputs, core_number, main_loop, split_range=split_range)

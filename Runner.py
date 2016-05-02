@@ -38,7 +38,7 @@ if __name__ == "__main__":
     #Parse args
     args = parser.parse_args()
 
-sa    #Load all the parameters (choose if/when read from CLI/config.py)
+    #Load all the parameters (choose if/when read from CLI/config.py)
     use_config = True if os.path.isfile("config.py") else False
     if use_config:
         import config
@@ -219,6 +219,10 @@ if args.analyze_spikes_frequency: #TODO: write all conditions etc
         #Fixme: changed function names, doesn't match anymore
         freq = spikes.getFreq(spikes.neuronSpikesToSquare(i, split_range=(5000, 30000)))
         duty_cycle = float(freq[1]) / (freq[0] + freq[1])
+        # for on, p in enumerate(freq[3]):
+        #     for l in p.items():
+        #         f.write("%s,%s,%s\n" % (l[0], l[1], on))
+
         if freq:
             print ("Neuron: %s, duty cycle: %f, osc-freq: %f"
                    %

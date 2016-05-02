@@ -4,7 +4,7 @@
 def chunks(l, n):
     return [l[i:i+n] for i in range(0, len(l), n)]
 
-def dispatch_jobs(data, job_number, function, remote = False, in_data = False):
+def dispatch_jobs(data, job_number, function, remote=False, in_data=False, split_range=(False,False)):
     import multiprocessing
     total = len(data)
     chunk_size = total / job_number or total
@@ -13,7 +13,7 @@ def dispatch_jobs(data, job_number, function, remote = False, in_data = False):
     jobs = []
 
     for s in _slice:
-        j = multiprocessing.Process(target=function, args=(s, remote, in_data))
+        j = multiprocessing.Process(target=function, args=(s, remote, in_data, split_range))
         jobs.append(j)
 
     for j in jobs:

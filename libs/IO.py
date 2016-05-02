@@ -363,7 +363,8 @@ def list_all(path, start_from, end_to):
 
 def ask(msg
         , exit_msg="Change your cli params then!"
-        , sure="Are you sure? [y/n]"):
+        , sure="Are you sure? [y/n]"
+):
     action = "z"
     while action.capitalize() not in ["Y", "N"]:
         action = raw_input(msg + "\n" + sure +": ")

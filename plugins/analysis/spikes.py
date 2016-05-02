@@ -4,6 +4,7 @@ This module provides function useful to analyze spike sequences
 """
 #Import modules needed for all
 import numpy as np
+from collections import Counter
 
 def neuronSpikesToSquare(
         spikes,
@@ -58,7 +59,6 @@ Input: serie - the data to analyze
     return spike_series, pd.Series(spike_series).rolling(window=window).mean()
 
 def getFreq((raw, tresholded), period=True):
-    from collections import Counter
     seq = tresholded #
     state = [[], []]#0 = off, 1 = on
     last_state = seq[0]
@@ -71,14 +71,20 @@ def getFreq((raw, tresholded), period=True):
             last_state = frame
         i += 1
     state[last_state].append(i - last_change)
+    periods = [[], []]
     off_period = Counter(state[0])
     on_period = Counter(state[1])
+    periods[0] = Counter(state[0])
+    periods[1] = Counter(state[1])
+
+    state_write = 0
+
     try:
-        off_sample = off_period.most_common(1)[0][1]
+        off_sample = periods[0].most_common(1)[0][1]
     except IndexError:
         off_sample = 0
     try:
-        on_sample = on_period.most_common(1)[0][1]
+        on_sample = periods[1].most_common(1)[0][1]
     except IndexError:
         on_sample = 0
     if (on_sample > 1) and (off_sample > 1):
@@ -89,9 +95,9 @@ def getFreq((raw, tresholded), period=True):
             print "DEBUG ME"
             raise
         if period:
-            return off_period_mode, on_period_mode, True
+            return off_period_mode, on_period_mode, True, periods
         else:
-            return 1000./off_period_mode, 1000./on_period_mode, True
+            return 1000./off_period_mode, 1000./on_period_mode, True, periods
     else: #Not oscillating. Mode (on/off) = max (state[0], state[1])
         # Get the mean excluding max and mean value
         # If len = 1 -> - X / - 2  -> X :D
@@ -104,7 +110,7 @@ def getFreq((raw, tresholded), period=True):
             broken = True
         if not broken and len(state[0] != 2):
             off_state = (sum(state[0]) - max(state[0]) - min(state[0])) / (len(state[0]) - 2)
-            return off_state, on_state, True
+            return off_state, on_state, True, periods
         else:
             try:
                 off_state = max(state[0])
@@ -114,4 +120,4 @@ def getFreq((raw, tresholded), period=True):
                 on_state = max(state[1])
             except ValueError:
                 on_state = 0
-            return off_state, on_state, False
+            return off_state, on_state, False, periods

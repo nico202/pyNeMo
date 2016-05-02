@@ -19,11 +19,22 @@ with import <nixpkgs> {};
          python27Packages.tkinter
          python27Packages.pyflakes
          python27Full
+         cmake
 	 yarp
+         curl #julia-gtk
+         llvm
+         clang
+         glib
+         julia
          #Enable image show
          imagemagick
          ( pkgs.callPackage ./yarp-python { })
          ];
       src = null;
+      shellHook = ''
+       unset http_proxy
+      export SSL_CERT_FILE=/etc/ssl/certs/ca-bundle.crt
+      export GIT_SSL_CAINFO=/etc/ssl/certs/ca-bundle.crt
+      '';
     }
 

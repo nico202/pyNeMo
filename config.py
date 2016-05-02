@@ -13,7 +13,7 @@ HISTORY_DIR = "./history"
 #Try to use the CUDA? Fallback to CPU if fails
 #Force one or the other with --cpu/--cuda
 #CUDA_BACKEND is the cuda processor to be used
-TRY_CUDA = False
+TRY_CUDA = True
 CUDA_BACKEND = 0
 
 #Batch config:
